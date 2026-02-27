@@ -85,6 +85,9 @@ const vendorBillSchema = new mongoose.Schema({
   // Visiting Charges
   visitingCharges: { type: Number, default: 0 },
 
+  // Transport Charges
+  transportCharges: { type: Number, default: 0 },
+
   // GST breakdown
   originalGST: { type: Number, default: 0 },
   vendorServiceGST: { type: Number, default: 0 },

@@ -49,6 +49,7 @@ const BillingPage = () => {
   const [selectedServices, setSelectedServices] = useState([]);
   const [selectedParts, setSelectedParts] = useState([]);
   const [customItems, setCustomItems] = useState([]);
+  const [transportCharges, setTransportCharges] = useState(0);
 
   // Search
   const [serviceSearch, setServiceSearch] = useState('');
@@ -83,7 +84,7 @@ const BillingPage = () => {
   // Save draft data
   useEffect(() => {
     if (id && !loading) {
-      const data = { selectedServices, selectedParts, customItems };
+      const data = { selectedServices, selectedParts, customItems, transportCharges };
       localStorage.setItem(`billing_data_${id}`, JSON.stringify(data));
     }
   }, [id, selectedServices, selectedParts, customItems, loading]);
@@ -120,6 +121,7 @@ const BillingPage = () => {
           setSelectedServices(parsed.selectedServices || []);
           setSelectedParts(parsed.selectedParts || []);
           setCustomItems(parsed.customItems || []);
+          setTransportCharges(parsed.transportCharges || 0);
           hasDraft = true;
         } catch (e) {
           console.error('Error parsing draft:', e);
@@ -136,6 +138,7 @@ const BillingPage = () => {
           setSelectedServices((billRes.bill.services || []).filter(s => !s.isOriginal));
           setSelectedParts(billRes.bill.parts || []);
           setCustomItems(billRes.bill.customItems || []);
+          setTransportCharges(billRes.bill.transportCharges || 0);
         }
 
         if (billRes.bill.payoutConfig) {
@@ -156,9 +159,10 @@ const BillingPage = () => {
         };
 
         let reachedStep = 1;
-        if (currentData.customItems?.length > 0) reachedStep = 4;
-        else if (currentData.selectedParts?.length > 0) reachedStep = 3;
-        else if (currentData.selectedServices?.length > 0) reachedStep = 2;
+        if (currentData.transportCharges > 0) reachedStep = 4;
+        else if (currentData.customItems?.length > 0) reachedStep = 3;
+        else if (currentData.selectedParts?.length > 0) reachedStep = 2;
+        else if (currentData.selectedServices?.length > 0) reachedStep = 1;
 
         setMaxStep(prev => Math.max(prev, reachedStep));
       } else if (!hasDraft) {
@@ -351,13 +355,14 @@ const BillingPage = () => {
 
     // Visiting Charges
     const visitingCharges = Number(booking.visitingCharges) || 0;
+    const finalTransportCharges = Number(transportCharges) || 0;
 
     const totalServiceBase = originalBase + extraServiceBase;
     const totalServiceGST = originalServiceGST + extraServiceGST;
     const totalPartsBase = partsBase + customBase;
     const totalPartsGST = partsGST + customGST;
 
-    const finalBillAmount = parseFloat(((totalServiceBase + totalServiceGST) + (totalPartsBase + totalPartsGST) + visitingCharges).toFixed(2));
+    const finalBillAmount = parseFloat(((totalServiceBase + totalServiceGST) + (totalPartsBase + totalPartsGST) + visitingCharges + finalTransportCharges).toFixed(2));
 
     // Vendor Earnings estimate
     const vendorServiceEarnings = parseFloat(((totalServiceBase * servicePayoutPct) / 100).toFixed(2));
@@ -374,6 +379,7 @@ const BillingPage = () => {
       totalPartsGST,
       totalGST: parseFloat((totalServiceGST + totalPartsGST).toFixed(2)),
       visitingCharges,
+      transportCharges: finalTransportCharges,
       finalBillAmount,
       totalVendorEarnings,
       vendorServiceEarnings,
@@ -381,7 +387,7 @@ const BillingPage = () => {
       servicePayoutPct,
       partsPayoutPct
     };
-  }, [booking, selectedServices, selectedParts, customItems, payoutSettings]);
+  }, [booking, selectedServices, selectedParts, customItems, transportCharges, payoutSettings]);
 
 
   const handleSubmit = async () => {
@@ -390,7 +396,8 @@ const BillingPage = () => {
       const res = await vendorBillService.createOrUpdateBill(id, {
         services: selectedServices,
         parts: selectedParts,
-        customItems
+        customItems,
+        transportCharges
       });
 
       if (res.success) {
@@ -417,7 +424,8 @@ const BillingPage = () => {
       await vendorBillService.createOrUpdateBill(id, {
         services: selectedServices,
         parts: selectedParts,
-        customItems
+        customItems,
+        transportCharges
       });
 
       const res = await vendorWalletService.initiateCashCollection(
@@ -652,7 +660,8 @@ const BillingPage = () => {
             { id: 1, label: 'Services', icon: FiTool },
             { id: 2, label: 'Parts', icon: FiPackage },
             { id: 3, label: 'Extras', icon: FiPlus },
-            { id: 4, label: 'Review', icon: FiFileText }
+            { id: 4, label: 'Transport', icon: FiPackage },
+            { id: 5, label: 'Review', icon: FiFileText }
           ].map((step) => {
             const isCompleted = step.id < currentStep;
             const isActive = step.id === currentStep;
@@ -669,7 +678,7 @@ const BillingPage = () => {
             );
           })}
           <div className="absolute top-8 left-0 right-0 h-0.5 bg-gray-200 -z-0 mx-8">
-            <div className="h-full bg-blue-600 transition-all duration-300" style={{ width: `${((maxStep - 1) / 3) * 100}%` }}></div>
+            <div className="h-full bg-blue-600 transition-all duration-300" style={{ width: `${((maxStep - 1) / 4) * 100}%` }}></div>
           </div>
         </div>
       </div>
@@ -833,7 +842,33 @@ const BillingPage = () => {
           </div>
         )}
 
-        {currentStep === 4 && calculations && (
+        {currentStep === 4 && (
+          <div className="animate-in fade-in slide-in-from-right-4">
+            <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col items-center text-center">
+              <div className="w-16 h-16 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center mb-4">
+                <FiPackage className="w-8 h-8" />
+              </div>
+              <h3 className="text-xl font-bold text-gray-800 mb-2">Transport Charges</h3>
+              <p className="text-sm text-gray-500 mb-6">Enter any additional transportation or travel costs for this service.</p>
+
+              <div className="w-full max-w-xs relative text-left">
+                <label className="text-[10px] font-bold text-gray-400 uppercase ml-1 mb-1 block">Amount (₹)</label>
+                <div className="relative">
+                  <span className="absolute left-4 top-1/2 -translate-y-1/2 font-bold text-gray-400">₹</span>
+                  <input
+                    type="number"
+                    placeholder="0"
+                    value={transportCharges || ''}
+                    onChange={e => setTransportCharges(Number(e.target.value))}
+                    className="w-full bg-gray-50 border border-gray-100 rounded-xl pl-8 pr-4 py-4 text-xl font-black outline-none focus:ring-2 focus:ring-blue-500/20 text-gray-900"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {currentStep === 5 && calculations && (
           <div className="animate-in fade-in slide-in-from-right-4 pb-10">
             <div className="bg-white rounded-3xl overflow-hidden shadow-xl border border-gray-100 mb-6">
               <div className="bg-gray-900 px-6 py-6 text-white text-center">
@@ -905,6 +940,19 @@ const BillingPage = () => {
                     </div>
                   </div>
                 )}
+
+                {transportCharges > 0 && (
+                  <div>
+                    <h4 className="font-bold text-gray-900 flex items-center gap-2 mb-2 pb-2 border-b border-gray-100">
+                      <span className="w-6 h-6 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center text-xs"><FiPackage /></span>
+                      Transport Charges
+                    </h4>
+                    <div className="flex justify-between text-sm pl-2 font-bold text-gray-800">
+                      <span>Transport Price</span>
+                      <span>₹{Number(transportCharges).toFixed(2)}</span>
+                    </div>
+                  </div>
+                )}
               </div>
               {/* Earnings Footer - ONLY SHOW WHEN COMPLETED */}
               {booking.status === 'completed' ? (
@@ -959,14 +1007,22 @@ const BillingPage = () => {
           <>
             <button onClick={() => setCurrentStep(2)} className="flex-1 py-3 text-gray-600 font-bold bg-white border border-gray-200 rounded-xl">Back</button>
             <button onClick={() => setCurrentStep(4)} className="flex-[2] py-3.5 bg-gray-900 text-white font-bold rounded-xl flex items-center justify-center gap-2 shadow-lg">
-              Next: Final Review <FiArrowRight />
+              Next: Transport <FiArrowRight />
             </button>
           </>
         )}
         {currentStep === 4 && (
           <>
+            <button onClick={() => setCurrentStep(3)} className="flex-1 py-3 text-gray-600 font-bold bg-white border border-gray-200 rounded-xl">Back</button>
+            <button onClick={() => setCurrentStep(5)} className="flex-[2] py-3.5 bg-gray-900 text-white font-bold rounded-xl flex items-center justify-center gap-2 shadow-lg">
+              Next: Final Review <FiArrowRight />
+            </button>
+          </>
+        )}
+        {currentStep === 5 && (
+          <>
             <button
-              onClick={() => setCurrentStep(3)}
+              onClick={() => setCurrentStep(4)}
               disabled={submitting || otpLoading}
               className="flex-1 py-3 text-gray-600 font-bold bg-white border border-gray-200 rounded-xl disabled:opacity-50"
             >

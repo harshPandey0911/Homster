@@ -21,7 +21,7 @@ const { BILL_STATUS } = require('../../utils/constants');
 const createOrUpdateBill = async (req, res) => {
   try {
     const { bookingId } = req.params;
-    const { services, parts, customItems } = req.body;
+    const { services, parts, customItems, transportCharges } = req.body;
     const vendorId = req.user.id;
 
     const booking = await Booking.findById(bookingId);
@@ -161,7 +161,8 @@ const createOrUpdateBill = async (req, res) => {
     totalPartsBase = parseFloat(totalPartsBase.toFixed(2));
 
     const totalGST = parseFloat((originalGST + vendorServiceGST + partsGST).toFixed(2));
-    const grandTotal = parseFloat((totalServiceBase + totalPartsBase + totalGST + visitingCharges).toFixed(2));
+    const finalTransportCharges = Number(transportCharges) || 0;
+    const grandTotal = parseFloat((totalServiceBase + totalPartsBase + totalGST + visitingCharges + finalTransportCharges).toFixed(2));
 
     // ═══════════════════════════════════════
     // 5. REVENUE SPLIT (% applied on BASE only)
@@ -206,6 +207,7 @@ const createOrUpdateBill = async (req, res) => {
       partsGST: parseFloat(partsGST.toFixed(2)),
       totalGST,
       visitingCharges,
+      transportCharges: finalTransportCharges,
       grandTotal,
       payoutConfig: {
         serviceSplitPercentage: serviceSplitPct,
