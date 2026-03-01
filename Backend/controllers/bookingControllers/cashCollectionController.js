@@ -133,6 +133,21 @@ exports.confirmCashCollection = async (req, res) => {
       }
     }
 
+    // --- ATOMIC LOCK AGAINST RACE CONDITIONS ---
+    const updateResult = await Booking.updateOne(
+      { _id: booking._id, cashCollected: { $ne: true } },
+      { $set: { cashCollected: true } }
+    );
+
+    if (updateResult.modifiedCount === 0) {
+      console.log(`[Race Condition Prevented] Booking ${booking._id} already processed.`);
+      return res.status(200).json({
+        success: true,
+        message: 'Cash collection already confirmed',
+        data: { bookingId: booking._id }
+      });
+    }
+
     const collectionAmount = amount || booking.finalAmount;
 
     // Store extra items in workDoneDetails (for display)

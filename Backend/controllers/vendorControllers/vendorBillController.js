@@ -273,7 +273,9 @@ const getBillByBookingId = async (req, res) => {
     const bill = await VendorBill.findOne({ bookingId }).populate('services.catalogId parts.catalogId');
 
     if (!bill) {
-      return res.status(404).json({ success: false, message: 'Bill not found' });
+      // Return 200 instead of 404 to gracefully tell the frontend that a bill is not yet created
+      // This prevents Ugly `404 (Not Found)` network errors in the console from Axios on page load
+      return res.status(200).json({ success: true, bill: null, message: 'Bill not found' });
     }
 
     res.status(200).json({ success: true, bill });

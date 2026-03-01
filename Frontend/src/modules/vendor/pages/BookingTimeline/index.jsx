@@ -16,7 +16,6 @@ const BookingTimeline = () => {
   const [booking, setBooking] = useState(null);
   const [currentStage, setCurrentStage] = useState(1);
   const [isVisitModalOpen, setIsVisitModalOpen] = useState(false);
-  const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
   const [isWorkDoneModalOpen, setIsWorkDoneModalOpen] = useState(false);
   const [otpInput, setOtpInput] = useState(['', '', '', '']);
   const [actionLoading, setActionLoading] = useState(false);
@@ -119,11 +118,10 @@ const BookingTimeline = () => {
 
   // Handle modal closing if payment is detected
   useEffect(() => {
-    if (booking?.paymentStatus === 'SUCCESS' && isPaymentModalOpen) {
-      setIsPaymentModalOpen(false);
-      toast.success('Online Payment Received!');
+    if (booking?.paymentStatus === 'SUCCESS') {
+      // payment was successful
     }
-  }, [booking?.paymentStatus, isPaymentModalOpen]);
+  }, [booking?.paymentStatus]);
 
   /* Handlers */
   const handleWorkerPayment = async () => {
@@ -248,37 +246,6 @@ const BookingTimeline = () => {
     }
   };
 
-  const handleInitiateOTP = async (totalAmount, extraItems = []) => {
-    try {
-      setActionLoading(true);
-      const res = await vendorWalletService.initiateCashCollection(id, totalAmount, extraItems);
-      return res;
-    } catch (err) {
-      console.error('Initiate cash error:', err);
-      throw err;
-    } finally {
-      setActionLoading(false);
-    }
-  };
-
-  const handleCollectCash = async (totalAmount, extraItems, otp) => {
-    try {
-      setActionLoading(true);
-      const res = await vendorWalletService.confirmCashCollection(id, totalAmount, otp, extraItems);
-      if (res.success) {
-        toast.success('Collection successful!');
-        window.location.reload();
-      } else {
-        throw new Error(res.message);
-      }
-    } catch (err) {
-      console.error('Confirm cash error:', err);
-      throw err;
-    } finally {
-      setActionLoading(false);
-    }
-  };
-
   const timelineStages = [
     {
       id: 1,
@@ -330,7 +297,7 @@ const BookingTimeline = () => {
         if (booking?.status === 'completed' || booking?.status === 'COMPLETED' || booking?.paymentStatus === 'SUCCESS' || booking?.paymentStatus === 'paid') return null;
 
         if (booking?.isSelfJob && currentStage === 7) {
-          return () => setIsPaymentModalOpen(true);
+          return () => navigate(`/vendor/booking/${id}/billing`);
         }
 
         if (!booking?.isSelfJob && currentStage === 7) {
@@ -565,16 +532,6 @@ const BookingTimeline = () => {
         onClose={() => setIsWorkDoneModalOpen(false)}
         job={booking}
         onComplete={handleCompleteWork}
-        loading={actionLoading}
-      />
-
-      {/* Unified Cash Collection Modal */}
-      <CashCollectionModal
-        isOpen={isPaymentModalOpen}
-        onClose={() => setIsPaymentModalOpen(false)}
-        booking={booking}
-        onInitiateOTP={handleInitiateOTP}
-        onConfirm={handleCollectCash}
         loading={actionLoading}
       />
 

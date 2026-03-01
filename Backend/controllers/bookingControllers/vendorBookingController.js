@@ -1103,7 +1103,7 @@ const completeSelfJob = async (req, res) => {
       userId: booking.userId,
       type: 'work_completed',
       title: 'Work Completed & Bill Ready',
-      message: `Work finished! Your total bill is ₹${grandTotal}. Please review and confirm.`,
+      message: `Work finished!  Please wait for the bill expert is preparing !`,
       relatedId: booking._id,
       relatedType: 'booking',
       priority: 'high',

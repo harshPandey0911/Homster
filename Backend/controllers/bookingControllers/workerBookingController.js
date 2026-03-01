@@ -466,7 +466,7 @@ const completeJob = async (req, res) => {
       userId: booking.userId,
       type: 'work_completed',
       title: 'Work Completed',
-      message: `Work finished! Your professional is preparing the final bill.`,
+      message: `Work finished!  Please wait for the bill expert is preparing !`,
       relatedId: booking._id,
       relatedType: 'booking',
       priority: 'high',

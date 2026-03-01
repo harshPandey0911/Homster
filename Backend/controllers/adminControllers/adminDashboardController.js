@@ -19,7 +19,9 @@ const getDashboardStats = async (req, res) => {
     const totalBookings = await Booking.countDocuments();
 
     // Booking stats
-    const pendingBookings = await Booking.countDocuments({ status: BOOKING_STATUS.PENDING });
+    const pendingBookings = await Booking.countDocuments({
+      status: { $nin: [BOOKING_STATUS.COMPLETED, BOOKING_STATUS.CANCELLED] }
+    });
     const completedBookings = await Booking.countDocuments({ status: BOOKING_STATUS.COMPLETED });
     const cancelledBookings = await Booking.countDocuments({ status: BOOKING_STATUS.CANCELLED });
 
@@ -28,7 +30,7 @@ const getDashboardStats = async (req, res) => {
       {
         $match: {
           status: BOOKING_STATUS.COMPLETED,
-          paymentStatus: PAYMENT_STATUS.SUCCESS
+          paymentStatus: { $in: [PAYMENT_STATUS.SUCCESS, PAYMENT_STATUS.COLLECTED_BY_VENDOR, 'success', 'collected_by_vendor', 'collected_by_worker', 'paid'] }
         }
       },
       {
@@ -53,12 +55,27 @@ const getDashboardStats = async (req, res) => {
     const pendingScraps = await Scrap.countDocuments({ status: 'pending' });
 
     // Recent activities (last 10 bookings)
-    const recentBookings = await Booking.find()
+    const recentActivityDocs = await Booking.find()
       .populate('userId', 'name phone')
       .populate('vendorId', 'name businessName')
       .populate('serviceId', 'title')
       .sort({ createdAt: -1 })
       .limit(10);
+
+    const recentBookings = recentActivityDocs.map(b => ({
+      id: b.bookingNumber || b._id,
+      _id: b._id,
+      status: b.status,
+      user: { name: b.userId?.name || 'Customer' },
+      serviceType: b.serviceId?.title || b.serviceName,
+      price: b.finalAmount || b.basePrice || 0,
+      createdAt: b.createdAt,
+      acceptedAt: b.acceptedAt,
+      assignedAt: b.assignedAt,
+      visitedAt: b.visitedAt,
+      completedAt: b.completedAt,
+      workerPaymentStatus: b.workerPaymentStatus
+    }));
 
     res.status(200).json({
       success: true,
@@ -119,7 +136,7 @@ const getRevenueAnalytics = async (req, res) => {
       {
         $match: {
           status: BOOKING_STATUS.COMPLETED,
-          paymentStatus: PAYMENT_STATUS.SUCCESS,
+          paymentStatus: { $in: [PAYMENT_STATUS.SUCCESS, PAYMENT_STATUS.COLLECTED_BY_VENDOR, 'success', 'collected_by_vendor', 'collected_by_worker', 'paid'] },
           ...dateFilter
         }
       },

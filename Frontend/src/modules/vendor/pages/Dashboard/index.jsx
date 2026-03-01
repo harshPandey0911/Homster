@@ -48,7 +48,7 @@ const Dashboard = memo(() => {
   const [pendingBookings, setPendingBookings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [activeAlertBooking, setActiveAlertBooking] = useState(null);
+  const [activeAlertBookings, setActiveAlertBookings] = useState([]);
 
   const ignoredBookingIds = useRef(new Set());
 
@@ -230,7 +230,10 @@ const Dashboard = memo(() => {
     const handleShowAlert = (e) => {
       // e.detail contains the new booking job
       if (e.detail) {
-        setActiveAlertBooking(e.detail);
+        setActiveAlertBookings(prev => {
+          if (prev.find(b => String(b.id || b._id) === String(e.detail.id || e.detail._id))) return prev;
+          return [e.detail, ...prev];
+        });
         // Also add to pending if not present
         setPendingBookings(prev => {
           if (prev.find(b => b.id === e.detail.id)) return prev;
@@ -250,7 +253,7 @@ const Dashboard = memo(() => {
         setPendingBookings(prev => prev.filter(b => String(b.id || b._id) !== idToRemove));
 
         // Remove from active alert if it's the one showing
-        setActiveAlertBooking(prev => (prev && String(prev.id || prev._id) === idToRemove) ? null : prev);
+        setActiveAlertBookings(prev => prev.filter(b => String(b.id || b._id) !== idToRemove));
 
         // Remove from recent jobs state
         setRecentJobs(prev => prev.filter(b => String(b.id || b._id) !== idToRemove));
@@ -485,7 +488,12 @@ const Dashboard = memo(() => {
           <PendingBookings
             bookings={pendingBookings}
             setPendingBookings={setPendingBookings}
-            setActiveAlertBooking={setActiveAlertBooking}
+            setActiveAlertBooking={(booking) => {
+              setActiveAlertBookings(prev => {
+                if (prev.find(b => String(b.id || b._id) === String(booking.id || booking._id))) return prev;
+                return [booking, ...prev];
+              });
+            }}
           />
 
           {/* Performance Metrics */}
@@ -750,8 +758,8 @@ const Dashboard = memo(() => {
       </main>
       {/* Slick New Booking Alert Modal */}
       <BookingAlertModal
-        isOpen={!!activeAlertBooking}
-        booking={activeAlertBooking}
+        isOpen={activeAlertBookings.length > 0}
+        bookings={activeAlertBookings}
         onAccept={async (id) => {
           try {
             await acceptBooking(id);
@@ -765,7 +773,7 @@ const Dashboard = memo(() => {
             // Dispatch remove event to update ignored list and UI
             window.dispatchEvent(new CustomEvent('removeVendorBooking', { detail: { id } }));
 
-            setActiveAlertBooking(null);
+            setActiveAlertBookings(prev => prev.filter(b => String(b.id || b._id) !== String(id)));
             window.dispatchEvent(new Event('vendorStatsUpdated'));
             toast.success('Job claimed successfully! Assigned to you.');
           } catch (e) {
@@ -784,7 +792,7 @@ const Dashboard = memo(() => {
             // Dispatch remove event
             window.dispatchEvent(new CustomEvent('removeVendorBooking', { detail: { id } }));
 
-            setActiveAlertBooking(null);
+            setActiveAlertBookings(prev => prev.filter(b => String(b.id || b._id) !== String(id)));
             window.dispatchEvent(new Event('vendorJobsUpdated'));
             toast.success('Job claimed! Redirecting to assign...');
             navigate(`/vendor/booking/${id}/assign-worker`);
@@ -804,14 +812,14 @@ const Dashboard = memo(() => {
             // Dispatch remove event
             window.dispatchEvent(new CustomEvent('removeVendorBooking', { detail: { id } }));
 
-            setActiveAlertBooking(null);
+            setActiveAlertBookings(prev => prev.filter(b => String(b.id || b._id) !== String(id)));
             setPendingBookings(prev => prev.filter(b => b.id !== id));
           } catch (e) {
-            setActiveAlertBooking(null);
+            setActiveAlertBookings(prev => prev.filter(b => String(b.id || b._id) !== String(id)));
           }
         }}
         onMinimize={() => {
-          setActiveAlertBooking(null);
+          setActiveAlertBookings([]);
           // Sound is stopped inside the component
         }}
       />

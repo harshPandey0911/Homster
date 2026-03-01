@@ -69,6 +69,7 @@ const notificationSchema = new mongoose.Schema({
       'new_scrap_added',
       'scrap_accepted',
       'scrap_completed',
+      'vendor_withdrawal_request',
       'general'
     ],
     index: true
@@ -91,7 +92,7 @@ const notificationSchema = new mongoose.Schema({
   },
   relatedType: {
     type: String,
-    enum: ['booking', 'payment', 'user', 'vendor', 'worker', 'service', 'scrap'],
+    enum: ['booking', 'payment', 'user', 'vendor', 'worker', 'service', 'scrap', 'withdrawal'],
     default: null
   },
   // Notification Status

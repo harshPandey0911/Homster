@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'react-hot-toast';
+import { FiX, FiCheckCircle } from 'react-icons/fi';
 import { verifySelfVisit } from '../../services/bookingService';
 import flutterBridge from '../../../../utils/flutterBridge';
 import LocationAccessModal from '../../../../components/common/LocationAccessModal';
