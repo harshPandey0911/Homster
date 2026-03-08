@@ -10,12 +10,29 @@ export default function GlobalBookingAlert() {
   const navigate = useNavigate();
   const location = useLocation();
 
+  const [maxSearchTime, setMaxSearchTime] = useState(5);
+
   useEffect(() => {
+    // Fetch global config for accurate timer
+    const fetchConfig = async () => {
+      try {
+        const { vendorDashboardService } = await import('../../services/dashboardService');
+        const response = await vendorDashboardService.getDashboardStats();
+        if (response.success && response.data.config) {
+          setMaxSearchTime(response.data.config.maxSearchTime || 5);
+        }
+      } catch (error) {
+        console.error('Failed to fetch config for GlobalAlert:', error);
+      }
+    };
+    fetchConfig();
+
     // Listen for custom dashboard events from SocketContext
     const handleShowAlert = (e) => {
       if (e.detail) {
         setActiveAlertBookings(prev => {
-          if (prev.find(b => String(b.id || b._id) === String(e.detail.id || e.detail._id))) return prev;
+          const bId = String(e.detail.id || e.detail._id);
+          if (prev.find(b => String(b.id || b._id) === bId)) return prev;
           return [e.detail, ...prev];
         });
       }
@@ -38,12 +55,13 @@ export default function GlobalBookingAlert() {
     };
   }, []);
 
-  if (activeAlertBookings.length === 0) return null;
+  if (activeAlertBookings.length === 0 || location.pathname.includes('/booking-alert/')) return null;
 
   return (
     <BookingAlertModal
       isOpen={activeAlertBookings.length > 0}
       bookings={activeAlertBookings}
+      maxSearchTimeMins={maxSearchTime}
       onAccept={async (id) => {
         try {
           await acceptBooking(id);

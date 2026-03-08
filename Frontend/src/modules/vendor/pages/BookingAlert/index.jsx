@@ -12,8 +12,10 @@ const BookingAlert = () => {
   const [booking, setBooking] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  const [maxSearchTime, setMaxSearchTime] = useState(5);
+
   useEffect(() => {
-    const loadBooking = () => {
+    const loadBooking = async () => {
       try {
         const pendingJobs = JSON.parse(localStorage.getItem('vendorPendingJobs') || '[]');
         let foundBooking = pendingJobs.find(job => String(job.id || job._id) === String(id));
@@ -25,6 +27,13 @@ const BookingAlert = () => {
           return;
         }
         setBooking(foundBooking);
+
+        // Also fetch config for accurate timer
+        const { vendorDashboardService } = await import('../../services/dashboardService');
+        const response = await vendorDashboardService.getDashboardStats();
+        if (response.success && response.data.config) {
+          setMaxSearchTime(response.data.config.maxSearchTime || 5);
+        }
       } catch (error) {
         console.error('Error loading booking:', error);
         navigate('/vendor/dashboard', { replace: true });
@@ -34,7 +43,7 @@ const BookingAlert = () => {
     };
 
     loadBooking();
-  }, [id]);
+  }, [id, navigate]);
 
   // Listen for booking_taken event specifically for this booking
   useEffect(() => {
@@ -119,6 +128,7 @@ const BookingAlert = () => {
       onAssign={handleAssign}
       onReject={handleReject}
       onMinimize={() => navigate('/vendor/dashboard', { replace: true })}
+      maxSearchTimeMins={maxSearchTime}
     />
   );
 };

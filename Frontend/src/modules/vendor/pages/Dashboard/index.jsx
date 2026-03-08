@@ -14,8 +14,7 @@ import { registerFCMToken } from '../../../../services/pushNotificationService';
 import LogoLoader from '../../../../components/common/LogoLoader';
 import StatsCards from './components/StatsCards';
 import PendingBookings from './components/PendingBookings';
-import BookingAlertModal from '../../components/bookings/BookingAlertModal';
-import { playAlertRing, stopAlertRing } from '../../../../utils/notificationSound';
+import PendingBookings from './components/PendingBookings';
 
 
 const SOCKET_URL = import.meta.env.VITE_API_BASE_URL?.replace(/\/api$/, '') || 'http://localhost:5000';
@@ -51,7 +50,6 @@ const Dashboard = memo(() => {
   const [pendingBookings, setPendingBookings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [activeAlertBookings, setActiveAlertBookings] = useState([]);
   const [globalConfig, setGlobalConfig] = useState({ maxSearchTime: 5, waveDuration: 60 });
 
   const ignoredBookingIds = useRef(new Set());
@@ -261,10 +259,6 @@ const Dashboard = memo(() => {
     const handleShowAlert = (e) => {
       // e.detail contains the new booking job
       if (e.detail) {
-        setActiveAlertBookings(prev => {
-          if (prev.find(b => String(b.id || b._id) === String(e.detail.id || e.detail._id))) return prev;
-          return [e.detail, ...prev];
-        });
         // Also add to pending if not present
         setPendingBookings(prev => {
           if (prev.find(b => b.id === e.detail.id)) return prev;
@@ -282,9 +276,6 @@ const Dashboard = memo(() => {
 
         // Remove from pending bookings state immediately
         setPendingBookings(prev => prev.filter(b => String(b.id || b._id) !== idToRemove));
-
-        // Remove from active alert if it's the one showing
-        setActiveAlertBookings(prev => prev.filter(b => String(b.id || b._id) !== idToRemove));
 
         // Remove from recent jobs state
         setRecentJobs(prev => prev.filter(b => String(b.id || b._id) !== idToRemove));
@@ -309,24 +300,13 @@ const Dashboard = memo(() => {
     };
   }, [loadDashboardData]);
 
-  // Handle Sound Trigger when alerts appear
-  useEffect(() => {
-    if (activeAlertBookings.length > 0) {
-      playAlertRing(true);
-    } else {
-      stopAlertRing();
-    }
-    return () => stopAlertRing();
-  }, [activeAlertBookings.length]);
 
   // Alert Action Handlers
   const handleAcceptAlert = async (bookingId) => {
     try {
       const response = await acceptBooking(bookingId);
       if (response.success) {
-        stopAlertRing();
         toast.success('Booking accepted successfully!');
-        setActiveAlertBookings(prev => prev.filter(b => String(b.id || b._id) !== String(bookingId)));
         setPendingBookings(prev => prev.filter(b => String(b.id || b._id) !== String(bookingId)));
 
         // Sync localStorage
@@ -347,9 +327,7 @@ const Dashboard = memo(() => {
     try {
       const response = await rejectBooking(bookingId);
       if (response.success) {
-        stopAlertRing();
         toast.success('Booking rejected');
-        setActiveAlertBookings(prev => prev.filter(b => String(b.id || b._id) !== String(bookingId)));
         setPendingBookings(prev => prev.filter(b => String(b.id || b._id) !== String(bookingId)));
 
         // Sync localStorage
@@ -366,7 +344,6 @@ const Dashboard = memo(() => {
   };
 
   const handleAssignAlert = async (bookingId) => {
-    setActiveAlertBookings(prev => prev.filter(b => String(b.id || b._id) !== String(bookingId)));
     navigate('/vendor/workers', { state: { bookingId } });
   };
 
@@ -587,11 +564,8 @@ const Dashboard = memo(() => {
             maxSearchTimeMins={globalConfig.maxSearchTime}
             setPendingBookings={setPendingBookings}
             setActiveAlertBooking={(booking) => {
-              setActiveAlertBookings(prev => {
-                const bId = String(booking.id || booking._id);
-                if (prev.find(b => String(b.id || b._id) === bId)) return prev;
-                return [...prev, booking];
-              });
+              // Dispatch to global alert via CustomEvent
+              window.dispatchEvent(new CustomEvent('showDashboardBookingAlert', { detail: booking }));
             }}
           />
 
@@ -856,16 +830,6 @@ const Dashboard = memo(() => {
         </div>
       </main>
 
-      {/* Booking Alert Modal */}
-      <BookingAlertModal
-        isOpen={activeAlertBookings.length > 0}
-        bookings={activeAlertBookings}
-        onAccept={handleAcceptAlert}
-        onReject={handleRejectAlert}
-        onAssign={handleAssignAlert}
-        onMinimize={() => setActiveAlertBookings([])}
-        maxSearchTimeMins={globalConfig.maxSearchTime}
-      />
     </div>
   );
 });
