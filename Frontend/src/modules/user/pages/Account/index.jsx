@@ -423,7 +423,7 @@ const Account = () => {
             />
             <motion.button
               whileTap={{ scale: 0.98 }}
-              onClick={() => navigate('/user/about-homster')}
+              onClick={() => navigate('/user/about-homestr')}
               className="w-full flex items-center justify-between p-4 bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all group mb-3"
             >
               <div className="flex items-center gap-4">
@@ -431,7 +431,7 @@ const Account = () => {
                   style={{ color: themeColors.brand.teal }}>
                   <span className="font-bold">H</span>
                 </div>
-                <span className="font-semibold text-gray-900">About Homster</span>
+                <span className="font-semibold text-gray-900">About Homestr</span>
               </div>
               <FiChevronRight className="w-5 h-5 text-gray-300 group-hover:text-teal-500 transition-colors" />
             </motion.button>

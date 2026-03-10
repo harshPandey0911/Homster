@@ -14,7 +14,7 @@ const HelpSupport = () => {
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [showContactForm, setShowContactForm] = useState(false);
   const [supportInfo, setSupportInfo] = useState({
-    email: 'support@homster.com',
+    email: 'support@homestr.com',
     phone: '',
     whatsapp: ''
   });
@@ -26,7 +26,7 @@ const HelpSupport = () => {
         if (response.data?.success && response.data?.settings) {
           const { supportEmail, supportPhone, supportWhatsapp } = response.data.settings;
           setSupportInfo({
-            email: supportEmail || 'support@homster.com',
+            email: supportEmail || 'support@homestr.com',
             phone: supportPhone || '',
             whatsapp: supportWhatsapp || ''
           });

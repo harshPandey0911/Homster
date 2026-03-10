@@ -9,7 +9,7 @@
  * - Worker module: import { workerTheme } from '../../../../theme'
  */
 
-// Homster LOGO Core Brand Colors
+// Homestr LOGO Core Brand Colors
 const brand = {
   teal: '#347989',
   yellow: '#D68F35',

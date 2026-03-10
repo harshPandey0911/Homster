@@ -61,7 +61,7 @@ const BookingDetails = () => {
   });
 
   const [supportInfo, setSupportInfo] = useState({
-    email: 'support@homster.com',
+    email: 'support@homestr.com',
     phone: ''
   });
 
@@ -75,14 +75,14 @@ const BookingDetails = () => {
         if (response.data?.success && response.data?.settings) {
           const { supportEmail, supportPhone } = response.data.settings;
           setSupportInfo({
-            email: supportEmail || 'help@homster.in',
+            email: supportEmail || 'help@homestr.in',
             phone: supportPhone || '+919999999999'
           });
         }
       } catch (error) {
         console.error('Failed to fetch support settings:', error);
         setSupportInfo({
-          email: 'help@homster.in',
+          email: 'help@homestr.in',
           phone: '+919999999999'
         });
       }
@@ -302,7 +302,7 @@ const BookingDetails = () => {
         amount: Math.round((booking.finalAmount || 0) * 100),
         currency: 'INR',
         order_id: booking.razorpayOrderId,
-        name: 'Homster',
+        name: 'Homestr',
         description: `Payment for ${booking.serviceName}`,
         handler: async function (response) {
           toast.loading('Verifying payment...');
@@ -352,7 +352,7 @@ const BookingDetails = () => {
         amount: Math.round(orderResponse.data.amount * 100),
         currency: orderResponse.data.currency || 'INR',
         order_id: orderResponse.data.orderId,
-        name: 'Homster',
+        name: 'Homestr',
         description: `Payment for ${booking.serviceName}`,
         handler: async function (response) {
           toast.loading('Verifying payment...');
@@ -1428,7 +1428,7 @@ const BookingDetails = () => {
             </button>
             <button
               onClick={() => {
-                const email = supportInfo.email || 'help@homster.in';
+                const email = supportInfo.email || 'help@homestr.in';
                 const link = document.createElement('a');
                 link.href = `mailto:${email}`;
                 document.body.appendChild(link);

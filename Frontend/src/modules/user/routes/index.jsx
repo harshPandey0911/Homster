@@ -52,7 +52,7 @@ const Wallet = lazyLoad(() => import('../pages/Wallet'));
 const MyPlan = lazyLoad(() => import('../pages/MyPlan'));
 const PlanDetails = lazyLoad(() => import('../pages/MyPlan/PlanDetails'));
 const MyRating = lazyLoad(() => import('../pages/MyRating'));
-const AboutHomster = lazyLoad(() => import('../pages/AboutHomster'));
+const AboutHomestr = lazyLoad(() => import('../pages/AboutHomster'));
 const UpdateProfile = lazyLoad(() => import('../pages/UpdateProfile'));
 const Login = lazyLoad(() => import('../pages/login'));
 const Signup = lazyLoad(() => import('../pages/signup'));
@@ -120,7 +120,7 @@ const UserRoutes = () => {
               <Route path="/my-plan" element={<ProtectedRoute userType="user"><MyPlan /></ProtectedRoute>} />
               <Route path="/my-plan/:id" element={<ProtectedRoute userType="user"><PlanDetails /></ProtectedRoute>} />
               <Route path="/my-rating" element={<ProtectedRoute userType="user"><MyRating /></ProtectedRoute>} />
-              <Route path="/about-homster" element={<ProtectedRoute userType="user"><AboutHomster /></ProtectedRoute>} />
+              <Route path="/about-homestr" element={<ProtectedRoute userType="user"><AboutHomestr /></ProtectedRoute>} />
               <Route path="/update-profile" element={<ProtectedRoute userType="user"><UpdateProfile /></ProtectedRoute>} />
               <Route path="/scrap" element={<ProtectedRoute userType="user"><Scrap /></ProtectedRoute>} />
               <Route path="/notifications" element={<ProtectedRoute userType="user"><Notifications /></ProtectedRoute>} />

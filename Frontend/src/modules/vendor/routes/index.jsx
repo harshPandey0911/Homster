@@ -61,7 +61,7 @@ const Notifications = lazyLoad(() => import('../pages/Notifications'));
 const SettlementRequest = lazyLoad(() => import('../pages/Wallet/SettlementRequest'));
 const SettlementHistory = lazyLoad(() => import('../pages/Wallet/SettlementHistory'));
 const MyRatings = lazyLoad(() => import('../pages/MyRatings'));
-const AboutHomster = lazyLoad(() => import('../pages/AboutHomster'));
+const AboutHomestr = lazyLoad(() => import('../pages/AboutHomster'));
 const BillingPage = lazyLoad(() => import('../pages/BillingPage'));
 
 // Loading fallback component
@@ -120,7 +120,7 @@ const VendorRoutes = () => {
               <Route path="/address-management" element={<ProtectedRoute userType="vendor"><AddressManagement /></ProtectedRoute>} />
               <Route path="/notifications" element={<ProtectedRoute userType="vendor"><Notifications /></ProtectedRoute>} />
               <Route path="/my-ratings" element={<ProtectedRoute userType="vendor"><MyRatings /></ProtectedRoute>} />
-              <Route path="/about-homster" element={<ProtectedRoute userType="vendor"><AboutHomster /></ProtectedRoute>} />
+              <Route path="/about-homestr" element={<ProtectedRoute userType="vendor"><AboutHomestr /></ProtectedRoute>} />
             </Routes>
           </PageTransition>
         </Suspense>

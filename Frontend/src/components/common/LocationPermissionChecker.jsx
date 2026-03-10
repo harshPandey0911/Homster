@@ -1,4 +1,4 @@
-// Location Permission Checker Component for Homster
+// Location Permission Checker Component for Homestr
 import React, { useState, useEffect } from 'react';
 import LocationAccessModal from './LocationAccessModal';
 import flutterBridge from '../../utils/flutterBridge';
