@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { GoogleMap, useJsApiLoader, Marker, Autocomplete } from '@react-google-maps/api';
 import { FiCrosshair } from 'react-icons/fi';
-import flutterBridge from '../../../../utils/flutterBridge';
+import flutterBridge from '../../../../../utils/flutterBridge';
 import { toast } from 'react-hot-toast';
 
 const libraries = ['places', 'geometry'];
