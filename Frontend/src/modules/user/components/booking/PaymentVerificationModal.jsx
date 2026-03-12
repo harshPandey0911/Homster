@@ -270,16 +270,18 @@ const PaymentVerificationModal = ({ isOpen, onClose, booking, onPayOnline }) => 
                     <div className="absolute top-1/2 left-0 right-0 h-px bg-slate-100 z-0"></div>
                   </div>
 
-                  {/* Cash Code */}
-                  <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 text-center">
-                    <p className="text-xs font-bold text-slate-700 mb-2">Paying Cash? Share Code</p>
-                    <div className="bg-white border-2 border-dashed border-slate-300 rounded-lg py-2 px-4 inline-block mb-1">
-                      <span className="text-2xl font-black font-mono text-slate-900 tracking-[0.2em]">
-                        {booking.customerConfirmationOTP || booking.paymentOtp || '....'}
-                      </span>
+                  {/* Cash Code (Always show if available, even if QR initiated) */}
+                  {(booking.customerConfirmationOTP || booking.paymentOtp) && (
+                    <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 text-center">
+                      <p className="text-xs font-bold text-slate-700 mb-2">Paying Cash? Share Code</p>
+                      <div className="bg-white border-2 border-dashed border-slate-300 rounded-lg py-2 px-4 inline-block mb-1">
+                        <span className="text-2xl font-black font-mono text-slate-900 tracking-[0.2em]">
+                          {booking.customerConfirmationOTP || booking.paymentOtp || '....'}
+                        </span>
+                      </div>
+                      <p className="text-[10px] text-slate-400 mt-1">Share with professional to confirm cash payment</p>
                     </div>
-                    <p className="text-[10px] text-slate-400 mt-1">Share with professional to confirm cash payment</p>
-                  </div>
+                  )}
                 </>
               )}
             </div>

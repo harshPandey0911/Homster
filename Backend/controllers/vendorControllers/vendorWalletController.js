@@ -146,7 +146,9 @@ const getTransactions = async (req, res) => {
 const recordCashCollection = async (req, res) => {
   try {
     const vendorId = req.user.id;
-    const { bookingId, amount, notes } = req.body;
+    const bookingId = req.body.bookingId;
+    const amount = Number(req.body.amount);
+    const notes = req.body.notes;
 
     if (!bookingId || !amount || amount <= 0) {
       return res.status(400).json({
@@ -245,6 +247,13 @@ const recordCashCollection = async (req, res) => {
     }
 
     await Vendor.findByIdAndUpdate(vendorId, updateQuery);
+    
+    // Update booking status
+    booking.status = 'completed';
+    booking.paymentStatus = 'collected by vendor';
+    booking.paymentMethod = 'cash collected';
+    booking.completedAt = new Date();
+    await booking.save();
 
     // Create transaction record for Cash Collection
     const transaction = await Transaction.create({
@@ -253,7 +262,7 @@ const recordCashCollection = async (req, res) => {
       type: 'cash_collected',
       amount: grandTotal,
       status: 'completed',
-      paymentMethod: 'cash',
+      paymentMethod: 'cash collected',
       description: `Cash ₹${grandTotal} collected. Dues increased.`,
       metadata: {
         notes,

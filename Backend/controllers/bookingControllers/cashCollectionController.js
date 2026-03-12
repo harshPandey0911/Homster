@@ -65,8 +65,8 @@ exports.initiateOnlineCollection = async (req, res) => {
       return res.status(500).json({ success: false, message: qrResult.error });
     }
 
-    // Generate OTP for manual verification if needed
-    const otp = Math.floor(1000 + Math.random() * 9000).toString();
+    // Reuse existing OTP or generate new one
+    const otp = booking.paymentOtp || Math.floor(1000 + Math.random() * 9000).toString();
     booking.customerConfirmationOTP = otp;
     booking.paymentOtp = otp;
 
@@ -139,8 +139,8 @@ exports.initiateCashCollection = async (req, res) => {
       return res.status(404).json({ success: false, message: 'Booking not found' });
     }
 
-    // Allow cash, pay_at_home, AND plan_benefit (for final bill flow)
-    const allowedMethods = ['cash', 'pay_at_home', 'plan_benefit'];
+    // Allow cash, pay_at_home, online (if user changes mind), AND plan_benefit (for final bill flow)
+    const allowedMethods = ['cash', 'pay_at_home', 'plan_benefit', 'online'];
     if (!allowedMethods.includes(booking.paymentMethod)) {
       return res.status(400).json({ success: false, message: 'This booking is not eligible for cash collection' });
     }
@@ -183,8 +183,14 @@ exports.initiateCashCollection = async (req, res) => {
       booking.markModified('extraCharges');
     }
 
-    // For backwards compatibility and future use, we can still generate it but not force it
-    const otp = Math.floor(1000 + Math.random() * 9000).toString();
+    // Reset QR payment flag and switch method if switching back to cash
+    booking.qrPaymentInitiated = false;
+    if (booking.paymentMethod === 'online') {
+      booking.paymentMethod = 'cash';
+    }
+
+    // Reuse existing OTP or generate new one
+    const otp = booking.paymentOtp || Math.floor(1000 + Math.random() * 9000).toString();
     booking.customerConfirmationOTP = otp;
     booking.paymentOtp = otp;
     await booking.save();
@@ -197,7 +203,8 @@ exports.initiateCashCollection = async (req, res) => {
         finalAmount: booking.finalAmount,
         customerConfirmationOTP: booking.customerConfirmationOTP,
         paymentOtp: booking.paymentOtp,
-        workDoneDetails: booking.workDoneDetails
+        workDoneDetails: booking.workDoneDetails,
+        qrPaymentInitiated: false
       });
     }
 
@@ -252,7 +259,8 @@ exports.confirmCashCollection = async (req, res) => {
 
     if (!isPlanBenefitNoExtras && booking.customerConfirmationOTP && otp && booking.customerConfirmationOTP !== otp) {
       if (process.env.NODE_ENV !== 'development' || otp !== '0000') {
-        return res.status(400).json({ success: false, message: 'Invalid OTP. Please enter the code sent to the customer.' });
+        console.warn(`[ConfirmCash] Invalid OTP attempt for booking ${id}. Expected: ${booking.customerConfirmationOTP}, Received: ${otp}`);
+        return res.status(400).json({ success: false, message: 'Invalid OTP. Please enter the correct code shared by the customer.' });
       }
     }
 
@@ -271,7 +279,7 @@ exports.confirmCashCollection = async (req, res) => {
       });
     }
 
-    const collectionAmount = amount || booking.finalAmount;
+    const collectionAmount = amount !== undefined ? Number(amount) : Number(booking.finalAmount);
 
     // Store extra items in workDoneDetails (for display)
     if (extraItems && Array.isArray(extraItems) && extraItems.length > 0) {
@@ -304,8 +312,15 @@ exports.confirmCashCollection = async (req, res) => {
     let grandTotal = collectionAmount;
 
     if (bill) {
-      vendorEarning = bill.vendorTotalEarning;
-      grandTotal = bill.grandTotal;
+      vendorEarning = Number(bill.vendorTotalEarning) || 0;
+      grandTotal = Number(bill.grandTotal) || 0;
+
+      // Sync booking fields from bill to ensure data consistency
+      booking.basePrice = bill.originalServiceBase;
+      booking.tax = bill.originalGST + bill.vendorServiceGST + bill.partsGST;
+      booking.visitingCharges = bill.visitingCharges;
+      booking.finalAmount = bill.grandTotal;
+      booking.userPayableAmount = bill.grandTotal;
 
       // Mark bill as paid
       bill.status = 'paid';
@@ -325,12 +340,17 @@ exports.confirmCashCollection = async (req, res) => {
       booking.paymentStatus = PAYMENT_STATUS.SUCCESS;
     } else {
       booking.paymentStatus = PAYMENT_STATUS.COLLECTED_BY_VENDOR;
+      booking.paymentMethod = 'cash collected'; // Standardized label
     }
 
     if (booking.status === 'work_done' || booking.status === 'visited' || booking.status === 'in_progress') {
       booking.status = 'completed';
       booking.completedAt = new Date();
     }
+
+    // Clear OTPs on completion
+    booking.paymentOtp = undefined;
+    booking.customerConfirmationOTP = undefined;
 
     await booking.save();
 
@@ -365,51 +385,63 @@ exports.confirmCashCollection = async (req, res) => {
       await Vendor.findByIdAndUpdate(vendorId, walletUpdate, { runValidators: false });
 
       // Record Transaction - Cash Collected
-      await Transaction.create({
-        vendorId,
-        userId: booking.userId,
-        bookingId: booking._id,
-        amount: grandTotal,
-        type: 'cash_collected',
-        description: `Cash ₹${grandTotal} collected for booking ${booking.bookingNumber}`,
-        status: 'completed',
-        metadata: {
-          type: 'dues_increase',
-          collectedBy: userRole,
-          billId: bill?._id?.toString(),
-          vendorEarning,
-          companyRevenue: bill?.companyRevenue
-        }
-      });
+      try {
+        await Transaction.create({
+          vendorId,
+          userId: booking.userId,
+          bookingId: booking._id,
+          amount: grandTotal,
+          type: 'cash_collected',
+          paymentMethod: 'cash collected',
+          description: `Cash ₹${grandTotal} collected for booking ${booking.bookingNumber}`,
+          status: 'completed',
+          metadata: {
+            type: 'dues_increase',
+            collectedBy: userRole,
+            billId: bill?._id?.toString(),
+            vendorEarning,
+            companyRevenue: bill?.companyRevenue
+          }
+        });
+      } catch (txnErr) {
+        console.error('[ConfirmCash] Transaction 1 (cash_collected) failed:', txnErr);
+        // We don't throw here to ensure the payment status remains 'completed' since booking.save and Vendor update already finished
+      }
 
       // Record Transaction - Earnings Credit
       if (vendorEarning > 0) {
-        await Transaction.create({
-          vendorId,
-          bookingId: booking._id,
-          amount: vendorEarning,
-          type: 'earnings_credit',
-          description: `Earnings ₹${vendorEarning} credited for booking ${booking.bookingNumber}`,
-          status: 'completed',
-          metadata: {
-            type: 'earnings_increase',
-            billId: bill?._id?.toString(),
-            serviceEarning: bill?.vendorServiceEarning,
-            partsEarning: bill?.vendorPartsEarning
-          }
-        });
+        try {
+          await Transaction.create({
+            vendorId,
+            bookingId: booking._id,
+            amount: vendorEarning,
+            type: 'earnings_credit',
+            paymentMethod: 'system',
+            description: `Earnings ₹${vendorEarning} credited for booking ${booking.bookingNumber}`,
+            status: 'completed',
+            metadata: {
+              type: 'earnings_increase',
+              billId: bill?._id?.toString(),
+              serviceEarning: bill?.vendorServiceEarning,
+              partsEarning: bill?.vendorPartsEarning
+            }
+          });
+        } catch (txnErr) {
+          console.error('[ConfirmCash] Transaction 2 (earnings_credit) failed:', txnErr);
+        }
       }
     }
 
     // Record stats in the Daily Earning Tracker
+    // Record stats in the Daily Earning Tracker (Async)
     recordBookingEarning({
       date: new Date(),
       totalRevenue: bill ? bill.grandTotal : collectionAmount,
-      platformCommission: bill ? bill.companyRevenue : (collectionAmount * 0.2),
+      platformCommission: bill ? (bill.companyRevenue || 0) : (collectionAmount * 0.2),
       vendorEarnings: vendorEarning > 0 ? vendorEarning : (collectionAmount * 0.8),
-      totalGST: bill ? bill.totalGST : 0,
+      totalGST: bill ? (bill.totalGST || 0) : 0,
       totalTDS: 0 // Captured separately during withdrawal
-    });
+    }).catch(err => console.error('[ConfirmCash] Daily tracker failed:', err));
 
     // Emit socket event
     const io = req.app.get('io');
@@ -504,7 +536,7 @@ exports.verifyOnlinePayment = async (req, res) => {
 
         // 1. Update Booking
         booking.paymentStatus = PAYMENT_STATUS.SUCCESS;
-        booking.paymentMethod = 'online';
+        booking.paymentMethod = 'Qr online';
         booking.cashCollected = false; // Ensure it's not counted as cash
         booking.razorpayPaymentId = capturedPayment.id;
         booking.paymentId = capturedPayment.id;
@@ -513,6 +545,10 @@ exports.verifyOnlinePayment = async (req, res) => {
           booking.status = BOOKING_STATUS.COMPLETED;
           booking.completedAt = new Date();
         }
+
+        // Clear OTPs on completion
+        booking.paymentOtp = undefined;
+        booking.customerConfirmationOTP = undefined;
 
         await booking.save();
 
@@ -523,6 +559,14 @@ exports.verifyOnlinePayment = async (req, res) => {
         let vendorEarning = 0;
         if (bill) {
           vendorEarning = bill.vendorTotalEarning;
+          
+          // Sync booking fields from bill to ensure data consistency
+          booking.basePrice = bill.originalServiceBase;
+          booking.tax = bill.originalGST + bill.vendorServiceGST + bill.partsGST;
+          booking.visitingCharges = bill.visitingCharges;
+          booking.finalAmount = bill.grandTotal;
+          booking.userPayableAmount = bill.grandTotal;
+          
           bill.status = 'paid';
           bill.paidAt = new Date();
           await bill.save();
@@ -542,7 +586,7 @@ exports.verifyOnlinePayment = async (req, res) => {
           bookingId: booking._id,
           amount: booking.finalAmount,
           type: 'payment',
-          paymentMethod: 'online',
+          paymentMethod: 'Qr online',
           status: 'completed',
           description: `Online QR payment for booking #${booking.bookingNumber}`,
           referenceId: capturedPayment.id,
@@ -568,15 +612,15 @@ exports.verifyOnlinePayment = async (req, res) => {
           });
         }
 
-        // 4. Record Stats
+        // 4. Record Stats (Async)
         recordBookingEarning({
           date: new Date(),
-          totalRevenue: bill ? bill.grandTotal : booking.finalAmount,
-          platformCommission: bill ? bill.companyRevenue : (booking.finalAmount * 0.2),
-          vendorEarnings: vendorEarning,
-          totalGST: bill ? bill.totalGST : 0,
+          totalRevenue: Number(bill ? bill.grandTotal : booking.finalAmount) || 0,
+          platformCommission: Number(bill ? bill.companyRevenue : (booking.finalAmount * 0.2)) || 0,
+          vendorEarnings: Number(vendorEarning) || 0,
+          totalGST: Number(bill ? bill.totalGST : 0) || 0,
           totalTDS: 0
-        });
+        }).catch(err => console.error('[ConfirmCash] Daily tracker failed:', err));
 
         // 5. Notify & Socket
         const io = req.app.get('io');
@@ -645,7 +689,7 @@ exports.confirmManualOnlinePayment = async (req, res) => {
 
     // 1. Update Booking
     booking.paymentStatus = PAYMENT_STATUS.SUCCESS;
-    booking.paymentMethod = 'online';
+    booking.paymentMethod = 'Qr online';
     booking.cashCollected = false;
     booking.paymentId = `manual_conf_${Date.now()}`;
     booking.status = BOOKING_STATUS.COMPLETED;
@@ -659,6 +703,14 @@ exports.confirmManualOnlinePayment = async (req, res) => {
     let vendorEarning = 0;
     if (bill) {
       vendorEarning = bill.vendorTotalEarning;
+      
+      // Sync booking fields from bill to ensure data consistency
+      booking.basePrice = bill.originalServiceBase;
+      booking.tax = bill.originalGST + bill.vendorServiceGST + bill.partsGST;
+      booking.visitingCharges = bill.visitingCharges;
+      booking.finalAmount = bill.grandTotal;
+      booking.userPayableAmount = bill.grandTotal;
+
       bill.status = 'paid';
       bill.paidAt = new Date();
       await bill.save();
@@ -677,7 +729,7 @@ exports.confirmManualOnlinePayment = async (req, res) => {
       bookingId: booking._id,
       amount: booking.finalAmount,
       type: 'payment',
-      paymentMethod: 'online',
+      paymentMethod: 'Qr online',
       status: 'completed',
       description: `Manual confirmation of UPI QR payment for booking #${booking.bookingNumber}`,
       referenceId: booking.paymentId,
@@ -697,15 +749,15 @@ exports.confirmManualOnlinePayment = async (req, res) => {
       });
     }
 
-    // 4. Record Stats
+    // 4. Record Stats (Async)
     recordBookingEarning({
       date: new Date(),
-      totalRevenue: bill ? bill.grandTotal : booking.finalAmount,
-      platformCommission: bill ? bill.companyRevenue : (booking.finalAmount * 0.2),
-      vendorEarnings: vendorEarning,
-      totalGST: bill ? bill.totalGST : 0,
+      totalRevenue: Number(bill ? bill.grandTotal : booking.finalAmount) || 0,
+      platformCommission: Number(bill ? bill.companyRevenue : (booking.finalAmount * 0.2)) || 0,
+      vendorEarnings: Number(vendorEarning) || 0,
+      totalGST: Number(bill ? bill.totalGST : 0) || 0,
       totalTDS: 0
-    });
+    }).catch(err => console.error('[ConfirmManual] Daily tracker failed:', err));
 
     // 5. Notify & Socket
     const io = req.app.get('io');

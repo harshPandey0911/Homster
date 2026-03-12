@@ -401,6 +401,7 @@ const BillingPage = () => {
         setIsOtpSent(true);
         setShowOtpModal(true);
         setPaymentMode('cash');
+        setOnlinePaymentData(null); // Reset online data when switching to cash
         toast.success('OTP sent to customer!');
       } else {
         toast.error(res.message || 'Failed to send OTP');
@@ -423,6 +424,7 @@ const BillingPage = () => {
         localStorage.removeItem(`worker_billing_step_${id}`);
         localStorage.removeItem(`worker_billing_max_step_${id}`);
         localStorage.removeItem(`worker_billing_data_${id}`);
+        fetchData();
         navigate(`/worker/job/${id}`);
       } else {
         toast.error(res.message || 'Invalid OTP');
@@ -450,8 +452,9 @@ const BillingPage = () => {
       if (res.success) {
         setOnlinePaymentData(res.data);
         setShowQrModal(true);
+        setIsOtpSent(true); // Generated OTP is available concurrently
         setPaymentMode('online');
-        toast.success('QR Code generated!');
+        toast.success('QR Code and OTP generated!');
       } else {
         toast.error(res.message || 'Failed to initiate online payment');
       }
@@ -473,6 +476,7 @@ const BillingPage = () => {
         localStorage.removeItem(`worker_billing_step_${id}`);
         localStorage.removeItem(`worker_billing_max_step_${id}`);
         localStorage.removeItem(`worker_billing_data_${id}`);
+        fetchData();
         navigate(`/worker/job/${id}`);
       } else {
         toast.error(res.message || 'Payment not yet confirmed');
@@ -945,7 +949,7 @@ const BillingPage = () => {
                     </div>
                   </div>
                 )}
-                {paymentMode && (
+                {(paymentMode && job.status === 'completed') && (
                   <div>
                     <h4 className="font-bold text-gray-900 flex items-center gap-2 mb-2 pb-2 border-b border-gray-100">
                       <span className={`w-6 h-6 rounded-full flex items-center justify-center text-xs ${paymentMode === 'cash' ? 'bg-emerald-50 text-emerald-600' : 'bg-blue-50 text-blue-600'}`}>
@@ -956,7 +960,7 @@ const BillingPage = () => {
                     <div className="flex justify-between text-sm pl-2 font-black text-gray-900 uppercase tracking-tight">
                       <span>Status</span>
                       <span className={paymentMode === 'cash' ? 'text-emerald-600' : 'text-blue-600'}>
-                        {paymentMode === 'cash' ? 'Pay in Cash (OTP Pending)' : 'Online (QR Scanned)'}
+                        {paymentMode === 'cash' ? 'Cash Collected' : 'Qr Online'}
                       </span>
                     </div>
                   </div>
@@ -1023,7 +1027,7 @@ const BillingPage = () => {
           <>
             <button onClick={() => setCurrentStep(4)} disabled={submitting || otpLoading} className="flex-1 py-3 text-gray-600 font-bold bg-white border border-gray-200 rounded-xl disabled:opacity-50">Back</button>
             <div className="flex-[2] grid grid-cols-2 gap-2">
-              {isOtpSent ? (
+              {(isOtpSent && paymentMode === 'cash') ? (
                 <button onClick={() => setShowOtpModal(true)} disabled={otpLoading || qrLoading} className="py-3 bg-gray-900 text-white font-bold rounded-xl shadow-lg flex flex-col items-center justify-center gap-1 active:scale-95 transition-all text-[10px]">
                   <FiKey className="w-4 h-4" /><span>Enter OTP</span>
                 </button>

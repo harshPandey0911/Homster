@@ -445,8 +445,8 @@ const completeJob = async (req, res) => {
     // Update booking
     booking.status = BOOKING_STATUS.WORK_DONE;
 
-    // Generate Payment OTP
-    const payOtp = Math.floor(1000 + Math.random() * 9000).toString();
+    // Reuse existing Payment OTP or generate new one
+    const payOtp = booking.paymentOtp || Math.floor(1000 + Math.random() * 9000).toString();
     booking.paymentOtp = payOtp;
 
     if (workPhotos && Array.isArray(workPhotos)) {
@@ -565,13 +565,13 @@ const collectCash = async (req, res) => {
       return res.status(500).json({ success: false, message: 'Bill not found — cannot process payment' });
     }
 
-    const grandTotal = bill.grandTotal;
-    const vendorEarning = bill.vendorTotalEarning;
+    const grandTotal = Number(bill.grandTotal) || 0;
+    const vendorEarning = Number(bill.vendorTotalEarning) || 0;
 
     // Update Booking Status
     booking.status = BOOKING_STATUS.COMPLETED;
-    booking.paymentStatus = PAYMENT_STATUS.SUCCESS;
-    booking.paymentMethod = 'cash';
+    booking.paymentMethod = 'cash collected'; // Standardized label
+    booking.paymentStatus = PAYMENT_STATUS.COLLECTED_BY_VENDOR;
     booking.cashCollected = true;
     booking.cashCollectedBy = 'worker';
     booking.cashCollectorId = workerId;
@@ -624,7 +624,7 @@ const collectCash = async (req, res) => {
           type: 'cash_collected',
           amount: grandTotal,
           status: 'completed',
-          paymentMethod: 'cash',
+          paymentMethod: 'cash collected', // Standardized label
           description: `Cash ₹${grandTotal} collected by worker for booking #${booking.bookingNumber}`,
           metadata: {
             type: 'dues_increase',

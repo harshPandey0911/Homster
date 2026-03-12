@@ -125,7 +125,7 @@ const verifyPaymentWebhook = async (req, res) => {
 
     // Update booking payment status
     booking.paymentStatus = PAYMENT_STATUS.SUCCESS;
-    booking.paymentMethod = 'razorpay';
+    booking.paymentMethod = 'online';
     booking.razorpayPaymentId = razorpay_payment_id;
     booking.paymentId = razorpay_payment_id;
 
@@ -194,15 +194,15 @@ const verifyPaymentWebhook = async (req, res) => {
       console.log(`[Payment] Credited ₹${vendorEarning} to vendor ${booking.vendorId}`);
     }
 
-    // Record stats in the Daily Earning Tracker
+    // Record stats in the Daily Earning Tracker (Async)
     recordBookingEarning({
       date: new Date(),
-      totalRevenue: bill ? bill.grandTotal : booking.finalAmount,
-      platformCommission: bill ? bill.companyRevenue : (booking.finalAmount * 0.2),
-      vendorEarnings: bill ? bill.vendorTotalEarning : (booking.finalAmount * 0.8),
-      totalGST: bill ? bill.totalGST : 0,
+      totalRevenue: Number(bill ? bill.grandTotal : booking.finalAmount) || 0,
+      platformCommission: Number(bill ? bill.companyRevenue : (booking.finalAmount * 0.2)) || 0,
+      vendorEarnings: Number(bill ? bill.vendorTotalEarning : (booking.finalAmount * 0.8)) || 0,
+      totalGST: Number(bill ? bill.totalGST : 0) || 0,
       totalTDS: 0 // Tracked in withdrawals
-    });
+    }).catch(err => console.error('[Payment] Daily tracker failed:', err));
 
     // Send notification to user
     await createNotification({
@@ -384,15 +384,15 @@ const processWalletPayment = async (req, res) => {
       console.log(`[Wallet Payment] Credited ₹${vendorEarning} to vendor ${booking.vendorId}`);
     }
 
-    // Record stats in the Daily Earning Tracker
+    // Record stats in the Daily Earning Tracker (Async)
     recordBookingEarning({
       date: new Date(),
-      totalRevenue: bill ? bill.grandTotal : booking.finalAmount,
-      platformCommission: bill ? bill.companyRevenue : (booking.finalAmount * 0.2),
-      vendorEarnings: bill ? bill.vendorTotalEarning : (booking.finalAmount * 0.8),
-      totalGST: bill ? bill.totalGST : 0,
+      totalRevenue: Number(bill ? bill.grandTotal : booking.finalAmount) || 0,
+      platformCommission: Number(bill ? bill.companyRevenue : (booking.finalAmount * 0.2)) || 0,
+      vendorEarnings: Number(bill ? bill.vendorTotalEarning : (booking.finalAmount * 0.8)) || 0,
+      totalGST: Number(bill ? bill.totalGST : 0) || 0,
       totalTDS: 0 // Tracked in withdrawals
-    });
+    }).catch(err => console.error('[Wallet Payment] Daily tracker failed:', err));
 
     // Send notification to user
     await createNotification({

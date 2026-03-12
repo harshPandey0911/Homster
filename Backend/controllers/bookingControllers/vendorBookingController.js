@@ -1182,8 +1182,8 @@ const completeSelfJob = async (req, res) => {
     booking.userPayableAmount = grandTotal; // Ensure consistency
     booking.vendorBillId = bill._id;
 
-    // Generate Payment OTP for cash collection
-    const payOtp = Math.floor(1000 + Math.random() * 9000).toString();
+    // Reuse existing Payment OTP for cash collection or generate new one
+    const payOtp = booking.paymentOtp || Math.floor(1000 + Math.random() * 9000).toString();
     booking.paymentOtp = payOtp;
 
     if (workPhotos) booking.workPhotos = workPhotos;
@@ -1276,13 +1276,13 @@ const collectSelfCash = async (req, res) => {
     const bill = await VendorBill.findOne({ bookingId: booking._id });
     if (!bill) return res.status(500).json({ success: false, message: 'Bill not found — cannot process payment' });
 
-    const grandTotal = bill.grandTotal;
-    const vendorEarning = bill.vendorTotalEarning;
+    const grandTotal = Number(bill.grandTotal) || 0;
+    const vendorEarning = Number(bill.vendorTotalEarning) || 0;
 
     // ── Update Booking status ──
     booking.status = BOOKING_STATUS.COMPLETED;
-    booking.paymentStatus = PAYMENT_STATUS.SUCCESS;
-    booking.paymentMethod = 'cash';
+    booking.paymentMethod = 'cash collected'; // Standardized label
+    booking.paymentStatus = PAYMENT_STATUS.COLLECTED_BY_VENDOR;
     booking.cashCollected = true;
     booking.cashCollectedBy = 'vendor';
     booking.cashCollectorId = vendorId;
@@ -1335,7 +1335,7 @@ const collectSelfCash = async (req, res) => {
         type: 'cash_collected',
         amount: grandTotal,
         status: 'completed',
-        paymentMethod: 'cash',
+        paymentMethod: 'cash collected', // Standardized label
         description: `Cash ₹${grandTotal} collected for booking #${booking.bookingNumber}. Dues increased.`,
         metadata: {
           type: 'dues_increase',

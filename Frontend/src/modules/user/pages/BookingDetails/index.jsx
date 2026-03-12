@@ -140,15 +140,28 @@ const BookingDetails = () => {
   // Track if we've shown the payment modal this session to prevent re-opening on data refresh
 
 
-  // Handle Payment Modal Visibility - Auto-open on work completion OR QR initiation
+  // Handle Payment Modal Visibility - Auto-open on new payment request from vendor
   useEffect(() => {
-    const isPaymentDone = booking?.paymentStatus === 'success' || booking?.cashCollected === true;
-    const hasShown = booking ? sessionStorage.getItem(`payment_modal_shown_${booking._id}`) : false;
+    if (!booking) return;
+    
+    const isPaymentDone = booking.paymentStatus === 'success' || booking.cashCollected === true;
 
-    // Open if: (Has Bill/OTP OR QR initiated) AND Payment not done AND not shown yet
-    if (booking && (booking.customerConfirmationOTP || booking.qrPaymentInitiated) && !isPaymentDone && !hasShown) {
+    // Track the latest OTP to detect a fresh payment request from the vendor
+    const lastSeenOtp = sessionStorage.getItem(`last_seen_otp_${booking._id}`);
+    const hasNewOtpRequest = booking.customerConfirmationOTP && booking.customerConfirmationOTP !== lastSeenOtp;
+    
+    // We also show if it was never shown and we have a pending payment request
+    const hasShown = sessionStorage.getItem(`payment_modal_shown_${booking._id}`);
+
+    if (!isPaymentDone && (hasNewOtpRequest || (!hasShown && (booking.customerConfirmationOTP || booking.qrPaymentInitiated)))) {
       setShowPaymentModal(true);
       sessionStorage.setItem(`payment_modal_shown_${booking._id}`, 'true');
+      if (booking.customerConfirmationOTP) {
+        sessionStorage.setItem(`last_seen_otp_${booking._id}`, booking.customerConfirmationOTP);
+      }
+    } else if (booking.qrPaymentInitiated === false && booking.customerConfirmationOTP && !isPaymentDone) {
+      // Re-trigger if it switches from QR to Cash
+      setShowPaymentModal(true);
     }
     // Close if payment becomes done
     else if (isPaymentDone) {
@@ -316,7 +329,7 @@ const BookingDetails = () => {
 
           if (verifyResponse.success) {
             toast.success('Payment successful!');
-            loadBooking();
+            window.location.reload();
           } else {
             toast.error('Payment verification failed');
           }
@@ -1140,8 +1153,9 @@ const BookingDetails = () => {
             </div>
           </section>
 
-          {/* Payment Summary - Professional Card */}
-          <section className="bg-white rounded-3xl shadow-[0_4px_20px_rgb(0,0,0,0.03)] border border-gray-100 overflow-hidden">
+          {/* Payment Summary - Only show if payment is completed/collected OR if a payment request is active (Work Done) */}
+          {(['work_done', 'completed'].includes(booking.status?.toLowerCase()) || booking.paymentStatus === 'success' || booking.cashCollected) && (
+            <section className="bg-white rounded-3xl shadow-[0_4px_20px_rgb(0,0,0,0.03)] border border-gray-100 overflow-hidden">
             <div className="p-5">
               <div className="flex items-center gap-2 mb-4 pb-2 border-b border-gray-100">
                 <div className={`p-2 rounded-lg ${booking.paymentMethod === 'plan_benefit' ? 'bg-amber-100' : 'bg-green-50'}`}>
@@ -1269,12 +1283,13 @@ const BookingDetails = () => {
                       <div className="mt-2 pt-2 border-t border-gray-100">
                         <div className="flex justify-between text-xs font-bold text-gray-600">
                           <span className="flex items-center gap-2 uppercase tracking-wide">
-                            {booking.paymentMethod === 'cash' ? <FiDollarSign className="text-emerald-500" /> : <MdQrCode className="text-blue-500" />}
+                            {booking.paymentMethod === 'cash collected' ? <FiDollarSign className="text-emerald-500" /> : <MdQrCode className="text-blue-500" />}
                             Payment Method
                           </span>
-                          <span className={`${booking.paymentMethod === 'cash' ? 'text-emerald-600' : 'text-blue-600'} uppercase`}>
-                            {booking.paymentMethod === 'cash' ? 'Cash Collected' : 
-                             booking.paymentMethod === 'online' ? 'Online Payment' : 
+                          <span className={`${booking.paymentMethod === 'cash collected' ? 'text-emerald-600' : 'text-blue-600'} uppercase`}>
+                            {booking.paymentMethod === 'cash collected' ? 'Cash Collected' : 
+                             booking.paymentMethod === 'Qr online' ? 'QR Online' : 
+                             booking.paymentMethod === 'online' ? 'Online Paid' : 
                              booking.paymentMethod === 'plan_benefit' ? 'Plan Benefit' : 
                              booking.paymentMethod || 'Online'}
                           </span>
@@ -1379,15 +1394,16 @@ const BookingDetails = () => {
             {/* Payment Status Footer */}
             <div className="bg-gray-50 px-5 py-3 border-t border-gray-100 flex justify-between items-center">
               <span className="text-xs font-bold text-gray-500 uppercase tracking-wide">Payment Status</span>
-              <span className={`px-2.5 py-1 rounded-md text-xs font-bold capitalize ${booking.paymentStatus === 'success' ? 'bg-green-100 text-green-700' :
+              <span className={`px-2.5 py-1 rounded-md text-xs font-bold capitalize ${['success', 'collected_by_vendor', 'paid'].includes(booking.paymentStatus?.toLowerCase()) ? 'bg-green-100 text-green-700' :
                 booking.paymentStatus === 'pending' || booking.paymentStatus === 'plan_covered' ? 'bg-yellow-100 text-yellow-700' : 'bg-red-100 text-red-700'
                 }`}>
-                {booking.paymentStatus === 'success' ? 'Paid' :
+                {['success', 'collected_by_vendor', 'paid', 'paid_online'].includes(booking.paymentStatus?.toLowerCase()) ? 'Paid' :
                   booking.paymentStatus === 'plan_covered' ? 'Processing Bill' :
-                    booking.paymentStatus || 'Pending'}
+                    booking.paymentStatus?.replace(/_/g, ' ') || 'Pending'}
               </span>
             </div>
-          </section>
+            </section>
+          )}
 
           {/* Action Card for Awaiting Payment */}
           {booking.status === 'awaiting_payment' && (
@@ -1397,7 +1413,7 @@ const BookingDetails = () => {
                   <FiDollarSign className="w-8 h-8 text-orange-600" />
                 </div>
                 <h3 className="text-lg font-bold text-black">Payment Required</h3>
-                <p className="text-sm text-gray-500">The vendor has accepted your request. Please choose a payment method to confirm your booking.</p>
+                <p className="text-sm text-gray-500">The professional has completed the work. Please choose a payment method to verify and close your booking.</p>
               </div>
 
               <div className="grid grid-cols-1 gap-3">

@@ -279,6 +279,9 @@ const BookingTrack = () => {
           if (data.qrPaymentInitiated) {
             setShowPaymentModal(true);
             toast.success('Professional has initiated payment!');
+          } else if (data.customerConfirmationOTP) {
+            setShowPaymentModal(true);
+            toast.success('Professional has requested payment!');
           }
           refreshBooking(false);
         }

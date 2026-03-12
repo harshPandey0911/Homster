@@ -68,6 +68,7 @@ const BillingPage = () => {
   const [showQrModal, setShowQrModal] = useState(false);
   const [qrLoading, setQrLoading] = useState(false);
   const [paymentMode, setPaymentMode] = useState(null); // 'cash' | 'online'
+  const [walletInfo, setWalletInfo] = useState(null);
 
   // Fetch Data
   useEffect(() => {
@@ -110,11 +111,16 @@ const BillingPage = () => {
         setIsOtpSent(true);
       }
 
-      const [servicesRes, partsRes, catRes] = await Promise.all([
+      const [servicesRes, partsRes, catRes, walletRes] = await Promise.all([
         vendorBillService.getServiceCatalog(),
         vendorBillService.getPartsCatalog(),
-        publicCatalogService.getCategories()
+        publicCatalogService.getCategories(),
+        vendorWalletService.getWallet().catch(() => ({ success: false }))
       ]);
+
+      if (walletRes && walletRes.success) {
+        setWalletInfo(walletRes.data || walletRes.wallet);
+      }
       const services = servicesRes.services || [];
       const parts = partsRes.parts || [];
 
@@ -430,6 +436,15 @@ const BillingPage = () => {
     };
   }, [booking, selectedServices, selectedParts, customItems, transportCharges, payoutSettings, applyPartsGST]);
 
+  const willExceedCashLimit = useMemo(() => {
+    if (!walletInfo || !calculations) return false;
+    const currentDues = walletInfo.dues || 0;
+    const currentEarnings = walletInfo.earnings || 0;
+    const cashLimit = walletInfo.cashLimit || 10000;
+    const expectedNewNetOwed = (currentDues + calculations.finalBillAmount) - (currentEarnings + calculations.totalVendorEarnings);
+    return expectedNewNetOwed > cashLimit;
+  }, [walletInfo, calculations]);
+
 
   const handleSubmit = async () => {
     try {
@@ -481,6 +496,7 @@ const BillingPage = () => {
         setIsOtpSent(true);
         setShowOtpModal(true);
         setPaymentMode('cash');
+        setOnlinePaymentData(null); // Clear QR data when switching to cash
         toast.success('OTP sent to customer!');
       } else {
         toast.error(res.message || 'Failed to send OTP');
@@ -510,6 +526,7 @@ const BillingPage = () => {
         localStorage.removeItem(`billing_step_${id}`);
         localStorage.removeItem(`billing_max_step_${id}`);
         localStorage.removeItem(`billing_data_${id}`);
+        fetchData();
         navigate(`/vendor/booking/${id}`);
       } else {
         toast.error(res.message || 'Invalid OTP');
@@ -539,8 +556,9 @@ const BillingPage = () => {
       if (res.success) {
         setOnlinePaymentData(res.data);
         setShowQrModal(true);
+        setIsOtpSent(true); // Generated OTP is available concurrently
         setPaymentMode('online');
-        toast.success('QR Code generated!');
+        toast.success('QR Code and OTP generated!');
       } else {
         toast.error(res.message || 'Failed to initiate online payment');
       }
@@ -563,6 +581,7 @@ const BillingPage = () => {
         localStorage.removeItem(`billing_step_${id}`);
         localStorage.removeItem(`billing_max_step_${id}`);
         localStorage.removeItem(`billing_data_${id}`);
+        fetchData();
         navigate(`/vendor/booking/${id}`);
       } else {
         toast.error(res.message || 'Payment not yet confirmed');
@@ -1073,7 +1092,7 @@ const BillingPage = () => {
                   </div>
                 )}
 
-                {paymentMode && (
+                {(paymentMode && booking.status === 'completed') && (
                   <div>
                     <h4 className="font-bold text-gray-900 flex items-center gap-2 mb-2 pb-2 border-b border-gray-100">
                       <span className={`w-6 h-6 rounded-full flex items-center justify-center text-xs ${paymentMode === 'cash' ? 'bg-emerald-50 text-emerald-600' : 'bg-blue-50 text-blue-600'}`}>
@@ -1084,8 +1103,24 @@ const BillingPage = () => {
                     <div className="flex justify-between text-sm pl-2 font-black text-gray-900 uppercase tracking-tight">
                       <span>Status</span>
                       <span className={paymentMode === 'cash' ? 'text-emerald-600' : 'text-blue-600'}>
-                        {paymentMode === 'cash' ? 'Pay in Cash (OTP Pending)' : 'Online (QR Scanned)'}
+                        {paymentMode === 'cash' ? 'Cash Collected' : 'Qr Online'}
                       </span>
+                    </div>
+                  </div>
+                )}
+
+                {/* Wallet Limit Warning */}
+                {willExceedCashLimit && (
+                  <div className="mt-4 p-4 rounded-2xl bg-amber-50 border border-amber-200 flex gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-amber-100 flex items-center justify-center shrink-0">
+                      <FiClock className="w-5 h-5 text-amber-600" />
+                    </div>
+                    <div>
+                      <p className="text-xs font-bold text-amber-800">Wallet Limit Warning</p>
+                      <p className="text-[10px] text-amber-600 leading-normal mt-0.5">
+                        Collecting this cash bill will exceed your net limit (₹{(walletInfo?.cashLimit || 10000).toLocaleString()}). 
+                        Your account will be temporarily blocked from new jobs until settled.
+                      </p>
                     </div>
                   </div>
                 )}
@@ -1167,8 +1202,8 @@ const BillingPage = () => {
 
             {/* Payment Options Grid for Step 5 */}
             <div className="flex-[2] grid grid-cols-2 gap-2">
-              {/* Cash Option */}
-              {isOtpSent ? (
+              {/* Cash/OTP Option - Show if either cash mode or QR generated OTP */}
+              {(isOtpSent && paymentMode === 'cash') ? (
                 <button
                   onClick={() => setShowOtpModal(true)}
                   disabled={otpLoading || qrLoading}

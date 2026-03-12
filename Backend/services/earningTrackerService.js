@@ -89,16 +89,20 @@ const recordWithdrawal = async (date, amount) => {
  */
 const updatePendingSnapshots = async (dateStr) => {
   try {
-    const vendors = await Vendor.find({}, 'walletBalance').lean();
+    const vendors = await Vendor.find({}, 'wallet').lean();
 
     let totalPendingSettlement = 0; // Negative balances (Vendor owes us)
     let totalPendingAmountToVendors = 0; // Positive balances (We owe Vendor)
 
     vendors.forEach(v => {
-      if (v.walletBalance < 0) {
-        totalPendingSettlement += Math.abs(v.walletBalance);
-      } else if (v.walletBalance > 0) {
-        totalPendingAmountToVendors += v.walletBalance;
+      const earnings = v.wallet?.earnings || 0;
+      const dues = v.wallet?.dues || 0;
+      const net = earnings - dues;
+      
+      if (net < 0) {
+        totalPendingSettlement += Math.abs(net);
+      } else if (net > 0) {
+        totalPendingAmountToVendors += net;
       }
     });
 

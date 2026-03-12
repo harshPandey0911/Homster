@@ -64,88 +64,86 @@ export default function BookingDetails() {
     };
   }, []);
 
-  useEffect(() => {
-    // Load booking from localStorage (mock data)
-    // Load booking from API
-    const loadBooking = async () => {
-      try {
-        setLoading(true);
-        let billData = null;
+  const loadBooking = async () => {
+    try {
+      setLoading(true);
+      let billData = null;
 
-        const [bookingRes, billRes] = await Promise.all([
-          getBookingById(id),
-          vendorBillService.getBill(id).catch(() => ({ success: false }))
-        ]);
+      const [bookingRes, billRes] = await Promise.all([
+        getBookingById(id),
+        vendorBillService.getBill(id).catch(() => ({ success: false }))
+      ]);
 
-        const apiData = bookingRes.data || bookingRes;
-        if (billRes && billRes.success) {
-          billData = billRes.bill;
-        }
-
-        // Map API response to Component State structure
-        const mappedBooking = {
-          ...apiData,
-          bill: billData || apiData.bill, // Prioritize fetched bill
-          id: apiData._id || apiData.id,
-          user: apiData.userId || apiData.user || { name: apiData.customerName || 'Customer', phone: apiData.customerPhone || 'Hidden' },
-          customerName: apiData.userId?.name || apiData.customerName || 'Customer',
-          customerPhone: apiData.userId?.phone || apiData.customerPhone || 'Hidden',
-          serviceType: apiData.serviceId?.title || apiData.serviceName || apiData.serviceType || 'Service',
-          items: apiData.bookedItems || [],
-          location: {
-            address: (() => {
-              const a = apiData.address;
-              if (!a) return 'Address not available';
-              if (typeof a === 'string') return a;
-              return `${a.addressLine2 ? a.addressLine2 + ', ' : ''}${a.addressLine1 || ''}, ${a.city || ''}`;
-            })(),
-            lat: apiData.address?.lat || 0,
-            lng: apiData.address?.lng || 0,
-            distance: apiData.distance ? `${apiData.distance.toFixed(1)} km` : 'N/A'
-          },
-          // Price Breakdown
-          basePrice: parseFloat(apiData.basePrice || 0),
-          tax: parseFloat(apiData.tax || (apiData.paymentMethod === 'plan_benefit' ? (apiData.basePrice || 0) * 0.18 : 0)),
-          visitingCharges: parseFloat(apiData.visitingCharges || apiData.visitationFee || (apiData.paymentMethod === 'plan_benefit' ? 49 : 0)),
-          discount: parseFloat(apiData.discount || 0),
-          platformCommission: parseFloat(apiData.adminCommission || apiData.platformFee || apiData.commission || 0),
-          finalAmount: parseFloat(apiData.finalAmount || 0),
-          vendorEarnings: parseFloat(
-            billData?.vendorTotalEarning ||
-            apiData.vendorEarnings ||
-            (apiData.paymentMethod === 'plan_benefit'
-              ? (Number(apiData.basePrice || 0) * 0.7) // Fallback: 70% share from base
-              : (apiData.finalAmount ? apiData.finalAmount - (apiData.commission || 0) : 0)
-            )
-          ),
-
-          // Display Price (Vendor Earnings by default as requested)
-          price: (apiData.vendorEarnings || (apiData.finalAmount ? apiData.finalAmount - (apiData.commission || 0) : 0)).toFixed(2),
-
-          timeSlot: {
-            date: apiData.scheduledDate ? new Date(apiData.scheduledDate).toLocaleDateString() : 'Today',
-            time: apiData.scheduledTime || apiData.timeSlot?.start ? `${apiData.timeSlot.start} - ${apiData.timeSlot.end}` : 'Flexible'
-          },
-          status: apiData.status,
-          description: apiData.description || apiData.notes || 'No description provided',
-          assignedTo: apiData.workerId ? { name: apiData.workerId.name } : (apiData.assignedAt ? { name: 'You (Self)' } : null),
-          workerResponse: apiData.workerResponse,
-          workerResponseAt: apiData.workerResponseAt,
-          paymentMethod: apiData.paymentMethod,
-          paymentStatus: apiData.paymentStatus,
-          cashCollected: apiData.cashCollected || false,
-          workerPaymentStatus: apiData.workerPaymentStatus,
-          finalSettlementStatus: apiData.finalSettlementStatus
-        };
-
-        setBooking(mappedBooking);
-      } catch (error) {
-        // Error loading booking
-      } finally {
-        setLoading(false);
+      const apiData = bookingRes.data || bookingRes;
+      if (billRes && billRes.success) {
+        billData = billRes.bill;
       }
-    };
 
+      // Map API response to Component State structure
+      const mappedBooking = {
+        ...apiData,
+        bill: billData || apiData.bill, // Prioritize fetched bill
+        id: apiData._id || apiData.id,
+        user: apiData.userId || apiData.user || { name: apiData.customerName || 'Customer', phone: apiData.customerPhone || 'Hidden' },
+        customerName: apiData.userId?.name || apiData.customerName || 'Customer',
+        customerPhone: apiData.userId?.phone || apiData.customerPhone || 'Hidden',
+        serviceType: apiData.serviceId?.title || apiData.serviceName || apiData.serviceType || 'Service',
+        items: apiData.bookedItems || [],
+        location: {
+          address: (() => {
+            const a = apiData.address;
+            if (!a) return 'Address not available';
+            if (typeof a === 'string') return a;
+            return `${a.addressLine2 ? a.addressLine2 + ', ' : ''}${a.addressLine1 || ''}, ${a.city || ''}`;
+          })(),
+          lat: apiData.address?.lat || 0,
+          lng: apiData.address?.lng || 0,
+          distance: apiData.distance ? `${apiData.distance.toFixed(1)} km` : 'N/A'
+        },
+        // Price Breakdown
+        basePrice: parseFloat(apiData.basePrice || 0),
+        tax: parseFloat(apiData.tax || (apiData.paymentMethod === 'plan_benefit' ? (apiData.basePrice || 0) * 0.18 : 0)),
+        visitingCharges: parseFloat(apiData.visitingCharges || apiData.visitationFee || (apiData.paymentMethod === 'plan_benefit' ? 49 : 0)),
+        discount: parseFloat(apiData.discount || 0),
+        platformCommission: parseFloat(apiData.adminCommission || apiData.platformFee || apiData.commission || 0),
+        finalAmount: parseFloat(apiData.finalAmount || 0),
+        vendorEarnings: parseFloat(
+          billData?.vendorTotalEarning ||
+          apiData.vendorEarnings ||
+          (apiData.paymentMethod === 'plan_benefit'
+            ? (Number(apiData.basePrice || 0) * 0.7) // Fallback: 70% share from base
+            : (apiData.finalAmount ? apiData.finalAmount - (apiData.commission || 0) : 0)
+          )
+        ),
+
+        // Display Price (Vendor Earnings by default as requested)
+        price: (apiData.vendorEarnings || (apiData.finalAmount ? apiData.finalAmount - (apiData.commission || 0) : 0)).toFixed(2),
+
+        timeSlot: {
+          date: apiData.scheduledDate ? new Date(apiData.scheduledDate).toLocaleDateString() : 'Today',
+          time: apiData.scheduledTime || apiData.timeSlot?.start ? `${apiData.timeSlot.start} - ${apiData.timeSlot.end}` : 'Flexible'
+        },
+        status: apiData.status,
+        description: apiData.description || apiData.notes || 'No description provided',
+        assignedTo: apiData.workerId ? { name: apiData.workerId.name } : (apiData.assignedAt ? { name: 'You (Self)' } : null),
+        workerResponse: apiData.workerResponse,
+        workerResponseAt: apiData.workerResponseAt,
+        paymentMethod: apiData.paymentMethod,
+        paymentStatus: apiData.paymentStatus,
+        cashCollected: apiData.cashCollected || false,
+        workerPaymentStatus: apiData.workerPaymentStatus,
+        finalSettlementStatus: apiData.finalSettlementStatus
+      };
+
+      setBooking(mappedBooking);
+    } catch (error) {
+      // Error loading booking
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
     loadBooking();
     window.addEventListener('vendorJobsUpdated', loadBooking);
 
@@ -330,7 +328,7 @@ export default function BookingDetails() {
           await updateBookingStatus(id, newStatus);
           window.dispatchEvent(new Event('vendorJobsUpdated'));
           toast.success(`Status updated to ${newStatus.replace('_', ' ')} successfully!`);
-          window.location.reload();
+          loadBooking();
         } catch (error) {
           console.error('Error updating status:', error);
           toast.error('Failed to update status. Please try again.');
@@ -363,7 +361,7 @@ export default function BookingDetails() {
         toast.success(res.message || 'Payment recorded successfully');
         setIsPayWorkerModalOpen(false);
         // Refresh booking data
-        window.location.reload();
+        loadBooking();
       } else {
         toast.error(res.message || 'Failed to record payment');
       }
@@ -390,7 +388,7 @@ export default function BookingDetails() {
           });
           window.dispatchEvent(new Event('vendorJobsUpdated'));
           toast.success('Final settlement marked as done!');
-          window.location.reload();
+          loadBooking();
         } catch (error) {
           console.error('Error updating settlement:', error);
           toast.error('Failed to update settlement. Please try again.');
@@ -1310,7 +1308,12 @@ export default function BookingDetails() {
                   </div>
                   <div className="mt-3 flex items-start gap-2 text-[11px] text-orange-700/80 leading-relaxed">
                     <FiClock className="w-3 h-3 mt-0.5" />
-                    <span>Customer chose {booking.paymentMethod?.replace('_', ' ') || 'Cash'} payment. Please verify collection to proceed.</span>
+                    <span>Customer chose {
+                      booking.paymentMethod === 'cash collected' ? 'Cash Collected' : 
+                      booking.paymentMethod === 'Qr online' ? 'QR Online' : 
+                      booking.paymentMethod === 'online' ? 'Online Paid' : 
+                      booking.paymentMethod?.replace('_', ' ') || 'Cash'
+                    } payment. Please verify collection to proceed.</span>
                   </div>
                 </div>
               )}
