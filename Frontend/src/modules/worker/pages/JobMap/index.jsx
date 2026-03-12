@@ -1,5 +1,6 @@
-// JobMap component for tracking worker journey and arrival verification
 import React, { useState, useEffect, useRef, useMemo } from 'react';
+import { db } from '../../../../firebase';
+import { ref as dbRef, set as dbSet } from 'firebase/database';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { GoogleMap, useJsApiLoader, DirectionsRenderer, OverlayView, PolylineF } from '@react-google-maps/api';
@@ -238,6 +239,16 @@ const JobMap = () => {
         lng: point.lng,
         heading: simHeading
       });
+
+      // Sync to Firebase
+      if (db) {
+        dbSet(dbRef(db, `trackings/${id}`), {
+          lat: point.lat,
+          lng: point.lng,
+          heading: simHeading,
+          updatedAt: Date.now()
+        });
+      }
 
       // Update local display
       setCurrentLocation(point);

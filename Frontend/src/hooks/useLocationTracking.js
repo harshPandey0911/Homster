@@ -1,8 +1,10 @@
 import { useEffect, useRef, useCallback } from 'react';
+import { db } from '../firebase';
+import { ref, set } from 'firebase/database';
 
 /**
  * useLocationTracking Hook
- * Watches GPS location and emits updates via socket for live tracking.
+ * Watches GPS location and emits updates via socket AND Firebase for live tracking.
  * 
  * @param {Socket} socket - Socket.IO client instance
  * @param {string} bookingId - Current booking ID
@@ -33,6 +35,22 @@ export const useLocationTracking = (socket, bookingId, isActive, options = {}) =
     return R * c;
   }, []);
 
+  // Sync to Firebase Realtime Database
+  const syncToFirebase = useCallback((lat, lng, heading) => {
+    if (!db || !bookingId) return;
+    try {
+      const trackingRef = ref(db, `trackings/${bookingId}`);
+      set(trackingRef, {
+        lat,
+        lng,
+        heading: heading || 0,
+        updatedAt: Date.now()
+      });
+    } catch (error) {
+      console.error('[Firebase Tracking] Error updating location:', error);
+    }
+  }, [bookingId]);
+
   // Emit location to socket
   const emitLocation = useCallback((position) => {
     if (!socket || !bookingId) return;
@@ -58,7 +76,7 @@ export const useLocationTracking = (socket, bookingId, isActive, options = {}) =
       }
     }
 
-    // Emit update
+    // 1. Emit to Socket.IO (for database storage and legacy support)
     socket.emit('update_location', {
       bookingId,
       lat: latitude,
@@ -66,9 +84,12 @@ export const useLocationTracking = (socket, bookingId, isActive, options = {}) =
       heading: heading || 0
     });
 
+    // 2. Sync to Firebase (for real-time high-performance tracking)
+    syncToFirebase(latitude, longitude, heading);
+
     lastEmitTimeRef.current = now;
     lastPositionRef.current = { lat: latitude, lng: longitude };
-  }, [socket, bookingId, interval, distanceFilter, getDistance]);
+  }, [socket, bookingId, interval, distanceFilter, getDistance, syncToFirebase]);
 
   // Start/stop watching position
   useEffect(() => {
@@ -114,12 +135,16 @@ export const useLocationTracking = (socket, bookingId, isActive, options = {}) =
         (position) => {
           if (socket && bookingId) {
             const { latitude, longitude, heading } = position.coords;
+            // 1. Socket
             socket.emit('update_location', {
               bookingId,
               lat: latitude,
               lng: longitude,
               heading: heading || 0
             });
+            // 2. Firebase
+            syncToFirebase(latitude, longitude, heading);
+            
             lastPositionRef.current = { lat: latitude, lng: longitude };
           }
         },
@@ -129,7 +154,7 @@ export const useLocationTracking = (socket, bookingId, isActive, options = {}) =
         { enableHighAccuracy, timeout: 5000 }
       );
     }
-  }, [socket, bookingId, enableHighAccuracy]);
+  }, [socket, bookingId, enableHighAccuracy, syncToFirebase]);
 
   return { forceEmit };
 };
