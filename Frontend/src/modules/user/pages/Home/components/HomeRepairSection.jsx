@@ -16,19 +16,12 @@ const HomeRepairSection = ({ services, onSeeAllClick, onServiceClick, onAddClick
 
   return (
     <div className="mb-6">
-      {/* Title and See All */}
       <div className="px-4 mb-5 flex items-center justify-between">
         <h2
           className="text-xl font-bold text-gray-900 tracking-tight"
         >
           Home repair & installation
         </h2>
-        <button
-          onClick={onSeeAllClick}
-          className="font-bold text-xs px-4 py-2 rounded-full transition-all hover:bg-gray-100 active:scale-95 bg-gray-50 text-gray-700 border border-gray-100"
-        >
-          See all
-        </button>
       </div>
 
       <div className="flex gap-4 overflow-x-auto px-6 pb-2 scrollbar-hide">

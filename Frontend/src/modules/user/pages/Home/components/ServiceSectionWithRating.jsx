@@ -79,7 +79,6 @@ const ServiceSectionWithRating = React.memo(({ title, subtitle, services, onSeeA
 
   return (
     <div ref={sectionRef} className="mb-6">
-      {/* Title and Subtitle Section */}
       <div ref={titleRef} className="px-4 mb-5 flex items-center justify-between" style={{ opacity: 1 }}>
         <div>
           <h2
@@ -93,27 +92,6 @@ const ServiceSectionWithRating = React.memo(({ title, subtitle, services, onSeeA
             </p>
           )}
         </div>
-        {onSeeAllClick && (
-          <button
-            onClick={onSeeAllClick}
-            className="font-bold text-xs px-4 py-2 rounded-full transition-all active:scale-95 border"
-            style={{
-              backgroundColor: `${themeColors.brand.teal}0D`,
-              color: themeColors.button,
-              borderColor: `${themeColors.brand.teal}1A`
-            }}
-            onMouseEnter={(e) => {
-              e.target.style.backgroundColor = themeColors.button;
-              e.target.style.color = '#FFFFFF';
-            }}
-            onMouseLeave={(e) => {
-              e.target.style.backgroundColor = `${themeColors.brand.teal}0D`;
-              e.target.style.color = themeColors.button;
-            }}
-          >
-            See all
-          </button>
-        )}
       </div>
 
       <div ref={cardsRef} className="flex gap-4 overflow-x-auto px-4 pb-4 scrollbar-hide -mx-0">
