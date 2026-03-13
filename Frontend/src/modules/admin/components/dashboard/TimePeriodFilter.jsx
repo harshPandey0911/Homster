@@ -1,7 +1,7 @@
 import React from 'react';
 import { FiCalendar, FiDownload } from 'react-icons/fi';
 
-const TimePeriodFilter = ({ selectedPeriod, onPeriodChange, onExport }) => {
+const TimePeriodFilter = ({ selectedPeriod, onPeriodChange, onExport, customDates, onCustomDateChange }) => {
   const periods = [
     { key: 'today', label: 'Today' },
     { key: 'week', label: 'This Week' },
@@ -11,18 +11,23 @@ const TimePeriodFilter = ({ selectedPeriod, onPeriodChange, onExport }) => {
 
   return (
     <div className="w-full">
-      <div className="flex items-center justify-between gap-3">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         {/* Left group: calendar + segmented control */}
-        <div className="flex items-center gap-3 flex-1 min-w-0">
+        <div className="flex flex-wrap items-center gap-3 flex-1 min-w-0">
           <button
             type="button"
-            className="h-10 w-10 rounded-xl bg-white border border-gray-200 shadow-sm flex items-center justify-center text-gray-700"
-            aria-label="Calendar"
+            onClick={() => onPeriodChange(selectedPeriod === 'custom' ? 'month' : 'custom')}
+            className={`h-10 w-10 rounded-xl border shadow-sm flex items-center justify-center transition-all ${
+              selectedPeriod === 'custom'
+                ? 'bg-primary-600 border-primary-600 text-white shadow-md scale-105'
+                : 'bg-white border-gray-200 text-gray-700 hover:border-primary-300'
+            }`}
+            aria-label="Custom Range"
           >
             <FiCalendar className="w-5 h-5" />
           </button>
 
-          <div className="flex items-center bg-gray-100 rounded-2xl p-1.5 overflow-x-auto scrollbar-hide">
+          <div className="flex items-center bg-gray-100/80 backdrop-blur-sm rounded-2xl p-1.5 shadow-inner">
             {periods.map((p) => {
               const active = selectedPeriod === p.key;
               return (
@@ -30,10 +35,10 @@ const TimePeriodFilter = ({ selectedPeriod, onPeriodChange, onExport }) => {
                   key={p.key}
                   type="button"
                   onClick={() => onPeriodChange(p.key)}
-                  className={`px-4 py-2 rounded-xl text-sm font-semibold whitespace-nowrap transition-all ${
+                  className={`px-4 py-2 rounded-xl text-sm font-bold whitespace-nowrap transition-all duration-200 ${
                     active
-                      ? 'bg-white text-gray-900 shadow-sm'
-                      : 'text-gray-700 hover:bg-white/60'
+                      ? 'bg-white text-primary-700 shadow-md transform scale-100'
+                      : 'text-gray-500 hover:text-gray-700 hover:bg-white/40'
                   }`}
                 >
                   {p.label}
@@ -41,16 +46,34 @@ const TimePeriodFilter = ({ selectedPeriod, onPeriodChange, onExport }) => {
               );
             })}
           </div>
+
+          {selectedPeriod === 'custom' && (
+            <div className="flex items-center gap-2 bg-white border border-primary-100 rounded-2xl p-1.5 px-4 shadow-sm animate-in fade-in slide-in-from-left-4 duration-500">
+              <input
+                type="date"
+                value={customDates?.start || ''}
+                onChange={(e) => onCustomDateChange({ ...customDates, start: e.target.value })}
+                className="border-0 bg-transparent text-sm font-semibold focus:ring-0 text-gray-700 py-1 w-32 cursor-pointer"
+              />
+              <span className="text-gray-400 font-bold text-xs uppercase tracking-widest">to</span>
+              <input
+                type="date"
+                value={customDates?.end || ''}
+                onChange={(e) => onCustomDateChange({ ...customDates, end: e.target.value })}
+                className="border-0 bg-transparent text-sm font-semibold focus:ring-0 text-gray-700 py-1 w-32 cursor-pointer"
+              />
+            </div>
+          )}
         </div>
 
         {/* Right: Export */}
         <button
           type="button"
           onClick={onExport}
-          className="h-10 px-4 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-semibold flex items-center gap-2 shadow-sm active:scale-[0.98] whitespace-nowrap"
+          className="h-10 px-6 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/20 active:scale-[0.95] transition-all whitespace-nowrap"
         >
           <FiDownload className="w-4 h-4" />
-          Export CSV
+          <span>Export CSV</span>
         </button>
       </div>
     </div>

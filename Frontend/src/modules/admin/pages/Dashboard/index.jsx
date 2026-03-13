@@ -17,6 +17,10 @@ import { getDashboardStats, getRevenueAnalytics } from '../../../../services/adm
 const AdminDashboard = () => {
   const navigate = useNavigate();
   const [period, setPeriod] = useState('month');
+  const [customDates, setCustomDates] = useState({
+    start: new Date(new Date().setDate(new Date().getDate() - 7)).toISOString().split('T')[0],
+    end: new Date().toISOString().split('T')[0]
+  });
   const [revenueData, setRevenueData] = useState([]);
   const [recentBookingsList, setRecentBookingsList] = useState([]);
   const [stats, setStats] = useState({
@@ -32,8 +36,39 @@ const AdminDashboard = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // 1. Fetch Stats & Recent Bookings
-        const statsRes = await getDashboardStats();
+        // 1. Calculate Period Dates
+        let apiPeriod = 'monthly';
+        let startDate = new Date();
+        let endDate = new Date().toISOString();
+
+        if (period === 'year') {
+          apiPeriod = 'monthly';
+          startDate.setFullYear(startDate.getFullYear() - 1);
+        } else if (period === 'week') {
+          apiPeriod = 'daily';
+          startDate.setDate(startDate.getDate() - 7);
+        } else if (period === 'month') {
+          apiPeriod = 'daily';
+          startDate.setDate(startDate.getDate() - 30);
+        } else if (period === 'custom') {
+          apiPeriod = 'daily';
+          startDate = new Date(customDates.start);
+          const customEndDate = new Date(customDates.end);
+          customEndDate.setHours(23, 59, 59, 999);
+          endDate = customEndDate.toISOString();
+        } else {
+          apiPeriod = 'daily';
+          startDate.setDate(startDate.getDate() - 1);
+        }
+
+        const startIso = startDate.toISOString();
+
+        // 2. Fetch Stats & Recent Bookings (Filtered)
+        const statsRes = await getDashboardStats({
+          startDate: startIso,
+          endDate
+        });
+        
         if (statsRes.success) {
           const s = statsRes.data.stats;
           setStats({
@@ -48,28 +83,10 @@ const AdminDashboard = () => {
           setRecentBookingsList(statsRes.data.recentBookings || []);
         }
 
-        // 2. Fetch Revenue Analytics based on Period
-        let apiPeriod = 'monthly';
-        let startDate = new Date();
-        const endDate = new Date().toISOString();
-
-        if (period === 'year') {
-          apiPeriod = 'monthly';
-          startDate.setFullYear(startDate.getFullYear() - 1);
-        } else if (period === 'week') {
-          apiPeriod = 'daily';
-          startDate.setDate(startDate.getDate() - 7);
-        } else if (period === 'month') {
-          apiPeriod = 'daily';
-          startDate.setDate(startDate.getDate() - 30);
-        } else {
-          apiPeriod = 'daily';
-          startDate.setDate(startDate.getDate() - 1);
-        }
-
+        // 3. Fetch Revenue Analytics based on Period
         const revRes = await getRevenueAnalytics({
           period: apiPeriod,
-          startDate: startDate.toISOString(),
+          startDate: startIso,
           endDate
         });
 
@@ -88,7 +105,7 @@ const AdminDashboard = () => {
     };
 
     fetchData();
-  }, [period]);
+  }, [period, customDates.start, customDates.end]);
 
   const handleExportCsv = () => {
     try {
@@ -125,7 +142,7 @@ const AdminDashboard = () => {
 
   const statsCards = [
     {
-      title: 'Total Revenue',
+      title: period === 'month' ? 'Monthly Revenue' : period === 'year' ? 'Yearly Revenue' : period === 'today' ? 'Today\'s Revenue' : period === 'week' ? 'Weekly Revenue' : 'Revenue',
       value: formatCurrency(stats.totalRevenue || 0),
       change: 0,
       icon: FiDollarSign,
@@ -158,7 +175,7 @@ const AdminDashboard = () => {
       link: '/admin/reports/bookings'
     },
     {
-      title: 'Total Users',
+      title: 'New Users',
       value: (stats.totalUsers || 0).toLocaleString(),
       change: 0,
       icon: FiUser,
@@ -169,7 +186,7 @@ const AdminDashboard = () => {
       link: '/admin/users/analytics'
     },
     {
-      title: 'Total Vendors',
+      title: 'New Vendors',
       value: (stats.totalVendors || 0).toLocaleString(),
       change: 0,
       icon: FiBriefcase,
@@ -180,7 +197,7 @@ const AdminDashboard = () => {
       link: '/admin/vendors/analytics'
     },
     {
-      title: 'Total Workers',
+      title: 'New Workers',
       value: (stats.totalWorkers || 0).toLocaleString(),
       change: 0,
       icon: FiUsers,
@@ -204,6 +221,8 @@ const AdminDashboard = () => {
             selectedPeriod={period}
             onPeriodChange={setPeriod}
             onExport={handleExportCsv}
+            customDates={customDates}
+            onCustomDateChange={setCustomDates}
           />
         </div>
       </div>

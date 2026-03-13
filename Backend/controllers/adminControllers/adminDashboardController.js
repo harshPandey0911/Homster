@@ -12,25 +12,57 @@ const { BOOKING_STATUS, PAYMENT_STATUS, VENDOR_STATUS } = require('../../utils/c
  */
 const getDashboardStats = async (req, res) => {
   try {
-    // Total counts
-    const totalUsers = await User.countDocuments({ isActive: true });
-    const totalVendors = await Vendor.countDocuments({ isActive: true });
-    const totalWorkers = await Worker.countDocuments({ isActive: true });
-    const totalBookings = await Booking.countDocuments();
+    const { startDate, endDate } = req.query;
+    const dateFilter = {};
+    if (startDate || endDate) {
+      dateFilter.createdAt = {};
+      if (startDate) dateFilter.createdAt.$gte = new Date(startDate);
+      if (endDate) {
+        const end = new Date(endDate);
+        end.setHours(23, 59, 59, 999);
+        dateFilter.createdAt.$lte = end;
+      }
+    }
+
+    // Revenue date filter (use completedAt for revenue consistency)
+    const revenueDateFilter = {};
+    if (startDate || endDate) {
+      revenueDateFilter.completedAt = {};
+      if (startDate) revenueDateFilter.completedAt.$gte = new Date(startDate);
+      if (endDate) {
+        const end = new Date(endDate);
+        end.setHours(23, 59, 59, 999);
+        revenueDateFilter.completedAt.$lte = end;
+      }
+    }
+
+    // Total counts (filtered by creation date if provided)
+    const totalUsers = await User.countDocuments({ isActive: true, ...dateFilter });
+    const totalVendors = await Vendor.countDocuments({ isActive: true, ...dateFilter });
+    const totalWorkers = await Worker.countDocuments({ isActive: true, ...dateFilter });
+    const totalBookings = await Booking.countDocuments(dateFilter);
 
     // Booking stats
     const pendingBookings = await Booking.countDocuments({
+      ...dateFilter,
       status: { $nin: [BOOKING_STATUS.COMPLETED, BOOKING_STATUS.CANCELLED] }
     });
-    const completedBookings = await Booking.countDocuments({ status: BOOKING_STATUS.COMPLETED });
-    const cancelledBookings = await Booking.countDocuments({ status: BOOKING_STATUS.CANCELLED });
+    const completedBookings = await Booking.countDocuments({
+      ...dateFilter,
+      status: BOOKING_STATUS.COMPLETED
+    });
+    const cancelledBookings = await Booking.countDocuments({
+      ...dateFilter,
+      status: BOOKING_STATUS.CANCELLED
+    });
 
     // Revenue stats
     const revenueResult = await Booking.aggregate([
       {
         $match: {
           status: BOOKING_STATUS.COMPLETED,
-          paymentStatus: { $in: [PAYMENT_STATUS.SUCCESS, PAYMENT_STATUS.COLLECTED_BY_VENDOR, 'success', 'collected_by_vendor', 'collected_by_worker', 'paid'] }
+          paymentStatus: { $in: [PAYMENT_STATUS.SUCCESS, PAYMENT_STATUS.COLLECTED_BY_VENDOR, 'success', 'collected_by_vendor', 'collected_by_worker', 'paid'] },
+          ...revenueDateFilter
         }
       },
       {
@@ -46,21 +78,21 @@ const getDashboardStats = async (req, res) => {
     const platformCommission = revenue.totalRevenue * 0.2; // 20% commission
 
     // Vendor approval stats
-    const pendingVendors = await Vendor.countDocuments({ approvalStatus: VENDOR_STATUS.PENDING });
-    const approvedVendors = await Vendor.countDocuments({ approvalStatus: VENDOR_STATUS.APPROVED });
+    const pendingVendors = await Vendor.countDocuments({ approvalStatus: VENDOR_STATUS.PENDING, ...dateFilter });
+    const approvedVendors = await Vendor.countDocuments({ approvalStatus: VENDOR_STATUS.APPROVED, ...dateFilter });
 
     // Withdrawal & Settlement stats
-    const pendingWithdrawals = await Withdrawal.countDocuments({ status: 'pending' });
-    const pendingSettlementsCount = await Settlement.countDocuments({ status: 'pending' });
-    const pendingScraps = await Scrap.countDocuments({ status: 'pending' });
+    const pendingWithdrawals = await Withdrawal.countDocuments({ status: 'pending', ...dateFilter });
+    const pendingSettlementsCount = await Settlement.countDocuments({ status: 'pending', ...dateFilter });
+    const pendingScraps = await Scrap.countDocuments({ status: 'pending', ...dateFilter });
 
-    // Recent activities (last 10 bookings)
-    const recentActivityDocs = await Booking.find()
+    // Recent activities (filtered by period)
+    const recentActivityDocs = await Booking.find(dateFilter)
       .populate('userId', 'name phone')
       .populate('vendorId', 'name businessName')
       .populate('serviceId', 'title')
       .sort({ createdAt: -1 })
-      .limit(10);
+      .limit(20);
 
     const recentBookings = recentActivityDocs.map(b => ({
       id: b.bookingNumber || b._id,
@@ -92,7 +124,6 @@ const getDashboardStats = async (req, res) => {
           platformCommission,
           pendingVendors,
           approvedVendors,
-          pendingWithdrawals,
           pendingWithdrawals,
           pendingSettlements: pendingSettlementsCount,
           pendingScraps
