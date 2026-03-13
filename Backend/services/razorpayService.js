@@ -142,6 +142,7 @@ const refundPayment = async (paymentId, amount = null, notes = {}) => {
  * Tries the modern standalone QR API first, then falls back to Payment Link if needed.
  */
 const createQRCode = async (amount, bookingNumber, notes = {}) => {
+  try {
     // Manual UPI QR block removed as requested
     
     if (!razorpay) {
