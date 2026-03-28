@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FiArrowLeft, FiCheck, FiStar } from 'react-icons/fi';
+import { FiArrowLeft, FiCheck, FiStar, FiCheckCircle, FiShield, FiZap } from 'react-icons/fi';
 import { getPlans } from '../../services/planService';
 import { userAuthService } from '../../../../services/authService';
 import { toast } from 'react-hot-toast';
@@ -17,39 +17,62 @@ const MyPlan = () => {
 
     if (lower.includes('platinum')) {
       return {
-        container: 'bg-slate-900 text-white border-slate-700 ring-1 ring-slate-700',
-        button: 'bg-white text-slate-900 hover:bg-slate-100',
-        icon: 'text-slate-900 bg-white'
+        container: 'bg-slate-900 border-slate-700 text-white',
+        badge: 'bg-emerald-500 text-white',
+        includes: 'text-slate-400',
+        check: 'text-emerald-400',
+        price: 'text-white',
+        button: 'bg-white text-slate-900 hover:bg-slate-100'
       };
     }
     if (lower.includes('diamond')) {
       return {
-        container: 'bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 text-white border-transparent shadow-xl ring-0',
-        button: 'bg-white text-indigo-600 hover:bg-gray-50',
-        icon: 'text-indigo-600 bg-white'
+        container: 'bg-indigo-50 border-indigo-100 text-indigo-900',
+        badge: 'bg-emerald-500 text-white',
+        includes: 'text-indigo-600',
+        check: 'text-indigo-500',
+        price: 'text-indigo-900',
+        button: 'bg-indigo-600 text-white hover:bg-indigo-700'
       }
     }
     if (lower.includes('gold')) {
       return {
-        container: 'bg-gradient-to-br from-amber-100 to-yellow-100 border-amber-200 text-amber-900',
-        button: 'bg-amber-600 text-white hover:bg-amber-700',
-        icon: 'text-amber-100 bg-amber-600'
+        container: 'bg-[#FEF9C3] border-yellow-200 text-[#854D0E]',
+        badge: 'bg-[#22C55E] text-white',
+        includes: 'text-[#854D0E] opacity-70',
+        check: 'text-[#854D0E]',
+        price: 'text-[#854D0E]',
+        button: 'bg-[#854D0E] text-white hover:bg-amber-900'
       };
     }
     if (lower.includes('silver')) {
       return {
-        container: 'bg-gradient-to-br from-gray-100 to-slate-200 border-gray-300 text-gray-800',
-        button: 'bg-gray-800 text-white hover:bg-gray-900',
-        icon: 'text-gray-700 bg-white/60'
+        container: 'bg-[#F1F5F9] border-slate-200 text-slate-800',
+        badge: 'bg-[#22C55E] text-white',
+        includes: 'text-slate-500',
+        check: 'text-slate-400',
+        price: 'text-slate-900',
+        button: 'bg-slate-800 text-white hover:bg-slate-900'
       };
     }
 
     // Default
     return {
-      container: 'bg-white border-gray-100 text-gray-800',
-      button: 'bg-primary-600 text-white hover:bg-primary-700',
-      icon: 'text-white bg-primary-400'
+      container: 'bg-white border-gray-200 text-gray-800',
+      badge: 'bg-emerald-500 text-white',
+      includes: 'text-gray-500',
+      check: 'text-primary-500',
+      price: 'text-gray-900',
+      button: 'bg-primary-600 text-white hover:bg-primary-700'
     };
+  };
+
+  const getPreviousPlanNote = (name) => {
+    const lower = name.toLowerCase();
+    if (lower.includes('platinum')) return 'Everything in Diamond & More';
+    if (lower.includes('diamond')) return 'Everything in Gold & More';
+    if (lower.includes('gold')) return 'Everything in Silver & More';
+    return null;
   };
 
   useEffect(() => {
@@ -78,7 +101,7 @@ const MyPlan = () => {
     <div className="min-h-screen bg-gray-50 pb-12">
       {/* Header */}
       <header className="bg-white shadow-sm sticky top-0 z-30">
-        <div className="px-4 py-3 flex items-center gap-3">
+        <div className="px-4 py-4 flex items-center gap-3 max-w-7xl mx-auto">
           <button
             onClick={() => navigate(-1)}
             className="p-2 hover:bg-gray-100 rounded-full transition-colors"
@@ -89,10 +112,12 @@ const MyPlan = () => {
         </div>
       </header>
 
-      <main className="px-4 py-8 max-w-6xl mx-auto">
-        <div className="text-center mb-10">
-          <h2 className="text-3xl font-bold text-gray-900 mb-3">Choose the Right Plan for You</h2>
-          <p className="text-gray-500 max-w-2xl mx-auto">Unlock exclusive services and premium features by subscribing to one of our plans.</p>
+      <main className="px-4 py-12 max-w-7xl mx-auto">
+        <div className="mb-12 bg-white/40 backdrop-blur-sm p-8 rounded-[2.5rem] border border-white shadow-sm">
+          <h2 className="text-4xl font-black text-slate-900 mb-3 tracking-tight">Experience Living, Elevated.</h2>
+          <p className="text-slate-500 font-bold text-lg max-w-2xl leading-relaxed">
+            Choose a plan that matches your lifestyle. Our premium tiers are <span className="text-primary-600">additive</span>—higher plans seamlessly include every single benefit of the levels below them.
+          </p>
         </div>
 
         {loading ? (
@@ -100,91 +125,111 @@ const MyPlan = () => {
             <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary-600"></div>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-8">
             {plans.map((plan) => {
-              const style = getCardStyle(plan.name);
-              const isBestValue = plan.name.toLowerCase().includes('gold') || plan.name.toLowerCase().includes('diamond');
-
+              const style = getCardStyle(plan.name || '');
               const currentPlan = user?.plans;
-              const hasActivePlan = currentPlan?.isActive;
-              const isCurrent = hasActivePlan && currentPlan?.name === plan.name;
+              const isCurrent = currentPlan?.isActive && currentPlan?.name === plan.name;
 
-              // Upgrade logic: if user has plan, check price
-              // If user has NO active plan, everything is selectable (Upgrade false)
               const userPlanPrice = currentPlan?.price || 0;
-              const isUpgrade = hasActivePlan && plan.price > userPlanPrice;
-
-              // Disable logic: 
-              // 1. Current Plan -> Disabled
-              // 2. Lower Plan -> Disabled (User said "only upgrade")
-              // 3. Same Price Plan (if different name) -> Disabled? Assume yes.
-              const isDowngradeOrSame = hasActivePlan && plan.price <= userPlanPrice && !isCurrent;
-
+              const isUpgrade = currentPlan?.isActive && plan.price > userPlanPrice;
+              const isDowngradeOrSame = currentPlan?.isActive && plan.price <= userPlanPrice && !isCurrent;
               const isDisabled = isCurrent || isDowngradeOrSame;
 
               let buttonText = `Select ${plan.name}`;
               if (isCurrent) buttonText = 'Current Plan';
-              if (isUpgrade) buttonText = 'Upgrade';
+              else if (isUpgrade) buttonText = 'Upgrade';
 
               return (
                 <div
                   key={plan._id}
                   onClick={() => navigate(`/user/my-plan/${plan._id}`)}
-                  className={`relative cursor-pointer rounded-3xl p-6 shadow-lg transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl border flex flex-col h-full ${style.container} ${isDisabled && !isCurrent ? 'opacity-80 grayscale-[0.5]' : ''}`}
+                  className={`relative cursor-pointer rounded-3xl border shadow-sm transition-all flex flex-col overflow-hidden ${style.container}`}
                 >
-                  {/* Popular Badge */}
-                  {isBestValue && (
-                    <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-gradient-to-r from-orange-500 to-pink-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow-md">
-                      POPULAR CHOICE
+                  <div className="p-8 pb-8 flex-1 relative">
+                    {/* Top Row: Name and Status */}
+                    <div className="flex justify-between items-start mb-6">
+                      <h3 className="text-3xl font-black">{plan.name}</h3>
+                      {isCurrent && (
+                        <span className={`px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest ${style.badge}`}>
+                          Active
+                        </span>
+                      )}
                     </div>
-                  )}
 
-                  <div className="mb-6 mt-2 text-center">
-                    <h3 className="text-lg font-bold uppercase tracking-widest opacity-90 mb-2">{plan.name}</h3>
-                    <div className="flex items-center justify-center">
-                      <span className="text-sm font-semibold mr-1 opacity-70">₹</span>
-                      <span className="text-4xl font-extrabold tracking-tight">{plan.price}</span>
+                    {/* Price and Duration */}
+                    <div className="flex items-baseline mb-8">
+                      <span className={`text-4xl font-black ${style.price}`}>₹{plan.price}</span>
+                      <span className="text-sm font-bold opacity-40 ml-2">/ {plan.duration || '60'} Days</span>
+                    </div>
+
+                    {/* Benefits Section */}
+                    <div className="space-y-6">
+                      <div className="space-y-1">
+                        <h4 className={`text-[10px] font-black uppercase tracking-[0.25em] ${style.includes}`}>
+                          MEMBERSHIP PERKS
+                        </h4>
+                        {getPreviousPlanNote(plan.name) && (
+                          <p className={`text-[11px] font-black italic opacity-60 flex items-center gap-1.5`}>
+                            <FiStar className="w-3 h-3 fill-current" />
+                            {getPreviousPlanNote(plan.name)}
+                          </p>
+                        )}
+                      </div>
+                      <ul className="space-y-3.5">
+                        {(plan.highlights || []).map((feature, idx) => (
+                          <li key={`h-${idx}`} className="flex items-start gap-3">
+                            <FiCheck className={`w-4 h-4 mt-1 shrink-0 ${style.check}`} />
+                            <span className="text-[14px] font-bold opacity-80 leading-snug">{feature}</span>
+                          </li>
+                        ))}
+                        {(plan.freeCategories || []).map((cat, idx) => (
+                          <li key={`cat-${idx}`} className="flex items-start gap-3">
+                            <FiZap className="w-4 h-4 mt-1 shrink-0 text-amber-500 fill-amber-500" />
+                            <span className="text-[14px] font-extrabold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-md">Free {cat.title || cat.name}</span>
+                          </li>
+                        ))}
+                        {(plan.freeBrands || []).map((brand, idx) => (
+                          <li key={`brand-${idx}`} className="flex items-start gap-3">
+                            <FiZap className="w-4 h-4 mt-1 shrink-0 text-amber-500 fill-amber-500" />
+                            <span className="text-[14px] font-extrabold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-md">Free {brand.title || brand.name}</span>
+                          </li>
+                        ))}
+                        {(plan.freeServices || []).map((svc, idx) => (
+                          <li key={`svc-${idx}`} className="flex items-start gap-3">
+                            <FiZap className="w-4 h-4 mt-1 shrink-0 text-amber-500 fill-amber-500" />
+                            <span className="text-[14px] font-extrabold text-rose-600 bg-rose-50 px-2 py-0.5 rounded-md">Free {svc.title || svc.name}</span>
+                          </li>
+                        ))}
+                      </ul>
                     </div>
                   </div>
 
-                  <div className="flex-1">
-                    <div className="w-full h-px bg-current opacity-10 mb-6"></div>
-                    <ul className="space-y-4 mb-8">
-                      {(plan.highlights || plan.services || []).slice(0, 4).map((feature, idx) => (
-                        <li key={idx} className="flex items-start">
-                          <div className={`flex-shrink-0 w-5 h-5 rounded-full flex items-center justify-center mt-0.5 ${style.icon}`}>
-                            <FiCheck className="w-3.5 h-3.5" />
-                          </div>
-                          <p className="ml-3 text-sm font-medium opacity-90 line-clamp-1">{feature}</p>
-                        </li>
-                      ))}
-                      {(plan.highlights || plan.services || []).length > 4 && (
-                        <li className="text-xs opacity-60 font-bold ml-8">+ {(plan.highlights || plan.services || []).length - 4} more benefits</li>
-                      )}
-                      {(plan.highlights || plan.services || []).length === 0 && (
-                        <li className="flex items-center justify-center text-sm opacity-60 italic">
-                          Standard benefits included
-                        </li>
-                      )}
-                    </ul>
-                  </div>
-
-                  <div className="mt-auto">
+                  {/* Action Button */}
+                  <div className="px-8 pb-8 mt-auto">
                     <button
-                      className={`w-full py-3.5 px-4 rounded-xl font-bold shadow-md transition-all active:scale-95 ${style.button} ${isDisabled && !isCurrent ? 'cursor-not-allowed opacity-70' : ''}`}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        navigate(`/user/my-plan/${plan._id}`);
+                      }}
+                      className={`w-full py-4 px-6 rounded-2xl font-black text-xs uppercase tracking-widest shadow-lg transition-all active:scale-95 transform hover:translate-y-[-2px] ${style.button} ${isDisabled && !isCurrent ? 'opacity-50 grayscale cursor-not-allowed' : ''}`}
                     >
-                      {isCurrent ? 'View Details' : buttonText}
+                      {buttonText}
                     </button>
+                    {isCurrent && (
+                       <p className="text-center text-[10px] font-bold uppercase tracking-widest opacity-30 mt-3">Membership In Good Standing</p>
+                    )}
                   </div>
                 </div>
-              )
+              );
             })}
-            {plans.length === 0 && (
-              <div className="col-span-full text-center py-20 text-gray-500 bg-white rounded-2xl border border-dashed">
-                <FiStar className="h-10 w-10 text-gray-300 mx-auto mb-3" />
-                <p>No subscription plans are currently available.</p>
-              </div>
-            )}
+          </div>
+        )}
+
+        {plans.length === 0 && !loading && (
+          <div className="text-center py-24 bg-white rounded-3xl border border-dashed border-gray-200 shadow-inner">
+            <FiStar className="h-12 w-12 text-gray-200 mx-auto mb-4" />
+            <p className="text-gray-400 font-bold">No subscription plans found at this time.</p>
           </div>
         )}
       </main>
