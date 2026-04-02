@@ -2,10 +2,17 @@ const mongoose = require('mongoose');
 
 const PlanSchema = new mongoose.Schema({
   name: {
-    type: String, // Silver, Gold, etc.
     type: String,
     required: true,
     unique: true
+  },
+  tagline: {
+    type: String, // Dynamic tagline from admin
+    default: ''
+  },
+  description: {
+    type: String, // Dynamic description from admin
+    default: ''
   },
   price: {
     type: Number,
@@ -15,7 +22,6 @@ const PlanSchema = new mongoose.Schema({
     type: String,
     required: true // e.g., '1 month', '1 year'
   },
-  highlights: [String],
   freeCategories: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Category'

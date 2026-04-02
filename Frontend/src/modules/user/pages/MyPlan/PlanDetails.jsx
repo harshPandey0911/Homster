@@ -101,18 +101,32 @@ const PlanDetails = () => {
             <span className="text-xs font-bold uppercase tracking-[0.2em] opacity-80">Subscription Plan</span>
           </div>
           <h1 className="text-4xl font-black">{plan.name}</h1>
+          {plan.tagline && (
+             <div className="mt-2 flex items-center">
+               <span className="bg-white/10 border border-white/20 text-white px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-[0.2em] shadow-sm">
+                 {plan.tagline}
+               </span>
+             </div>
+          )}
         </div>
       </div>
 
       <div className="px-6 -mt-8 relative z-10">
         {/* Main Info Card */}
         <div className="bg-white rounded-3xl shadow-xl border border-gray-100 p-8 mb-6">
+          {plan.description && (
+             <div className="mb-8 p-5 bg-slate-50 border-l-4 border-slate-900 rounded-2xl shadow-inner">
+                <p className="text-sm font-bold text-slate-600 leading-relaxed italic">
+                  "{plan.description}"
+                </p>
+             </div>
+          )}
           <div className="flex justify-between items-start mb-8">
             <div>
               <p className="text-gray-500 text-sm font-medium mb-1">Total Pricing</p>
               <div className="flex items-baseline">
                 <span className={`text-4xl font-black ${theme.color}`}>₹{plan.price}</span>
-                <span className="text-gray-400 text-sm ml-1">/ month</span>
+                <span className="text-gray-400 text-sm ml-1">/ {plan.duration || '1'} Months</span>
               </div>
             </div>
             {isCurrent && (
@@ -125,23 +139,6 @@ const PlanDetails = () => {
 
           <div className="space-y-6">
             <h3 className="font-bold text-gray-900 border-b border-gray-50 pb-3">Plan Benefits</h3>
-            <ul className="grid grid-cols-1 gap-4">
-              {(plan.highlights || plan.services || []).map((service, index) => (
-                <li key={index} className="flex items-start gap-4 p-4 rounded-2xl bg-gray-50/50 hover:bg-gray-50 transition-colors border border-transparent hover:border-gray-100">
-                  <div className={`mt-1 p-1.5 rounded-lg ${theme.bg} text-white shadow-md`}>
-                    <FiCheck className="w-3.5 h-3.5" />
-                  </div>
-                  <div>
-                    <span className="text-gray-800 font-semibold">{service}</span>
-                    <p className="text-gray-400 text-xs mt-0.5">Premium benefit included in your plan</p>
-                  </div>
-                </li>
-              ))}
-              {(!(plan.highlights || plan.services) || (plan.highlights || plan.services).length === 0) && (
-                <p className="text-gray-400 text-sm italic py-4 text-center">Standard benefits are included with this plan.</p>
-              )}
-            </ul>
-
           </div>
         </div>
 

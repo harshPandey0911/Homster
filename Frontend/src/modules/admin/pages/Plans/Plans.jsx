@@ -9,8 +9,7 @@ const Plans = () => {
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentPlan, setCurrentPlan] = useState(null);
-  const [formData, setFormData] = useState({ name: 'Silver', price: '', highlights: [], validityDays: 30, freeCategories: [], freeBrands: [], freeServices: [], bonusServices: [] });
-  const [featureInput, setFeatureInput] = useState('');
+  const [formData, setFormData] = useState({ name: 'Silver', price: '', tagline: '', description: '', validityMonths: 1, freeCategories: [], freeBrands: [], freeServices: [], bonusServices: [] });
 
   const PLAN_TYPES = ['Silver', 'Gold', 'Diamond', 'Platinum'];
 
@@ -182,7 +181,7 @@ const Plans = () => {
           categoryId: String(bs.categoryId?._id || bs.categoryId),
           serviceId: String(bs.serviceId?._id || bs.serviceId)
         })),
-        highlights: formData.highlights 
+        duration: String(formData.validityMonths || 1)
       };
 
       if (currentPlan) {
@@ -204,18 +203,18 @@ const Plans = () => {
     setCurrentPlan(plan);
     setFormData({
       name: plan.name,
-      price: plan.price,
-      highlights: plan.highlights || plan.services || [],
-      validityDays: plan.validityDays || 30,
-      freeCategories: (plan.freeCategories || []).map(c => c._id || c),
-      freeServices: (plan.freeServices || []).map(s => s._id || s),
-      bonusServices: (plan.bonusServices || []).map(bs => ({
-        categoryId: bs.categoryId?._id || bs.categoryId,
-        serviceId: bs.serviceId?._id || bs.serviceId
-      }))
-    });
-    setFeatureInput('');
-    setIsModalOpen(true);
+      tagline: plan.tagline || '',
+      description: plan.description || '',
+        price: plan.price,
+        validityMonths: plan.validityMonths || plan.validityDays || 1,
+        freeCategories: (plan.freeCategories || []).map(c => c._id || c),
+        freeServices: (plan.freeServices || []).map(s => s._id || s),
+        bonusServices: (plan.bonusServices || []).map(bs => ({
+          categoryId: bs.categoryId?._id || bs.categoryId,
+          serviceId: bs.serviceId?._id || bs.serviceId
+        }))
+      });
+      setIsModalOpen(true);
     
     // Auto-select first category/brand for easier editing
     if (plan.freeCategories?.length > 0) {
@@ -255,9 +254,10 @@ const Plans = () => {
     setCurrentPlan(null);
     setFormData({ 
       name: 'Silver', 
+      tagline: '',
+      description: '',
       price: '', 
-      highlights: [], 
-      validityDays: 30, 
+      validityMonths: 1,
       freeCategories: [], 
       freeServices: [], 
       bonusServices: [],
@@ -299,7 +299,7 @@ const Plans = () => {
                   </div>
                   <div className={`flex items-baseline gap-2 mb-4 ${style.price}`}>
                     <span className="text-2xl font-bold">₹{plan.price}</span>
-                    <span className={`text-[10px] font-medium opacity-60`}>/ {plan.validityDays || 30} Days</span>
+                    <span className={`text-[10px] font-medium opacity-60`}>/ {plan.duration || plan.validityMonths || '1'} Months</span>
                   </div>
 
                   <div className="space-y-2 mb-4">
@@ -464,78 +464,45 @@ const Plans = () => {
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-sm font-semibold text-gray-700">Validity (Days)</label>
+                  <label className="text-sm font-semibold text-gray-700">Validity (Months)</label>
                   <input
                     type="number"
-                    name="validityDays"
-                    value={formData.validityDays}
+                    name="validityMonths"
+                    value={formData.validityMonths}
                     onChange={handleInputChange}
                     className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-all font-bold text-gray-800"
                     required
-                    placeholder="30"
+                    placeholder="1"
                     min="1"
                   />
                 </div>
               </div>
 
-              <div className="border border-gray-200 rounded-2xl overflow-hidden shadow-sm">
-                <div className="bg-gray-50 px-6 py-4 border-b border-gray-200 flex items-center gap-3">
-                  <span className="bg-amber-100 text-amber-600 p-2 rounded-lg">
-                    <FiList className="w-5 h-5" />
-                  </span>
-                  <div>
-                    <h3 className="font-bold text-gray-800">Plan Highlights</h3>
-                    <p className="text-xs text-gray-500">Marketing features shown to customers</p>
-                  </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <label className="text-sm font-semibold text-gray-700">Tagline</label>
+                  <input
+                    type="text"
+                    name="tagline"
+                    value={formData.tagline}
+                    onChange={handleInputChange}
+                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-all font-medium"
+                    placeholder="e.g. Best for small families"
+                  />
                 </div>
-                <div className="p-6 bg-white space-y-4">
-                  <div className="flex gap-2">
-                    <input
-                      type="text"
-                      value={featureInput}
-                      onChange={(e) => setFeatureInput(e.target.value)}
-                      onKeyPress={(e) => {
-                        if (e.key === 'Enter' && featureInput.trim()) {
-                          e.preventDefault();
-                          setFormData(p => ({ ...p, highlights: [...p.highlights, featureInput.trim()] }));
-                          setFeatureInput('');
-                        }
-                      }}
-                      className="flex-1 px-4 py-2 bg-gray-50 border border-gray-200 rounded-xl text-sm outline-none focus:ring-2 focus:ring-amber-500 transition-all"
-                      placeholder="e.g. 24/7 Priority Support, Genuine Spare Parts..."
-                    />
-                    <button
-                      type="button"
-                      onClick={() => {
-                        if (featureInput.trim()) {
-                          setFormData(p => ({ ...p, highlights: [...p.highlights, featureInput.trim()] }));
-                          setFeatureInput('');
-                        }
-                      }}
-                      className="px-6 py-2 bg-amber-500 text-white rounded-xl text-sm font-bold shadow-lg shadow-amber-500/20 active:scale-95 transition-all"
-                    >
-                      Add
-                    </button>
-                  </div>
-                  <div className="flex flex-wrap gap-2 min-h-[40px]">
-                    {formData.highlights.map((feature, idx) => (
-                      <div key={idx} className="flex items-center gap-2 px-3 py-1.5 bg-amber-50 border border-amber-100 rounded-full text-[11px] font-bold text-amber-700 shadow-sm animate-in fade-in slide-in-from-left-2 transition-all">
-                        <span>{feature}</span>
-                        <button
-                          type="button"
-                          onClick={() => setFormData(p => ({ ...p, highlights: p.highlights.filter((_, i) => i !== idx) }))}
-                          className="w-4 h-4 flex items-center justify-center bg-white rounded-full text-amber-400 hover:text-red-500 transition-colors"
-                        >
-                          <FiX className="w-3 h-3" />
-                        </button>
-                      </div>
-                    ))}
-                    {formData.highlights.length === 0 && (
-                      <p className="text-gray-400 text-xs italic">No highlights added yet. Describe what makes this plan special.</p>
-                    )}
-                  </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-semibold text-gray-700">Description</label>
+                  <textarea
+                    name="description"
+                    value={formData.description}
+                    onChange={handleInputChange}
+                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-all font-medium min-h-[100px]"
+                    placeholder="Describe the plan benefits in detail..."
+                  />
                 </div>
               </div>
+
+
 
               <div className="border border-gray-200 rounded-2xl overflow-hidden">
                 <div className="bg-gray-50 px-6 py-4 border-b border-gray-200 flex justify-between items-center">

@@ -21,6 +21,7 @@ const run = async () => {
 
     let emptyCats = 0;
     brands.forEach(b => {
+      console.log(`- ${b.title}`);
       if (!b.categoryIds || b.categoryIds.length === 0) {
         emptyCats++;
         console.log(`Brand ${b.title} has NO categories.`);

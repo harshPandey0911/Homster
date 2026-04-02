@@ -149,7 +149,20 @@ const MyPlan = () => {
                   <div className="p-8 pb-8 flex-1 relative">
                     {/* Top Row: Name and Status */}
                     <div className="flex justify-between items-start mb-6">
-                      <h3 className="text-3xl font-black">{plan.name}</h3>
+                      <div className="flex flex-col">
+                        <h3 className="text-3xl font-black tracking-tight">{plan.name}</h3>
+                        {plan.tagline && (
+                          <div className={`mt-2 flex items-center`}>
+                             <span className={`inline-block px-2.5 py-1 rounded-lg text-[9px] font-black uppercase tracking-[0.15em] shadow-sm border ${
+                               plan.name.toLowerCase().includes('platinum') 
+                               ? 'bg-white/10 border-white/20 text-white' 
+                               : 'bg-primary-50 border-primary-100 text-primary-600'
+                             }`}>
+                               {plan.tagline}
+                             </span>
+                          </div>
+                        )}
+                      </div>
                       {isCurrent && (
                         <span className={`px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest ${style.badge}`}>
                           Active
@@ -160,18 +173,12 @@ const MyPlan = () => {
                     {/* Price and Duration */}
                     <div className="flex items-baseline mb-8">
                       <span className={`text-4xl font-black ${style.price}`}>₹{plan.price}</span>
-                      <span className="text-sm font-bold opacity-40 ml-2">/ {plan.duration || '60'} Days</span>
+                      <span className="text-sm font-bold opacity-40 ml-2">/ {plan.duration || '1'} Months</span>
                     </div>
 
                     {/* Benefits Section */}
                     <div className="space-y-6">
                       <ul className="space-y-3.5">
-                        {(plan.highlights || []).map((feature, idx) => (
-                          <li key={`h-${idx}`} className="flex items-start gap-3">
-                            <FiCheck className={`w-4 h-4 mt-1 shrink-0 ${style.check}`} />
-                            <span className="text-[14px] font-bold opacity-80 leading-snug">{feature}</span>
-                          </li>
-                        ))}
                         {(plan.freeCategories || []).map((cat, idx) => (
                           <li key={`cat-${idx}`} className="flex items-start gap-3">
                             <FiZap className="w-4 h-4 mt-1 shrink-0 text-amber-500 fill-amber-500" />
@@ -263,6 +270,21 @@ const MyPlan = () => {
 
                   {/* Action Button */}
                   <div className="px-8 pb-8 mt-auto">
+                    {plan.description && (
+                      <div className={`mb-8 p-4 rounded-2xl border-l-[4px] shadow-sm flex items-start gap-4 transition-all duration-300 transform group-hover:scale-[1.02] ${
+                        plan.name.toLowerCase().includes('platinum') 
+                          ? 'bg-white/5 border-emerald-400' 
+                          : 'bg-white/60 border-primary-500 backdrop-blur-md'
+                      }`}>
+                         <p className={`text-[12px] font-bold leading-relaxed ${
+                            plan.name.toLowerCase().includes('platinum') 
+                              ? 'text-slate-300' 
+                              : 'text-slate-600'
+                         }`}>
+                           {plan.description}
+                         </p>
+                      </div>
+                    )}
                     <button
                       onClick={(e) => {
                         e.stopPropagation();

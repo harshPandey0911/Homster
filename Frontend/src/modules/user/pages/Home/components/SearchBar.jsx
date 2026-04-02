@@ -8,7 +8,16 @@ const SearchBar = ({ onInputClick }) => {
   const [isTyping, setIsTyping] = useState(true);
   const [currentServiceIndex, setCurrentServiceIndex] = useState(0);
 
-  const serviceNames = ['facial', 'kitchen cleaning', 'AC service'];
+  const serviceNames = [
+    'AC service and repair',
+    'Washing machine services',
+    'Cooler repair at Home',
+    'R.O. repair installation',
+    'Microwave repair',
+    'Geyser repair',
+    'Bathroom appliance installation',
+    'Fridge at Home'
+  ];
 
   useEffect(() => {
     let timer;

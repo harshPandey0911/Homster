@@ -46,7 +46,7 @@ const ServiceCategories = React.memo(({ categories, onCategoryClick, onSeeAllCli
         {serviceCategories.map((category, index) => {
           const iconSrc = toAssetUrl(category.icon || category.image);
           return (
-            <div key={category.id} className="flex justify-center h-full">
+            <div key={category.id || index} className="flex justify-center h-full">
               <CategoryCard
                 title={category.title}
                 icon={
