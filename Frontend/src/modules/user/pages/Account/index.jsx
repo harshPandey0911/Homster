@@ -27,6 +27,7 @@ import {
 } from 'react-icons/fi';
 import { MdAccountBalanceWallet } from 'react-icons/md';
 import NotificationBell from '../../components/common/NotificationBell';
+import Logo from '../../../../components/common/Logo';
 
 const Account = () => {
   const navigate = useNavigate();
@@ -427,11 +428,10 @@ const Account = () => {
               className="w-full flex items-center justify-between p-4 bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all group mb-3"
             >
               <div className="flex items-center gap-4">
-                <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-gray-50 transition-colors group-hover:bg-opacity-80"
-                  style={{ color: themeColors.brand.teal }}>
-                  <span className="font-bold">H</span>
+                <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-gray-50 transition-colors group-hover:bg-opacity-80">
+                  <Logo className="w-8 h-8" />
                 </div>
-                <span className="font-semibold text-gray-900">About Homestr</span>
+                <span className="font-semibold text-gray-900">About Cleaning Expert Services</span>
               </div>
               <FiChevronRight className="w-5 h-5 text-gray-300 group-hover:text-teal-500 transition-colors" />
             </motion.button>
