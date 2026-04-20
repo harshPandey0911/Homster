@@ -185,7 +185,7 @@ const VendorLogin = () => {
       <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-[#D68F35] opacity-[0.03] rounded-full blur-3xl animate-floating" style={{ animationDelay: '2s' }} />
 
       <div className="sm:mx-auto sm:w-full sm:max-w-md text-center mb-8 relative z-10 animate-fade-in">
-        <Logo className="h-16 w-auto transform hover:scale-110 transition-transform duration-500 mx-auto" />
+        <Logo className="h-24 w-24 mx-auto transform hover:scale-110 transition-transform duration-500" />
         <h2 className="mt-4 text-3xl font-extrabold text-gray-900 tracking-tight">
           {step === 'phone' ? 'Vendor Sign In' : 'Verify Identity'}
         </h2>

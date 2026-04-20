@@ -183,7 +183,7 @@ const Login = () => {
 
       <div className="sm:mx-auto sm:w-full sm:max-w-md text-center mb-8 relative z-10 animate-fade-in">
         <div className="flex justify-center mb-6">
-          <Logo className="h-16 w-auto transform hover:scale-110 transition-transform duration-500" />
+          <Logo className="h-24 w-24 transform hover:scale-110 transition-transform duration-500" />
         </div>
         <h2 className="text-3xl font-extrabold text-gray-900 tracking-tight">
           {step === 'phone' ? 'Sign in to account' : 'Verify your phone'}

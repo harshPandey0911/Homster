@@ -37,9 +37,9 @@ const LogoLoader = ({ fullScreen = false, overlay = false, inline = false, size 
         className={`relative ${size} flex items-center justify-center`}
       >
         <img
-          src="/Homster-logo.png"
+          src="/cleaning-expert-logo.png"
           alt="Loading..."
-          className="w-full h-full object-contain"
+          className="w-full h-full object-cover rounded-full shadow-lg"
         />
         {/* Subtle ripple effect */}
         <motion.div
