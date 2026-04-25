@@ -25,6 +25,7 @@ const userTheme = {
   headerGradient: 'linear-gradient(135deg, #00a6a6 0%, #008a8a 50%, #006b6b 100%)',
   headerBg: '#EBF8FF',
   button: brand.teal,
+  primary: brand.teal,
   icon: brand.teal,
   cardShadow: '0 8px 16px -2px rgba(0, 166, 166, 0.15), 0 4px 8px -1px rgba(0, 166, 166, 0.1)',
   cardBorder: '1px solid rgba(0, 166, 166, 0.15)',
@@ -37,6 +38,7 @@ const vendorTheme = {
   gradient: brand.gradient,
   headerGradient: brand.teal,
   button: brand.teal,
+  primary: brand.teal,
   icon: brand.teal,
   brand: brand
 };
@@ -47,6 +49,7 @@ const workerTheme = {
   gradient: brand.gradient,
   headerGradient: brand.teal,
   button: brand.teal,
+  primary: brand.teal,
   icon: brand.teal,
   brand: brand
 };
