@@ -60,5 +60,19 @@ export const vendorDashboardService = {
       console.error('Error fetching service performance:', error);
       throw error;
     }
+  },
+
+  /**
+   * Update vendor online/offline status
+   * @param {boolean} isOnline - True for Online, False for Offline
+   */
+  updateStatus: async (isOnline) => {
+    try {
+      const response = await api.put('/vendors/status', { isOnline });
+      return response.data;
+    } catch (error) {
+      console.error('Error updating status:', error);
+      throw error;
+    }
   }
 };

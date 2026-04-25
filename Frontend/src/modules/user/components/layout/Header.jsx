@@ -11,6 +11,7 @@ import { themeColors } from '../../../../theme';
 import CitySelectorModal from '../common/CitySelectorModal';
 import { useCity } from '../../../../context/CityContext';
 import { HiChevronDown } from 'react-icons/hi';
+import NotificationBell from '../common/NotificationBell';
 
 const Header = ({ location, onLocationClick }) => {
   const logoRef = useRef(null);
@@ -71,37 +72,37 @@ const Header = ({ location, onLocationClick }) => {
             </nav>
 
             {/* Right: City & Location */}
-            <div className="flex flex-col items-end gap-1 flex-1 min-w-0 ml-4">
-
-
-
-              {/* Location Selector */}
-              <div className="flex flex-col items-end cursor-pointer" onClick={onLocationClick}>
-                <div className="flex items-center gap-1 mb-0.5">
-                  {/* Gradient Definition for Icons */}
-                  <svg width="0" height="0" className="absolute">
-                    <linearGradient id="homestr-location-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                      <stop offset="0%" stopColor={themeColors.brand.teal} />
-                      <stop offset="50%" stopColor={themeColors.brand.yellow} />
-                      <stop offset="100%" stopColor={themeColors.brand.orange} />
-                    </linearGradient>
-                  </svg>
-                  <HiLocationMarker
-                    className="w-4 h-4 shrink-0"
-                    style={{ fill: 'url(#homestr-location-gradient)' }}
+            <div className="flex items-center gap-2">
+              <NotificationBell />
+              <div className="flex flex-col items-end gap-1 flex-1 min-w-0 ml-1">
+                {/* Location Selector */}
+                <div className="flex flex-col items-end cursor-pointer" onClick={onLocationClick}>
+                  <div className="flex items-center gap-1 mb-0.5">
+                    {/* Gradient Definition for Icons */}
+                    <svg width="0" height="0" className="absolute">
+                      <linearGradient id="homestr-location-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stopColor={themeColors.brand.teal} />
+                        <stop offset="50%" stopColor={themeColors.brand.yellow} />
+                        <stop offset="100%" stopColor={themeColors.brand.orange} />
+                      </linearGradient>
+                    </svg>
+                    <HiLocationMarker
+                      className="w-4 h-4 shrink-0"
+                      style={{ fill: 'url(#homestr-location-gradient)' }}
+                    />
+                    <span className="text-sm font-bold truncate max-w-[160px]" style={{
+                      background: themeColors.gradient,
+                      WebkitBackgroundClip: 'text',
+                      WebkitTextFillColor: 'transparent',
+                    }}>
+                      {location && location !== '...' ? location.split('-')[0].trim() : 'Select Location'}
+                    </span>
+                  </div>
+                  <LocationSelector
+                    location={location}
+                    onLocationClick={onLocationClick}
                   />
-                  <span className="text-sm font-bold truncate max-w-[160px]" style={{
-                    background: themeColors.gradient,
-                    WebkitBackgroundClip: 'text',
-                    WebkitTextFillColor: 'transparent',
-                  }}>
-                    {location && location !== '...' ? location.split('-')[0].trim() : 'Select Location'}
-                  </span>
                 </div>
-                <LocationSelector
-                  location={location}
-                  onLocationClick={onLocationClick}
-                />
               </div>
             </div>
           </div>

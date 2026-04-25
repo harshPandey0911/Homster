@@ -102,7 +102,7 @@ const VendorTraining = () => {
       if (pendingData) {
         try {
           setLoading(true);
-          const res = await register(pendingData);
+          const res = await register({ ...pendingData, trainingScore: score });
           if (res.success) {
             toast.success('Registration Complete! Please wait for admin approval.');
             sessionStorage.removeItem('pendingVendorRegistration');

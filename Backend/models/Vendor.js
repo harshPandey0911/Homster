@@ -257,6 +257,10 @@ const vendorSchema = new mongoose.Schema({
   loginSessionId: {
     type: String,
     default: null
+  },
+  trainingScore: {
+    type: Number,
+    default: 0
   }
 }, {
   timestamps: true

@@ -2,6 +2,7 @@ import React, { useState, useEffect, useLayoutEffect, useCallback, useMemo, memo
 import { useNavigate, useLocation } from 'react-router-dom';
 import { FiBriefcase, FiUsers, FiBell, FiArrowRight, FiUser, FiClock, FiMapPin, FiCheckCircle, FiTrendingUp, FiChevronRight } from 'react-icons/fi';
 import { FaWallet } from 'react-icons/fa';
+import { motion } from 'framer-motion';
 import { vendorTheme as themeColors } from '../../../../theme';
 import Header from '../../components/layout/Header';
 import { vendorDashboardService } from '../../services/dashboardService';
@@ -39,6 +40,8 @@ const Dashboard = memo(() => {
     completedJobs: 0,
     rating: 0,
   });
+  const [isOnline, setIsOnline] = useState(false);
+  const [isToggling, setIsToggling] = useState(false);
   const [vendorProfile, setVendorProfile] = useState({
     name: 'Vendor Name',
     businessName: 'Business Name',
@@ -181,6 +184,11 @@ const Dashboard = memo(() => {
       completedJobs: apiStats.completedBookings || 0,
       rating: apiStats.rating || 0,
     });
+    
+    // Set online status from API
+    if (apiStats.isOnline !== undefined) {
+      setIsOnline(apiStats.isOnline);
+    }
 
     // Recent jobs (non-requested)
     const recentJobsData = otherBookings.slice(0, 3).map(booking => ({
@@ -346,6 +354,26 @@ const Dashboard = memo(() => {
     navigate('/vendor/workers', { state: { bookingId } });
   };
 
+  const handleToggleOnline = async () => {
+    try {
+      setIsToggling(true);
+      const newStatus = !isOnline;
+      const response = await vendorDashboardService.updateStatus(newStatus);
+      if (response.success) {
+        setIsOnline(newStatus);
+        toast.success(`You are now ${newStatus ? 'Online' : 'Offline'}`);
+        
+        // Update local stats too
+        setStats(prev => ({ ...prev, isOnline: newStatus }));
+      }
+    } catch (error) {
+      console.error('Failed to toggle status:', error);
+      toast.error('Failed to update status');
+    } finally {
+      setIsToggling(false);
+    }
+  };
+
   // Memoize quickActions to prevent recreation on every render
   const quickActions = useMemo(() => [
     {
@@ -509,6 +537,42 @@ const Dashboard = memo(() => {
                 </p>
                 <h2 className="text-base font-bold text-white truncate mb-0.5">{vendorProfile.name}</h2>
                 <p className="text-xs text-white truncate font-medium opacity-90">{vendorProfile.businessName}</p>
+                
+                {/* Online/Offline Badge */}
+                <div className="flex items-center gap-1.5 mt-2">
+                  <div className={`w-2 h-2 rounded-full animate-pulse ${isOnline ? 'bg-green-400' : 'bg-gray-400'}`} />
+                  <span className="text-[10px] font-black uppercase tracking-wider text-white">
+                    {isOnline ? 'Active Now' : 'Offline'}
+                  </span>
+                </div>
+              </div>
+
+              {/* Online/Offline Toggle Button */}
+              <div className="flex flex-col items-center gap-2 mr-1">
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleToggleOnline();
+                  }}
+                  disabled={isToggling}
+                  className={`relative w-14 h-7 rounded-full transition-all duration-500 flex items-center px-1 shadow-inner ${isOnline ? 'bg-green-500' : 'bg-gray-300'
+                    }`}
+                >
+                  <motion.div
+                    animate={{ x: isOnline ? 28 : 0 }}
+                    transition={{ type: "spring", stiffness: 500, damping: 30 }}
+                    className="w-5 h-5 bg-white rounded-full shadow-md flex items-center justify-center"
+                  >
+                    {isToggling ? (
+                      <div className="w-3 h-3 border-2 border-teal-500 border-t-transparent rounded-full animate-spin" />
+                    ) : (
+                      <div className={`w-1.5 h-1.5 rounded-full ${isOnline ? 'bg-green-500' : 'bg-gray-400'}`} />
+                    )}
+                  </motion.div>
+                </button>
+                <span className="text-[9px] font-bold text-white uppercase tracking-tighter opacity-80">
+                  {isOnline ? 'Go Offline' : 'Go Online'}
+                </span>
               </div>
 
               {/* Arrow Icon */}

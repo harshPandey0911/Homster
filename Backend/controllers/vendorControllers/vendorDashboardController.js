@@ -169,7 +169,8 @@ const getDashboardStats = async (req, res) => {
           totalRevenue: vendorEarnings, // UI shows totalEarnings as sum
           vendorEarnings: vendorEarnings,
           workersOnline,
-          rating: parseFloat(rating.toFixed(1))
+          rating: parseFloat(rating.toFixed(1)),
+          isOnline: req.user.isOnline
         },
         recentBookings
       }

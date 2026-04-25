@@ -424,7 +424,7 @@ const Account = () => {
             />
             <motion.button
               whileTap={{ scale: 0.98 }}
-              onClick={() => navigate('/user/about-homestr')}
+              onClick={() => navigate('/user/about-cleaning-expert')}
               className="w-full flex items-center justify-between p-4 bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all group mb-3"
             >
               <div className="flex items-center gap-4">

@@ -251,7 +251,8 @@ const register = async (req, res) => {
       pan: { number: pan, document: panUrl },
       otherDocuments: otherUrls,
       approvalStatus: VENDOR_STATUS.PENDING,
-      isPhoneVerified: true
+      isPhoneVerified: true,
+      trainingScore: req.body.trainingScore || 0
     });
 
     // Notify Admins
