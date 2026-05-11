@@ -1,12 +1,10 @@
 import React, { useState, useEffect, useLayoutEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FiBriefcase, FiStar, FiCheckCircle, FiChevronRight, FiInfo, FiActivity, FiPlus } from 'react-icons/fi';
-import { motion, AnimatePresence } from 'framer-motion';
+import { FiBriefcase, FiStar, FiChevronRight, FiInfo, FiPlus } from 'react-icons/fi';
+import { motion } from 'framer-motion';
 import { vendorTheme as themeColors } from '../../../../theme';
-import Header from '../../components/layout/Header';
 import BottomNav from '../../components/layout/BottomNav';
 import vendorService from '../../services/vendorService';
-import LogoLoader from '../../../../components/common/LogoLoader';
 
 const MyServices = () => {
   const navigate = useNavigate();
@@ -50,21 +48,27 @@ const MyServices = () => {
   }, []);
 
   return (
-    <div className="min-h-screen pb-24" style={{ background: themeColors.backgroundGradient }}>
-      <Header title="My Services" showBack={true} />
+  return (
+    <div className="min-h-screen pb-24" style={{ background: '#FFFFFF' }}>
+      <header className="px-6 py-5 flex items-center justify-between bg-transparent">
+        <h1 className="text-xl font-black text-gray-900">My Services</h1>
+        <div className="w-10 h-10 rounded-2xl bg-white shadow-sm flex items-center justify-center border border-gray-100">
+          <FiBriefcase className="w-5 h-5 text-black" />
+        </div>
+      </header>
 
       <main className="px-4 py-6 max-w-lg mx-auto">
-        {/* Stats Header */}
+        {/* Stats Header (Black Theme) */}
         <div className="grid grid-cols-2 gap-4 mb-8">
-          <div className="bg-white/60 backdrop-blur-md rounded-[2rem] p-5 border border-white/40 shadow-sm">
-            <p className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-1">Total Expertise</p>
+          <div className="bg-white rounded-[28px] p-5 border border-gray-100 shadow-sm">
+            <p className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-2">Total Expertise</p>
             <div className="flex items-center gap-2">
               <span className="text-2xl font-black text-gray-900">{services.length}</span>
-              <span className="text-[10px] font-bold text-teal-600 bg-teal-50 px-2 py-0.5 rounded-full">Categories</span>
+              <span className="text-[10px] font-bold text-black bg-gray-50 px-2 py-0.5 rounded-full">Categories</span>
             </div>
           </div>
-          <div className="bg-white/60 backdrop-blur-md rounded-[2rem] p-5 border border-white/40 shadow-sm">
-            <p className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-1">Overall Rating</p>
+          <div className="bg-white rounded-[28px] p-5 border border-gray-100 shadow-sm">
+            <p className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-2">Overall Rating</p>
             <div className="flex items-center gap-2">
               <span className="text-2xl font-black text-gray-900">
                 {services.length > 0 
@@ -76,15 +80,15 @@ const MyServices = () => {
           </div>
         </div>
 
-        {/* Section Title */}
+        {/* Section Title (Black Theme) */}
         <div className="flex items-center justify-between mb-6 px-1">
           <div className="flex items-center gap-2">
-            <div className="w-2 h-2 rounded-full bg-teal-500 animate-pulse"></div>
+            <div className="w-2 h-2 rounded-full bg-black animate-pulse"></div>
             <h2 className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">Authorized Portfolios</h2>
           </div>
           <button 
             onClick={() => navigate('/vendor/add-custom-content')}
-            className="flex items-center gap-2 bg-teal-600 text-white px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-lg shadow-teal-100 active:scale-95 transition-all"
+            className="flex items-center gap-2 bg-black text-white px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-lg shadow-gray-200 active:scale-95 transition-all"
           >
             <FiPlus className="w-3 h-3" />
             Add New
@@ -94,13 +98,13 @@ const MyServices = () => {
         {/* Services List */}
         {loading ? (
           <div className="flex flex-col items-center justify-center py-20">
-            <div className="w-12 h-12 border-4 border-t-transparent rounded-full animate-spin mb-4" style={{ borderColor: `${themeColors.button} transparent ${themeColors.button} ${themeColors.button}` }}></div>
+            <div className="w-12 h-12 border-4 border-t-transparent rounded-full animate-spin mb-4" style={{ borderColor: `#000000 transparent #000000 #000000` }}></div>
             <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">Loading Portfolio...</p>
           </div>
         ) : services.length === 0 ? (
-          <div className="bg-white/60 backdrop-blur-xl rounded-[2.5rem] p-12 text-center border border-white/40 shadow-xl">
-            <div className="w-20 h-20 mx-auto mb-6 bg-gray-50 rounded-[2rem] flex items-center justify-center text-gray-300">
-              <FiBriefcase className="w-10 h-10" />
+          <div className="bg-white rounded-[32px] p-12 text-center border border-gray-100">
+            <div className="w-20 h-20 mx-auto mb-6 bg-gray-50 rounded-full flex items-center justify-center">
+              <FiBriefcase className="w-10 h-10 text-gray-200" />
             </div>
             <h3 className="text-xl font-black text-gray-800 mb-2">No Services Yet</h3>
             <p className="text-xs text-gray-400 font-bold uppercase tracking-wider">Contact admin to get assigned categories</p>
@@ -113,7 +117,7 @@ const MyServices = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.1 }}
-                className="group relative bg-white/80 backdrop-blur-lg rounded-[2.5rem] p-1 border border-white/40 shadow-lg hover:shadow-2xl transition-all duration-500"
+                className="group relative bg-white rounded-[32px] p-1 border border-gray-100 shadow-sm hover:shadow-md transition-all duration-500"
               >
                 <div className="flex p-4 gap-4">
                   {/* Service Image/Icon */}
@@ -155,13 +159,13 @@ const MyServices = () => {
                         <div className="w-[1px] h-6 bg-gray-100 mt-1" />
                         <div className="flex flex-col">
                           <span className="text-[9px] font-black text-gray-400 uppercase tracking-tighter">Done</span>
-                          <span className="text-xs font-black text-teal-600">{service.stats.completedJobs}</span>
+                          <span className="text-xs font-black text-black">{service.stats.completedJobs}</span>
                         </div>
                       </div>
                       
                       <button 
                         onClick={() => navigate(`/vendor/jobs?category=${service.title}`)}
-                        className="w-10 h-10 rounded-2xl bg-gray-50 flex items-center justify-center text-gray-400 hover:bg-teal-500 hover:text-white transition-all duration-300 shadow-sm active:scale-90"
+                        className="w-10 h-10 rounded-2xl bg-gray-50 flex items-center justify-center text-black hover:bg-black hover:text-white transition-all duration-300 shadow-sm active:scale-90"
                       >
                         <FiChevronRight className="w-5 h-5" />
                       </button>
@@ -173,20 +177,20 @@ const MyServices = () => {
           </div>
         )}
 
-        {/* Info Card */}
-        <div className="mt-10 p-6 bg-blue-50/50 rounded-[2rem] border border-blue-100">
+        {/* Info Card (Black/Gray Theme) */}
+        <div className="mt-10 p-6 bg-gray-50 rounded-[28px] border border-gray-100">
           <div className="flex gap-3">
-            <div className="w-10 h-10 rounded-xl bg-blue-100 flex items-center justify-center shrink-0">
-              <FiInfo className="w-5 h-5 text-blue-600" />
+            <div className="w-10 h-10 rounded-xl bg-white shadow-sm flex items-center justify-center shrink-0">
+              <FiInfo className="w-5 h-5 text-black" />
             </div>
             <div>
-              <h4 className="text-sm font-black text-blue-900">Need more categories?</h4>
-              <p className="text-[10px] text-blue-700 mt-1 font-medium leading-relaxed">
+              <h4 className="text-sm font-black text-gray-900">Need more categories?</h4>
+              <p className="text-[10px] text-gray-500 mt-1 font-medium leading-relaxed">
                 Your service portfolio is managed by the administrator. To add new skills or service categories, please raise a support ticket.
               </p>
               <button 
                 onClick={() => navigate('/vendor/support')}
-                className="mt-3 text-[10px] font-black uppercase tracking-widest text-blue-600 underline"
+                className="mt-3 text-[10px] font-black uppercase tracking-widest text-black underline"
               >
                 Open Support Ticket
               </button>

@@ -242,6 +242,9 @@ export const SocketProvider = ({ children }) => {
       newSocket.on('new_booking_request', (data) => {
         // console.log('🚨 New Booking Request Alert:', data);
 
+        // Acknowledge receipt to server
+        newSocket.emit('booking_alert_received', { bookingId: data.bookingId });
+
         // Play urgent alert ring
         playAlertRing();
 
