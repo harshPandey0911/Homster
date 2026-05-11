@@ -128,6 +128,11 @@ const workerService = {
   deleteAllNotifications: async () => {
     const response = await api.delete('/notifications/delete-all');
     return response.data;
+  },
+
+  updateStatus: async (status) => {
+    const response = await api.put('/workers/profile', { status });
+    return response.data;
   }
 };
 

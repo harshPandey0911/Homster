@@ -81,6 +81,10 @@ const Notifications = lazyLoad(() => import('../pages/Notifications'));
 const HelpSupport = lazyLoad(() => import('../pages/HelpSupport'));
 const CancellationPolicy = lazyLoad(() => import('../pages/CancellationPolicy'));
 
+const About = lazyLoad(() => import('../pages/About'));
+const Contact = lazyLoad(() => import('../pages/Contact'));
+const Services = lazyLoad(() => import('../pages/Services'));
+
 // Loading fallback component
 import LogoLoader from '../../../components/common/LogoLoader';
 
@@ -144,6 +148,9 @@ const UserRoutes = () => {
                 <Route path="/about-cleaning-expert" element={<ProtectedRoute userType="user"><AboutCleaningExpert /></ProtectedRoute>} />
                 <Route path="/update-profile" element={<ProtectedRoute userType="user"><UpdateProfile /></ProtectedRoute>} />
                 <Route path="/notifications" element={<ProtectedRoute userType="user"><Notifications /></ProtectedRoute>} />
+                <Route path="/about" element={<ProtectedRoute userType="user"><About /></ProtectedRoute>} />
+                <Route path="/contact" element={<ProtectedRoute userType="user"><Contact /></ProtectedRoute>} />
+                <Route path="/services" element={<ProtectedRoute userType="user"><Services /></ProtectedRoute>} />
                 <Route path="/help-support" element={<ProtectedRoute userType="user"><HelpSupport /></ProtectedRoute>} />
                 <Route path="/cancellation-policy" element={<ProtectedRoute userType="user"><CancellationPolicy /></ProtectedRoute>} />
               </Routes>
@@ -154,7 +161,7 @@ const UserRoutes = () => {
         {/* These components are OUTSIDE Suspense so they persist during page loads */}
         {!isBookingDetailsPage && !isBookingConfirmationPage && !isPublicPage && <LiveBookingCard hasBottomNav={shouldShowBottomNav} />}
         {shouldShowBottomNav && <BottomNav />}
-        {(location.pathname === '/user' || location.pathname === '/user/') && <Footer />}
+        {(['/user', '/user/', '/user/about', '/user/contact', '/user/services'].includes(location.pathname)) && <Footer />}
       </ErrorBoundary>
     </ThemeManager>
   );

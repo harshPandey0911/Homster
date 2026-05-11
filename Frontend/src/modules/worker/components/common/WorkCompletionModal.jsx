@@ -80,7 +80,7 @@ const WorkCompletionModal = ({ isOpen, onClose, job, onComplete, loading }) => {
   return (
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 pb-12">
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -94,7 +94,7 @@ const WorkCompletionModal = ({ isOpen, onClose, job, onComplete, loading }) => {
             exit={{ scale: 0.9, opacity: 0, y: 20 }}
             className="bg-white w-full max-w-md rounded-[24px] shadow-2xl relative z-10 overflow-hidden"
           >
-            <div className="flex flex-col max-h-[90vh]">
+            <div className="flex flex-col max-h-[80vh]">
               {/* Header */}
               <div className="px-8 pt-8 pb-4 flex justify-between items-start flex-shrink-0">
                 <div>

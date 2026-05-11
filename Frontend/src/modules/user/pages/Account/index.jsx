@@ -368,9 +368,15 @@ const Account = () => {
 
           {/* Menu Groups */}
 
-          {/* Shopping */}
+          {/* Plans & Rewards */}
           <motion.div variants={itemVariants} className="mb-6">
-            <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3 pl-2">Shopping</h3>
+            <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3 pl-2">Plans & Rewards</h3>
+            <MenuItem
+              icon={FiGift}
+              label="Refer & Earn"
+              onClick={() => navigate('/user/rewards')}
+              color="text-teal-600"
+            />
             <MenuItem
               icon={FiFileText}
               label="My Plans"
@@ -426,7 +432,7 @@ const Account = () => {
                 <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-gray-50 transition-colors group-hover:bg-opacity-80">
                   <Logo className="w-8 h-8" />
                 </div>
-                <span className="font-semibold text-gray-900">About Cleaning Expert Services</span>
+                <span className="font-semibold text-gray-900">About Nexora Go</span>
               </div>
               <FiChevronRight className="w-5 h-5 text-gray-300 group-hover:text-teal-500 transition-colors" />
             </motion.button>
