@@ -137,7 +137,10 @@ const RedirectionSelector = ({
   );
 };
 
-const HomePage = ({ catalog, setCatalog, selectedCity }) => {
+import { useOutletContext } from "react-router-dom";
+
+const HomePage = () => {
+  const { catalog, setCatalog } = useOutletContext();
   const [isBannerModalOpen, setIsBannerModalOpen] = useState(false);
   const [bannerForm, setBannerForm] = useState({ imageUrl: "", text: "", targetCategoryId: "", slug: "", targetServiceId: "", scrollToSection: "" });
   const [editingBannerId, setEditingBannerId] = useState(null);
@@ -177,13 +180,43 @@ const HomePage = ({ catalog, setCatalog, selectedCity }) => {
   });
   const [editingCardId, setEditingCardId] = useState(null);
 
+  // New Nexora Go Sections
+  const [heroForm, setHeroForm] = useState({ title: "", subtitle: "", primaryBtnText: "", secondaryBtnText: "", imageUrl: "" });
+  const [appDownloadForm, setAppDownloadForm] = useState({ title: "", subtitle: "", playStoreUrl: "", appStoreUrl: "", qrCodeUrl: "", imageUrl: "" });
+  const [isStatsModalOpen, setIsStatsModalOpen] = useState(false);
+  const [statsForm, setStatsForm] = useState({ label: "", value: "", icon: "FiActivity" });
+  const [editingStatsId, setEditingStatsId] = useState(null);
+
+  const [isNavLinkModalOpen, setIsNavLinkModalOpen] = useState(false);
+  const [navLinkForm, setNavLinkForm] = useState({ label: "", path: "" });
+  const [editingNavLinkId, setEditingNavLinkId] = useState(null);
+
+  const [identityForm, setIdentityForm] = useState({ brandName: "", slogan: "" });
+
+  const [howItWorksForm, setHowItWorksForm] = useState({ title: "", subtitle: "" });
+  const [isHowItWorksModalOpen, setIsHowItWorksModalOpen] = useState(false);
+  const [howItWorksItemForm, setHowItWorksItemForm] = useState({ title: "", description: "", icon: "FiCheckCircle" });
+  const [editingHowItWorksItemId, setEditingHowItWorksItemId] = useState(null);
+
+  const [aboutUsForm, setAboutUsForm] = useState({ title: "", content: "", imageUrl: "", features: [] });
+  const [isFeatureModalOpen, setIsFeatureModalOpen] = useState(false);
+  const [featureForm, setFeatureForm] = useState({ title: "", description: "" });
+  const [editingFeatureId, setEditingFeatureId] = useState(null);
+
+  const [offersForm, setOffersForm] = useState({ title: "", subtitle: "", items: [] });
+  const [isOfferItemModalOpen, setIsOfferItemModalOpen] = useState(false);
+  const [offerItemForm, setOfferItemForm] = useState({ title: "", code: "", discount: "", description: "", imageUrl: "" });
+  const [editingOfferItemId, setEditingOfferItemId] = useState(null);
+
+  const [contactUsForm, setContactUsForm] = useState({ title: "", subtitle: "", email: "", phone: "", address: "", workingHours: "" });
+
   // Uploading state for all modals
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [isSyncing, setIsSyncing] = useState(false);
 
   const categories = useMemo(() => {
-    const list = ensureIds(catalog).categories || [];
+    const list = catalog.categories || [];
     return [...list].sort((a, b) => {
       const ao = Number.isFinite(a.homeOrder) ? a.homeOrder : 0;
       const bo = Number.isFinite(b.homeOrder) ? b.homeOrder : 0;
@@ -192,14 +225,13 @@ const HomePage = ({ catalog, setCatalog, selectedCity }) => {
     });
   }, [catalog]);
 
-  const home = ensureIds(catalog).home;
+  const home = useMemo(() => catalog.home || { banners: [] }, [catalog.home]);
 
-  // Fetch home content from API on mount or city change
+  // Fetch home content from API on mount
   useEffect(() => {
     const fetchHomeContent = async () => {
       try {
         const params = {};
-        if (selectedCity) params.cityId = selectedCity;
 
         const response = await homeContentService.get(params);
         if (response.success && response.homeContent) {
@@ -225,7 +257,7 @@ const HomePage = ({ catalog, setCatalog, selectedCity }) => {
           };
 
           // Map API response to component's expected format
-          const next = ensureIds(catalog);
+          const next = { ...catalog };
           next.home = {
             banners: addIds(hc.banners || []),
             promoCarousel: addIds(hc.promos || []), // API returns 'promos', component expects 'promoCarousel'
@@ -239,7 +271,23 @@ const HomePage = ({ catalog, setCatalog, selectedCity }) => {
             isNoteworthyVisible: hc.isNoteworthyVisible ?? true,
             isBookedVisible: hc.isBookedVisible ?? true,
             isCategorySectionsVisible: hc.isCategorySectionsVisible ?? true,
-            isCategoriesVisible: hc.isCategoriesVisible ?? true
+            isCategoriesVisible: hc.isCategoriesVisible ?? true,
+            isStatsVisible: hc.isStatsVisible ?? true,
+            isAppDownloadVisible: hc.isAppDownloadVisible ?? true,
+            isOrderTrackingVisible: hc.isOrderTrackingVisible ?? true,
+            heroSection: hc.heroSection || { title: "", subtitle: "", primaryBtnText: "", secondaryBtnText: "", imageUrl: "" },
+            stats: addIds(hc.stats || []),
+            appDownload: hc.appDownload || { title: "", subtitle: "", playStoreUrl: "", appStoreUrl: "", qrCodeUrl: "", imageUrl: "" },
+            navLinks: addIds(hc.navLinks || []),
+            siteIdentity: hc.siteIdentity || { brandName: "NEXORA GO", slogan: "Everything you need, one place" },
+            isHowItWorksVisible: hc.isHowItWorksVisible ?? true,
+            howItWorks: hc.howItWorks || { title: "", subtitle: "", items: [] },
+            isAboutUsVisible: hc.isAboutUsVisible ?? true,
+            aboutUs: hc.aboutUs || { title: "", content: "", imageUrl: "", features: [] },
+            isOffersVisible: hc.isOffersVisible ?? true,
+            offers: hc.offers || { title: "", subtitle: "", items: [] },
+            isContactUsVisible: hc.isContactUsVisible ?? true,
+            contactUs: hc.contactUs || { title: "", subtitle: "", email: "", phone: "", address: "", workingHours: "" }
           };
           setCatalog(next);
           saveCatalog(next);
@@ -250,7 +298,20 @@ const HomePage = ({ catalog, setCatalog, selectedCity }) => {
       }
     };
     fetchHomeContent();
-  }, [selectedCity]); // Re-fetch on city change
+  }, []); // Fetch once on mount
+
+  // Sync forms with loaded data
+  useEffect(() => {
+    if (home) {
+      if (home.heroSection) setHeroForm(home.heroSection);
+      if (home.appDownload) setAppDownloadForm(home.appDownload);
+      if (home.siteIdentity) setIdentityForm(home.siteIdentity);
+      if (home.howItWorks) setHowItWorksForm({ title: home.howItWorks.title, subtitle: home.howItWorks.subtitle });
+      if (home.aboutUs) setAboutUsForm({ ...home.aboutUs });
+      if (home.offers) setOffersForm({ ...home.offers });
+      if (home.contactUs) setContactUsForm({ ...home.contactUs });
+    }
+  }, [home]);
 
   const getCategoryTitle = (id) => {
     const found = categories.find((c) => c.id === id);
@@ -266,7 +327,6 @@ const HomePage = ({ catalog, setCatalog, selectedCity }) => {
     const fetchServices = async () => {
       try {
         const params = {};
-        if (selectedCity) params.cityId = selectedCity;
 
         const response = await serviceService.getAll(params);
         if (response.success) {
@@ -277,17 +337,17 @@ const HomePage = ({ catalog, setCatalog, selectedCity }) => {
       }
     };
     fetchServices();
-  }, [selectedCity]);
+  }, []);
 
   const updateCategory = (id, patch) => {
-    const next = ensureIds(catalog);
+    const next = { ...catalog };
     next.categories = next.categories.map((c) => (c.id === id ? { ...c, ...patch } : c));
     setCatalog(next);
     saveCatalog(next);
   };
 
   const moveCategory = (id, dir) => {
-    const next = ensureIds(catalog);
+    const next = { ...catalog };
     const list = [...next.categories].sort((a, b) => (a.homeOrder || 0) - (b.homeOrder || 0));
     const idx = list.findIndex((c) => c.id === id);
     if (idx < 0) return;
@@ -322,9 +382,25 @@ const HomePage = ({ catalog, setCatalog, selectedCity }) => {
         isNoteworthyVisible: homeData.isNoteworthyVisible,
         isBookedVisible: homeData.isBookedVisible,
         isCategorySectionsVisible: homeData.isCategorySectionsVisible,
-        isCategoriesVisible: homeData.isCategoriesVisible
+        isCategoriesVisible: homeData.isCategoriesVisible,
+        isStatsVisible: homeData.isStatsVisible,
+        isAppDownloadVisible: homeData.isAppDownloadVisible,
+        isOrderTrackingVisible: homeData.isOrderTrackingVisible,
+        heroSection: homeData.heroSection,
+        stats: homeData.stats,
+        appDownload: homeData.appDownload,
+        navLinks: homeData.navLinks,
+        siteIdentity: homeData.siteIdentity,
+        isHowItWorksVisible: homeData.isHowItWorksVisible,
+        howItWorks: homeData.howItWorks,
+        isAboutUsVisible: homeData.isAboutUsVisible,
+        aboutUs: homeData.aboutUs,
+        isOffersVisible: homeData.isOffersVisible,
+        offers: homeData.offers,
+        isContactUsVisible: homeData.isContactUsVisible,
+        contactUs: homeData.contactUs
       };
-      await homeContentService.update(payload, { cityId: selectedCity });
+      await homeContentService.update(payload);
       toast.success('Home page updated successfully!');
     } catch (error) {
       console.error('Failed to sync home content:', error);
@@ -337,7 +413,7 @@ const HomePage = ({ catalog, setCatalog, selectedCity }) => {
   };
 
   const setHomeBanners = async (banners) => {
-    const next = ensureIds(catalog);
+    const next = { ...catalog };
     next.home = { ...(next.home || { banners: [] }), banners };
     setCatalog(next);
     saveCatalog(next);
@@ -345,7 +421,7 @@ const HomePage = ({ catalog, setCatalog, selectedCity }) => {
   };
 
   const patchHome = async (patch) => {
-    const next = ensureIds(catalog);
+    const next = { ...catalog };
     next.home = { ...(next.home || {}), ...patch };
     setCatalog(next);
     saveCatalog(next);
@@ -529,6 +605,741 @@ const HomePage = ({ catalog, setCatalog, selectedCity }) => {
 
   return (
     <div className="space-y-4">
+      {/* 0. Site Identity Settings */}
+      <CardShell icon={FiGrid}>
+        <div className="space-y-6">
+          <div className="flex items-center justify-between border-b border-gray-100 pb-4">
+            <div className="text-lg font-bold text-gray-900 flex items-center gap-3">
+              <div className="w-1.5 h-6 bg-blue-600 rounded-full"></div>
+              <span>Site Identity</span>
+            </div>
+            <button
+              onClick={() => patchHome({ siteIdentity: identityForm })}
+              className="px-6 py-2.5 bg-blue-600 text-white rounded-xl font-bold text-sm shadow-lg shadow-blue-200 hover:brightness-110 active:scale-95 transition-all"
+            >
+              Save Identity
+            </button>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label className="block text-sm font-bold text-gray-700 mb-1">Brand Name</label>
+              <input
+                type="text"
+                value={identityForm.brandName || home?.siteIdentity?.brandName || ""}
+                onChange={(e) => setIdentityForm({ ...identityForm, brandName: e.target.value })}
+                placeholder="NEXORA GO"
+                className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-bold text-gray-700 mb-1">Brand Slogan</label>
+              <input
+                type="text"
+                value={identityForm.slogan || home?.siteIdentity?.slogan || ""}
+                onChange={(e) => setIdentityForm({ ...identityForm, slogan: e.target.value })}
+                placeholder="Everything you need, one place"
+                className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none"
+              />
+            </div>
+          </div>
+        </div>
+      </CardShell>
+
+      {/* 1. Hero Section Settings */}
+      <CardShell icon={FiGrid}>
+        <div className="space-y-6">
+          <div className="flex items-center justify-between border-b border-gray-100 pb-4">
+            <div className="text-lg font-bold text-gray-900 flex items-center gap-3">
+              <div className="w-1.5 h-6 bg-blue-600 rounded-full"></div>
+              <span>Hero Section Settings</span>
+            </div>
+            <div className="flex items-center gap-4">
+              <button
+                onClick={() => patchHome({ heroSection: heroForm })}
+                className="px-6 py-2.5 bg-blue-600 text-white rounded-xl font-bold text-sm shadow-lg shadow-blue-200 hover:brightness-110 active:scale-95 transition-all"
+              >
+                Save Hero Section
+              </button>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-bold text-gray-700 mb-1">Headline (HTML supported)</label>
+                <textarea
+                  value={heroForm.title || home?.heroSection?.title || ""}
+                  onChange={(e) => setHeroForm({ ...heroForm, title: e.target.value })}
+                  placeholder="Everything You Need, Delivered to You."
+                  className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none h-24"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-bold text-gray-700 mb-1">Subtitle</label>
+                <textarea
+                  value={heroForm.subtitle || home?.heroSection?.subtitle || ""}
+                  onChange={(e) => setHeroForm({ ...heroForm, subtitle: e.target.value })}
+                  placeholder="One super app for all your daily needs..."
+                  className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none h-20"
+                />
+              </div>
+            </div>
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-bold text-gray-700 mb-1">Primary Button</label>
+                  <input
+                    type="text"
+                    value={heroForm.primaryBtnText || home?.heroSection?.primaryBtnText || ""}
+                    onChange={(e) => setHeroForm({ ...heroForm, primaryBtnText: e.target.value })}
+                    placeholder="Get Started"
+                    className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-bold text-gray-700 mb-1">Secondary Button</label>
+                  <input
+                    type="text"
+                    value={heroForm.secondaryBtnText || home?.heroSection?.secondaryBtnText || ""}
+                    onChange={(e) => setHeroForm({ ...heroForm, secondaryBtnText: e.target.value })}
+                    placeholder="Explore Services"
+                    className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none"
+                  />
+                </div>
+              </div>
+              <div>
+                <label className="block text-sm font-bold text-gray-700 mb-1">Hero Image URL</label>
+                <input
+                  type="text"
+                  value={heroForm.imageUrl || home?.heroSection?.imageUrl || ""}
+                  onChange={(e) => setHeroForm({ ...heroForm, imageUrl: e.target.value })}
+                  placeholder="/hero-illustration.png"
+                  className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      </CardShell>
+
+      {/* 2. Statistics Bar Settings */}
+      <CardShell icon={FiGrid}>
+        <div className="space-y-6">
+          <div className="flex items-center justify-between border-b border-gray-100 pb-4">
+            <div className="text-lg font-bold text-gray-900 flex items-center gap-3">
+              <div className="w-1.5 h-6 bg-blue-600 rounded-full"></div>
+              <span>Statistics Bar</span>
+            </div>
+            <div className="flex items-center gap-4">
+              <ToggleSwitch
+                label="Show Stats"
+                checked={home?.isStatsVisible !== false}
+                onChange={() => patchHome({ isStatsVisible: !home?.isStatsVisible })}
+              />
+              <button
+                onClick={() => {
+                  setStatsForm({ label: "", value: "", icon: "FiActivity" });
+                  setEditingStatsId(null);
+                  setIsStatsModalOpen(true);
+                }}
+                className="px-4 py-2 bg-blue-600 text-white rounded-xl font-bold text-sm flex items-center gap-2"
+              >
+                <FiPlus /> Add Stat
+              </button>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {(home?.stats || []).map((stat) => (
+              <div key={stat.id} className="bg-gray-50 p-4 rounded-2xl border border-gray-100 relative group">
+                <div className="text-xl font-black text-gray-900">{stat.value}</div>
+                <div className="text-xs font-bold text-gray-400 uppercase tracking-widest">{stat.label}</div>
+                <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity flex gap-1">
+                  <button
+                    onClick={() => {
+                      setStatsForm(stat);
+                      setEditingStatsId(stat.id);
+                      setIsStatsModalOpen(true);
+                    }}
+                    className="p-1 bg-white rounded-md text-blue-600 shadow-sm border border-gray-100"
+                  >
+                    <FiEdit2 className="w-3 h-3" />
+                  </button>
+                  <button
+                    onClick={() => patchHome({ stats: (home.stats || []).filter(s => s.id !== stat.id) })}
+                    className="p-1 bg-white rounded-md text-red-600 shadow-sm border border-gray-100"
+                  >
+                    <FiTrash2 className="w-3 h-3" />
+                  </button>
+                </div>
+              </div>
+            ))}
+            {(home?.navLinks || []).length === 0 && (
+              <div className="col-span-full py-8 text-center text-gray-400 font-medium bg-gray-50 rounded-2xl border-2 border-dashed border-gray-200">
+                No custom navigation links. Using defaults.
+              </div>
+            )}
+          </div>
+        </div>
+      </CardShell>
+
+      {/* 5. About Us Settings */}
+      <CardShell icon={FiGrid}>
+        <div className="space-y-6">
+          <div className="flex items-center justify-between border-b border-gray-100 pb-4">
+            <div className="text-lg font-bold text-gray-900 flex items-center gap-3">
+              <div className="w-1.5 h-6 bg-teal-500 rounded-full"></div>
+              <span>About Us Section</span>
+            </div>
+            <div className="flex items-center gap-4">
+              <ToggleSwitch
+                label="Show Section"
+                checked={home?.isAboutUsVisible !== false}
+                onChange={() => patchHome({ isAboutUsVisible: !home?.isAboutUsVisible })}
+              />
+              <button
+                onClick={() => patchHome({ aboutUs: aboutUsForm })}
+                className="px-6 py-2.5 bg-blue-600 text-white rounded-xl font-bold text-sm"
+              >
+                Save About Us
+              </button>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-bold text-gray-700 mb-1">Title</label>
+                <input
+                  type="text"
+                  value={aboutUsForm.title}
+                  onChange={(e) => setAboutUsForm({ ...aboutUsForm, title: e.target.value })}
+                  className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-bold text-gray-700 mb-1">Content / Description</label>
+                <textarea
+                  value={aboutUsForm.content}
+                  onChange={(e) => setAboutUsForm({ ...aboutUsForm, content: e.target.value })}
+                  className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none h-32"
+                />
+              </div>
+            </div>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-bold text-gray-700 mb-1">Image URL</label>
+                <input
+                  type="text"
+                  value={aboutUsForm.imageUrl}
+                  onChange={(e) => setAboutUsForm({ ...aboutUsForm, imageUrl: e.target.value })}
+                  className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none"
+                />
+              </div>
+              <div className="pt-2">
+                <div className="flex items-center justify-between mb-2">
+                  <h4 className="text-xs font-bold text-gray-500 uppercase tracking-widest">Key Features</h4>
+                  <button
+                    onClick={() => {
+                      setFeatureForm({ title: "", description: "" });
+                      setEditingFeatureId(null);
+                      setIsFeatureModalOpen(true);
+                    }}
+                    className="text-blue-600 text-xs font-bold flex items-center gap-1"
+                  >
+                    <FiPlus /> Add Feature
+                  </button>
+                </div>
+                <div className="space-y-2">
+                  {(aboutUsForm.features || []).map((f, idx) => (
+                    <div key={idx} className="flex items-center justify-between bg-gray-50 p-2 rounded-lg border border-gray-100">
+                      <div className="text-xs font-bold text-gray-700">{f.title}</div>
+                      <div className="flex gap-1">
+                        <button onClick={() => {
+                          setFeatureForm(f);
+                          setEditingFeatureId(idx);
+                          setIsFeatureModalOpen(true);
+                        }} className="p-1 text-blue-600"><FiEdit2 className="w-3 h-3" /></button>
+                        <button onClick={() => {
+                          const features = aboutUsForm.features.filter((_, i) => i !== idx);
+                          setAboutUsForm({ ...aboutUsForm, features });
+                        }} className="p-1 text-red-600"><FiTrash2 className="w-3 h-3" /></button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </CardShell>
+
+      {/* 6. Offers Section Settings */}
+      <CardShell icon={FiGrid}>
+        <div className="space-y-6">
+          <div className="flex items-center justify-between border-b border-gray-100 pb-4">
+            <div className="text-lg font-bold text-gray-900 flex items-center gap-3">
+              <div className="w-1.5 h-6 bg-rose-500 rounded-full"></div>
+              <span>Offers Section</span>
+            </div>
+            <div className="flex items-center gap-4">
+              <ToggleSwitch
+                label="Show Section"
+                checked={home?.isOffersVisible !== false}
+                onChange={() => patchHome({ isOffersVisible: !home?.isOffersVisible })}
+              />
+              <button
+                onClick={() => patchHome({ offers: offersForm })}
+                className="px-6 py-2.5 bg-blue-600 text-white rounded-xl font-bold text-sm"
+              >
+                Save Offers
+              </button>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-bold text-gray-700 mb-1">Title</label>
+                <input
+                  type="text"
+                  value={offersForm.title}
+                  onChange={(e) => setOffersForm({ ...offersForm, title: e.target.value })}
+                  className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-bold text-gray-700 mb-1">Subtitle</label>
+                <input
+                  type="text"
+                  value={offersForm.subtitle}
+                  onChange={(e) => setOffersForm({ ...offersForm, subtitle: e.target.value })}
+                  className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none"
+                />
+              </div>
+            </div>
+            <div>
+              <div className="flex items-center justify-between mb-4">
+                <h4 className="text-xs font-bold text-gray-500 uppercase tracking-widest">Offer Items</h4>
+                <button
+                  onClick={() => {
+                    setOfferItemForm({ title: "", code: "", discount: "", description: "", imageUrl: "" });
+                    setEditingOfferItemId(null);
+                    setIsOfferItemModalOpen(true);
+                  }}
+                  className="text-blue-600 text-sm font-bold flex items-center gap-1"
+                >
+                  <FiPlus /> Add Offer
+                </button>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {(offersForm.items || []).map((item, idx) => (
+                  <div key={idx} className="bg-gray-50 p-3 rounded-xl border border-gray-100 relative group">
+                    <div className="text-xs font-black text-gray-900">{item.title}</div>
+                    <div className="text-[10px] text-blue-600 font-bold">{item.code}</div>
+                    <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity flex gap-1">
+                      <button onClick={() => {
+                        setOfferItemForm(item);
+                        setEditingOfferItemId(idx);
+                        setIsOfferItemModalOpen(true);
+                      }} className="p-1 bg-white rounded shadow-sm"><FiEdit2 className="w-3 h-3" /></button>
+                      <button onClick={() => {
+                        const items = offersForm.items.filter((_, i) => i !== idx);
+                        setOffersForm({ ...offersForm, items });
+                      }} className="p-1 bg-white rounded shadow-sm text-red-600"><FiTrash2 className="w-3 h-3" /></button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </CardShell>
+
+      {/* 7. Contact Us Settings */}
+      <CardShell icon={FiGrid}>
+        <div className="space-y-6">
+          <div className="flex items-center justify-between border-b border-gray-100 pb-4">
+            <div className="text-lg font-bold text-gray-900 flex items-center gap-3">
+              <div className="w-1.5 h-6 bg-purple-500 rounded-full"></div>
+              <span>Contact Us Section</span>
+            </div>
+            <div className="flex items-center gap-4">
+              <ToggleSwitch
+                label="Show Section"
+                checked={home?.isContactUsVisible !== false}
+                onChange={() => patchHome({ isContactUsVisible: !home?.isContactUsVisible })}
+              />
+              <button
+                onClick={() => patchHome({ contactUs: contactUsForm })}
+                className="px-6 py-2.5 bg-blue-600 text-white rounded-xl font-bold text-sm"
+              >
+                Save Contact
+              </button>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-bold text-gray-700 mb-1">Title</label>
+                <input
+                  type="text"
+                  value={contactUsForm.title}
+                  onChange={(e) => setContactUsForm({ ...contactUsForm, title: e.target.value })}
+                  className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-bold text-gray-700 mb-1">Subtitle</label>
+                <input
+                  type="text"
+                  value={contactUsForm.subtitle}
+                  onChange={(e) => setContactUsForm({ ...contactUsForm, subtitle: e.target.value })}
+                  className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none"
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-bold text-gray-700 mb-1">Email</label>
+                  <input
+                    type="email"
+                    value={contactUsForm.email}
+                    onChange={(e) => setContactUsForm({ ...contactUsForm, email: e.target.value })}
+                    className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-bold text-gray-700 mb-1">Phone</label>
+                  <input
+                    type="text"
+                    value={contactUsForm.phone}
+                    onChange={(e) => setContactUsForm({ ...contactUsForm, phone: e.target.value })}
+                    className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none"
+                  />
+                </div>
+              </div>
+            </div>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-bold text-gray-700 mb-1">Address</label>
+                <textarea
+                  value={contactUsForm.address}
+                  onChange={(e) => setContactUsForm({ ...contactUsForm, address: e.target.value })}
+                  className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none h-20"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-bold text-gray-700 mb-1">Working Hours</label>
+                <input
+                  type="text"
+                  value={contactUsForm.workingHours}
+                  onChange={(e) => setContactUsForm({ ...contactUsForm, workingHours: e.target.value })}
+                  placeholder="Mon - Sat: 9 AM - 8 PM"
+                  className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      </CardShell>
+
+      {/* 2.5 How It Works Settings */}
+      <CardShell icon={FiGrid}>
+        <div className="space-y-6">
+          <div className="flex items-center justify-between border-b border-gray-100 pb-4">
+            <div className="text-lg font-bold text-gray-900 flex items-center gap-3">
+              <div className="w-1.5 h-6 bg-orange-500 rounded-full"></div>
+              <span>How It Works</span>
+            </div>
+            <div className="flex items-center gap-4">
+              <ToggleSwitch
+                label="Show Section"
+                checked={home?.isHowItWorksVisible !== false}
+                onChange={() => patchHome({ isHowItWorksVisible: !home?.isHowItWorksVisible })}
+              />
+              <button
+                onClick={() => patchHome({ howItWorks: { ...home.howItWorks, ...howItWorksForm } })}
+                className="px-4 py-2 bg-blue-600 text-white rounded-xl font-bold text-sm"
+              >
+                Save Titles
+              </button>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label className="block text-sm font-bold text-gray-700 mb-1">Section Title</label>
+              <input
+                type="text"
+                value={howItWorksForm.title || home?.howItWorks?.title || ""}
+                onChange={(e) => setHowItWorksForm({ ...howItWorksForm, title: e.target.value })}
+                className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-bold text-gray-700 mb-1">Section Subtitle</label>
+              <input
+                type="text"
+                value={howItWorksForm.subtitle || home?.howItWorks?.subtitle || ""}
+                onChange={(e) => setHowItWorksForm({ ...howItWorksForm, subtitle: e.target.value })}
+                className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none"
+              />
+            </div>
+          </div>
+
+          <div className="pt-4 border-t border-gray-50">
+            <div className="flex items-center justify-between mb-4">
+              <h4 className="text-sm font-black text-gray-900 uppercase tracking-widest">Steps / Items</h4>
+              <button
+                onClick={() => {
+                  setHowItWorksItemForm({ title: "", description: "", icon: "FiCheckCircle" });
+                  setEditingHowItWorksItemId(null);
+                  setIsHowItWorksModalOpen(true);
+                }}
+                className="text-blue-600 text-sm font-bold flex items-center gap-1 hover:underline"
+              >
+                <FiPlus /> Add Step
+              </button>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {(home?.howItWorks?.items || []).map((item, idx) => (
+                <div key={idx} className="bg-gray-50 p-4 rounded-2xl border border-gray-100 relative group">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center text-blue-600 shadow-sm border border-gray-100">
+                      <FiGrid />
+                    </div>
+                    <div>
+                      <div className="text-sm font-black text-gray-900">{item.title}</div>
+                      <div className="text-xs text-gray-500 line-clamp-1">{item.description}</div>
+                    </div>
+                  </div>
+                  <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity flex gap-1">
+                    <button
+                      onClick={() => {
+                        setHowItWorksItemForm(item);
+                        setEditingHowItWorksItemId(idx);
+                        setIsHowItWorksModalOpen(true);
+                      }}
+                      className="p-1 bg-white rounded-md text-blue-600 shadow-sm border border-gray-100"
+                    >
+                      <FiEdit2 className="w-3 h-3" />
+                    </button>
+                    <button
+                      onClick={() => {
+                        const items = (home.howItWorks.items || []).filter((_, i) => i !== idx);
+                        patchHome({ howItWorks: { ...home.howItWorks, items } });
+                      }}
+                      className="p-1 bg-white rounded-md text-red-600 shadow-sm border border-gray-100"
+                    >
+                      <FiTrash2 className="w-3 h-3" />
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </CardShell>
+
+      {/* 3. App Download Settings */}
+      <CardShell icon={FiGrid}>
+        <div className="space-y-6">
+          <div className="flex items-center justify-between border-b border-gray-100 pb-4">
+            <div className="text-lg font-bold text-gray-900 flex items-center gap-3">
+              <div className="w-1.5 h-6 bg-blue-600 rounded-full"></div>
+              <span>App Download Banner</span>
+            </div>
+            <div className="flex items-center gap-4">
+              <ToggleSwitch
+                label="Show Section"
+                checked={home?.isAppDownloadVisible !== false}
+                onChange={() => patchHome({ isAppDownloadVisible: !home?.isAppDownloadVisible })}
+              />
+              <button
+                onClick={() => patchHome({ appDownload: appDownloadForm })}
+                className="px-6 py-2.5 bg-blue-600 text-white rounded-xl font-bold text-sm shadow-lg shadow-blue-200 hover:brightness-110 active:scale-95 transition-all"
+              >
+                Save App Settings
+              </button>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-bold text-gray-700 mb-1">Title</label>
+                <input
+                  type="text"
+                  value={appDownloadForm.title || home?.appDownload?.title || ""}
+                  onChange={(e) => setAppDownloadForm({ ...appDownloadForm, title: e.target.value })}
+                  className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-bold text-gray-700 mb-1">Subtitle</label>
+                <textarea
+                  value={appDownloadForm.subtitle || home?.appDownload?.subtitle || ""}
+                  onChange={(e) => setAppDownloadForm({ ...appDownloadForm, subtitle: e.target.value })}
+                  className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none h-20"
+                />
+              </div>
+            </div>
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-bold text-gray-700 mb-1">Google Play URL</label>
+                  <input
+                    type="text"
+                    value={appDownloadForm.playStoreUrl || home?.appDownload?.playStoreUrl || ""}
+                    onChange={(e) => setAppDownloadForm({ ...appDownloadForm, playStoreUrl: e.target.value })}
+                    className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-bold text-gray-700 mb-1">App Store URL</label>
+                  <input
+                    type="text"
+                    value={appDownloadForm.appStoreUrl || home?.appDownload?.appStoreUrl || ""}
+                    onChange={(e) => setAppDownloadForm({ ...appDownloadForm, appStoreUrl: e.target.value })}
+                    className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none"
+                  />
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-bold text-gray-700 mb-1">QR Code Image</label>
+                  <div className="space-y-2">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      disabled={uploading}
+                      onChange={async (e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                          setUploading(true);
+                          setUploadProgress(0);
+                          try {
+                            const response = await serviceService.uploadImage(file, 'app-qr', (p) => setUploadProgress(p));
+                            if (response.success) {
+                              setAppDownloadForm({ ...appDownloadForm, qrCodeUrl: response.imageUrl });
+                              toast.success("QR Code uploaded!");
+                            }
+                          } catch (error) {
+                            toast.error("Failed to upload QR code");
+                          } finally {
+                            setUploading(false);
+                          }
+                        }
+                      }}
+                      className="w-full text-xs"
+                    />
+                    <input
+                      type="text"
+                      value={appDownloadForm.qrCodeUrl || home?.appDownload?.qrCodeUrl || ""}
+                      onChange={(e) => setAppDownloadForm({ ...appDownloadForm, qrCodeUrl: e.target.value })}
+                      placeholder="Or enter URL"
+                      className="w-full px-4 py-2 border border-gray-200 rounded-lg text-xs"
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-sm font-bold text-gray-700 mb-1">Phone Mockup Image</label>
+                  <div className="space-y-2">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      disabled={uploading}
+                      onChange={async (e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                          setUploading(true);
+                          setUploadProgress(0);
+                          try {
+                            const response = await serviceService.uploadImage(file, 'app-preview', (p) => setUploadProgress(p));
+                            if (response.success) {
+                              setAppDownloadForm({ ...appDownloadForm, imageUrl: response.imageUrl });
+                              toast.success("Mockup uploaded!");
+                            }
+                          } catch (error) {
+                            toast.error("Failed to upload mockup");
+                          } finally {
+                            setUploading(false);
+                          }
+                        }
+                      }}
+                      className="w-full text-xs"
+                    />
+                    <input
+                      type="text"
+                      value={appDownloadForm.imageUrl || home?.appDownload?.imageUrl || ""}
+                      onChange={(e) => setAppDownloadForm({ ...appDownloadForm, imageUrl: e.target.value })}
+                      placeholder="Or enter URL"
+                      className="w-full px-4 py-2 border border-gray-200 rounded-lg text-xs"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </CardShell>
+
+      {/* 4. Header Navigation Links */}
+      <CardShell icon={FiGrid}>
+        <div className="space-y-6">
+          <div className="flex items-center justify-between border-b border-gray-100 pb-4">
+            <div className="text-lg font-bold text-gray-900 flex items-center gap-3">
+              <div className="w-1.5 h-6 bg-blue-600 rounded-full"></div>
+              <span>Header Navigation Links</span>
+            </div>
+            <button
+              onClick={() => {
+                setNavLinkForm({ label: "", path: "" });
+                setEditingNavLinkId(null);
+                setIsNavLinkModalOpen(true);
+              }}
+              className="px-4 py-2 bg-blue-600 text-white rounded-xl font-bold text-sm flex items-center gap-2"
+            >
+              <FiPlus /> Add Link
+            </button>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {(home?.navLinks || []).map((link, idx) => (
+              <div key={link.id || idx} className="bg-gray-50 p-4 rounded-2xl border border-gray-100 relative group">
+                <div className="text-sm font-black text-gray-900">{link.label}</div>
+                <div className="text-xs font-bold text-gray-400 mt-1">{link.path}</div>
+                <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity flex gap-1">
+                  <button
+                    onClick={() => {
+                      setNavLinkForm(link);
+                      setEditingNavLinkId(link.id || idx);
+                      setIsNavLinkModalOpen(true);
+                    }}
+                    className="p-1 bg-white rounded-md text-blue-600 shadow-sm border border-gray-100"
+                  >
+                    <FiEdit2 className="w-3 h-3" />
+                  </button>
+                  <button
+                    onClick={() => patchHome({ navLinks: (home.navLinks || []).filter((l, i) => (l.id || i) !== (link.id || idx)) })}
+                    className="p-1 bg-white rounded-md text-red-600 shadow-sm border border-gray-100"
+                  >
+                    <FiTrash2 className="w-3 h-3" />
+                  </button>
+                </div>
+              </div>
+            ))}
+            {(home?.navLinks || []).length === 0 && (
+              <div className="col-span-full py-8 text-center text-gray-400 font-medium bg-gray-50 rounded-2xl border-2 border-dashed border-gray-200">
+                No custom navigation links. Using defaults.
+              </div>
+            )}
+          </div>
+        </div>
+      </CardShell>
+
       <CardShell icon={FiGrid}>
         <div className="space-y-4">
           <div>
@@ -2333,6 +3144,315 @@ const HomePage = ({ catalog, setCatalog, selectedCity }) => {
             <button
               onClick={resetCardForm}
               className="px-6 py-3.5 text-gray-700 rounded-xl font-medium hover:bg-gray-100 transition-all border border-gray-200"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      </Modal>
+      {/* Stats Modal */}
+      <Modal
+        isOpen={isStatsModalOpen}
+        onClose={() => setIsStatsModalOpen(false)}
+        title={editingStatsId ? "Edit Stat" : "Add Stat"}
+      >
+        <div className="space-y-4">
+          <div>
+            <label className="block text-sm font-bold text-gray-700 mb-1">Value (e.g. 10K+)</label>
+            <input
+              type="text"
+              value={statsForm.value}
+              onChange={(e) => setStatsForm({ ...statsForm, value: e.target.value })}
+              placeholder="10K+"
+              className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-bold text-gray-700 mb-1">Label (e.g. Happy Customers)</label>
+            <input
+              type="text"
+              value={statsForm.label}
+              onChange={(e) => setStatsForm({ ...statsForm, label: e.target.value })}
+              placeholder="Happy Customers"
+              className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-bold text-gray-700 mb-1">Icon (from react-icons/fi)</label>
+            <select
+              value={statsForm.icon}
+              onChange={(e) => setStatsForm({ ...statsForm, icon: e.target.value })}
+              className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none"
+            >
+              <option value="FiUsers">FiUsers</option>
+              <option value="FiShoppingBag">FiShoppingBag</option>
+              <option value="FiTruck">FiTruck</option>
+              <option value="FiActivity">FiActivity</option>
+            </select>
+          </div>
+          <div className="flex gap-3 pt-4">
+            <button
+              onClick={() => {
+                const stats = home?.stats || [];
+                if (editingStatsId) {
+                  patchHome({ stats: stats.map(s => s.id === editingStatsId ? { ...s, ...statsForm } : s) });
+                } else {
+                  patchHome({ stats: [...stats, { id: `stat-${Date.now()}`, ...statsForm }] });
+                }
+                setIsStatsModalOpen(false);
+              }}
+              className="flex-1 py-3 bg-blue-600 text-white rounded-xl font-bold"
+            >
+              {editingStatsId ? "Update Stat" : "Add Stat"}
+            </button>
+            <button
+              onClick={() => setIsStatsModalOpen(false)}
+              className="px-6 py-3 border border-gray-200 rounded-xl font-bold"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      </Modal>
+      {/* Navigation Link Modal */}
+      <Modal
+        isOpen={isNavLinkModalOpen}
+        onClose={() => setIsNavLinkModalOpen(false)}
+        title={editingNavLinkId !== null ? "Edit Navigation Link" : "Add Navigation Link"}
+      >
+        <div className="space-y-4">
+          <div>
+            <label className="block text-sm font-bold text-gray-700 mb-1">Link Label (e.g. Offers)</label>
+            <input
+              type="text"
+              value={navLinkForm.label}
+              onChange={(e) => setNavLinkForm({ ...navLinkForm, label: e.target.value })}
+              placeholder="Offers"
+              className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-bold text-gray-700 mb-1">Path (e.g. /offers or /Home)</label>
+            <input
+              type="text"
+              value={navLinkForm.path}
+              onChange={(e) => setNavLinkForm({ ...navLinkForm, path: e.target.value })}
+              placeholder="/Home"
+              className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none"
+            />
+          </div>
+          <div className="flex gap-3 pt-4">
+            <button
+              onClick={() => {
+                const links = home?.navLinks || [];
+                if (editingNavLinkId !== null) {
+                  patchHome({ navLinks: links.map((l, i) => (l.id || i) === editingNavLinkId ? { ...l, ...navLinkForm } : l) });
+                } else {
+                  patchHome({ navLinks: [...links, { id: `nav-${Date.now()}`, ...navLinkForm }] });
+                }
+                setIsNavLinkModalOpen(false);
+              }}
+              className="flex-1 py-3 bg-blue-600 text-white rounded-xl font-bold"
+            >
+              {editingNavLinkId !== null ? "Update Link" : "Add Link"}
+            </button>
+            <button
+              onClick={() => setIsNavLinkModalOpen(false)}
+              className="px-6 py-3 border border-gray-200 rounded-xl font-bold"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      </Modal>
+      {/* Feature Modal for About Us */}
+      <Modal
+        isOpen={isFeatureModalOpen}
+        onClose={() => setIsFeatureModalOpen(false)}
+        title={editingFeatureId !== null ? "Edit Feature" : "Add Feature"}
+      >
+        <div className="space-y-4">
+          <div>
+            <label className="block text-sm font-bold text-gray-700 mb-1">Feature Title</label>
+            <input
+              type="text"
+              value={featureForm.title}
+              onChange={(e) => setFeatureForm({ ...featureForm, title: e.target.value })}
+              className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-bold text-gray-700 mb-1">Description</label>
+            <textarea
+              value={featureForm.description}
+              onChange={(e) => setFeatureForm({ ...featureForm, description: e.target.value })}
+              rows={3}
+              className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none resize-none"
+            />
+          </div>
+          <div className="flex gap-3 pt-4">
+            <button
+              onClick={() => {
+                let features = [...(aboutUsForm.features || [])];
+                if (editingFeatureId !== null) {
+                  features[editingFeatureId] = featureForm;
+                } else {
+                  features.push(featureForm);
+                }
+                setAboutUsForm({ ...aboutUsForm, features });
+                setIsFeatureModalOpen(false);
+              }}
+              className="flex-1 py-3 bg-blue-600 text-white rounded-xl font-bold"
+            >
+              {editingFeatureId !== null ? "Update" : "Add"}
+            </button>
+            <button
+              onClick={() => setIsFeatureModalOpen(false)}
+              className="px-6 py-3 border border-gray-200 rounded-xl font-bold"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      </Modal>
+
+      {/* Offer Item Modal */}
+      <Modal
+        isOpen={isOfferItemModalOpen}
+        onClose={() => setIsOfferItemModalOpen(false)}
+        title={editingOfferItemId !== null ? "Edit Offer" : "Add Offer"}
+      >
+        <div className="space-y-4">
+          <div>
+            <label className="block text-sm font-bold text-gray-700 mb-1">Offer Title</label>
+            <input
+              type="text"
+              value={offerItemForm.title}
+              onChange={(e) => setOfferItemForm({ ...offerItemForm, title: e.target.value })}
+              className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none"
+            />
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-bold text-gray-700 mb-1">Promo Code</label>
+              <input
+                type="text"
+                value={offerItemForm.code}
+                onChange={(e) => setOfferItemForm({ ...offerItemForm, code: e.target.value })}
+                className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-bold text-gray-700 mb-1">Discount Text</label>
+              <input
+                type="text"
+                value={offerItemForm.discount}
+                onChange={(e) => setOfferItemForm({ ...offerItemForm, discount: e.target.value })}
+                placeholder="e.g. 20% OFF"
+                className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none"
+              />
+            </div>
+          </div>
+          <div>
+            <label className="block text-sm font-bold text-gray-700 mb-1">Description</label>
+            <textarea
+              value={offerItemForm.description}
+              onChange={(e) => setOfferItemForm({ ...offerItemForm, description: e.target.value })}
+              rows={2}
+              className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none resize-none"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-bold text-gray-700 mb-1">Image URL</label>
+            <input
+              type="text"
+              value={offerItemForm.imageUrl}
+              onChange={(e) => setOfferItemForm({ ...offerItemForm, imageUrl: e.target.value })}
+              className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none"
+            />
+          </div>
+          <div className="flex gap-3 pt-4">
+            <button
+              onClick={() => {
+                let items = [...(offersForm.items || [])];
+                if (editingOfferItemId !== null) {
+                  items[editingOfferItemId] = offerItemForm;
+                } else {
+                  items.push(offerItemForm);
+                }
+                setOffersForm({ ...offersForm, items });
+                setIsOfferItemModalOpen(false);
+              }}
+              className="flex-1 py-3 bg-blue-600 text-white rounded-xl font-bold"
+            >
+              {editingOfferItemId !== null ? "Update" : "Add"}
+            </button>
+            <button
+              onClick={() => setIsOfferItemModalOpen(false)}
+              className="px-6 py-3 border border-gray-200 rounded-xl font-bold"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      </Modal>
+
+      {/* How It Works Item Modal */}
+      <Modal
+        isOpen={isHowItWorksModalOpen}
+        onClose={() => setIsHowItWorksModalOpen(false)}
+        title={editingHowItWorksItemId !== null ? "Edit Step" : "Add Step"}
+      >
+        <div className="space-y-4">
+          <div>
+            <label className="block text-sm font-bold text-gray-700 mb-1">Step Title</label>
+            <input
+              type="text"
+              value={howItWorksItemForm.title}
+              onChange={(e) => setHowItWorksItemForm({ ...howItWorksItemForm, title: e.target.value })}
+              placeholder="e.g. Choose a service"
+              className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-bold text-gray-700 mb-1">Description</label>
+            <textarea
+              value={howItWorksItemForm.description}
+              onChange={(e) => setHowItWorksItemForm({ ...howItWorksItemForm, description: e.target.value })}
+              placeholder="e.g. Select from our wide range of services"
+              rows={3}
+              className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none resize-none"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-bold text-gray-700 mb-1">Icon Identifier (e.g. FiUser)</label>
+            <input
+              type="text"
+              value={howItWorksItemForm.icon}
+              onChange={(e) => setHowItWorksItemForm({ ...howItWorksItemForm, icon: e.target.value })}
+              className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none"
+            />
+          </div>
+          <div className="flex gap-3 pt-4">
+            <button
+              onClick={() => {
+                const currentItems = home?.howItWorks?.items || [];
+                let newItems = [];
+                if (editingHowItWorksItemId !== null) {
+                  newItems = currentItems.map((item, idx) => idx === editingHowItWorksItemId ? howItWorksItemForm : item);
+                } else {
+                  newItems = [...currentItems, howItWorksItemForm];
+                }
+                patchHome({ howItWorks: { ...home.howItWorks, items: newItems } });
+                setIsHowItWorksModalOpen(false);
+              }}
+              className="flex-1 py-3 bg-blue-600 text-white rounded-xl font-bold"
+            >
+              {editingHowItWorksItemId !== null ? "Update Step" : "Add Step"}
+            </button>
+            <button
+              onClick={() => setIsHowItWorksModalOpen(false)}
+              className="px-6 py-3 border border-gray-200 rounded-xl font-bold"
             >
               Cancel
             </button>

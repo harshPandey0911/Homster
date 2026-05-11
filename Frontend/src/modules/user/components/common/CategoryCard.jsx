@@ -27,57 +27,50 @@ const CategoryCard = memo(({ icon, title, onClick, hasSaleBadge = false, index =
   return (
     <div
       ref={cardRef}
-      className="flex flex-col items-center justify-center p-1 cursor-pointer relative category-card-container group transition-transform duration-300 ease-out active:scale-95 w-full"
+      className="flex flex-col items-center justify-start cursor-pointer relative category-card-container group active:scale-95 w-full py-1"
       onClick={onClick}
       style={{
         opacity: 0, // Start hidden for GSAP
       }}
     >
       <div
-        className="w-[64px] h-[64px] rounded-2xl flex items-center justify-center mb-2 relative border border-gray-100 flex-shrink-0 transition-all duration-500 group-hover:shadow-lg group-hover:shadow-primary-100 group-hover:-translate-y-1 bg-white"
+        className="w-[72px] h-[72px] rounded-full flex items-center justify-center mb-3 relative transition-all duration-300 group-hover:scale-110"
         style={{
-          boxShadow: '0 8px 20px -6px rgba(0,0,0,0.05)',
+          background: 'rgba(37, 99, 235, 0.15)',
+          border: '1px solid rgba(37, 99, 235, 0.1)'
         }}
       >
-        <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-primary-50/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-        {icon || (
-          <svg
-            className="w-7 h-7 text-gray-400 transition-colors duration-300"
-            style={{ color: 'inherit' }}
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-            onMouseEnter={(e) => e.currentTarget.style.color = themeColors.button}
-            onMouseLeave={(e) => e.currentTarget.style.color = 'inherit'}
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={1.5}
-              d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-            />
-          </svg>
-        )}
+        <div className="w-[40px] h-[40px] flex items-center justify-center">
+          {icon || (
+            <svg
+              className="w-8 h-8 text-blue-500"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={1.5}
+                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+            </svg>
+          )}
+        </div>
+        
         {hasSaleBadge && (
           <div
-            className="absolute -top-1.5 -right-1.5 text-white text-[9px] font-bold px-2 py-0.5 rounded-full shadow-lg z-10 border border-white"
+            className="absolute top-0 right-0 text-white text-[8px] font-black px-2 py-0.5 rounded-full shadow-md z-10"
             style={{
-              background: themeColors.gradient,
-              boxShadow: `0 4px 12px ${themeColors.brand.teal}4D`
+              background: '#EF4444', // Red for sale
             }}
           >
-            SALE
+            OFF
           </div>
         )}
       </div>
       <span
-        className="text-[11px] text-center text-gray-700 font-medium leading-tight tracking-tight mt-1 transition-colors duration-300 w-full line-clamp-2 px-1"
-        style={{
-          wordWrap: 'break-word',
-          color: 'inherit'
-        }}
-        onMouseEnter={(e) => e.currentTarget.style.color = themeColors.button}
-        onMouseLeave={(e) => e.currentTarget.style.color = 'inherit'}
+        className="text-[13px] text-center text-gray-800 font-bold leading-tight tracking-tight mt-1 transition-colors duration-300 w-full line-clamp-1 px-1"
       >
         {title}
       </span>

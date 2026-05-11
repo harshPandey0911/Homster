@@ -1,6 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { HiOutlineSearch } from 'react-icons/hi';
+import { HiOutlineSearch, HiArrowRight } from 'react-icons/hi';
+import { FiCheckCircle, FiClock, FiTruck, FiBox } from 'react-icons/fi';
 import { themeColors, getColorWithOpacity } from '../../../../../theme';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Autoplay, Pagination, EffectFade } from 'swiper/modules';
@@ -8,46 +9,20 @@ import 'swiper/css';
 import 'swiper/css/pagination';
 import 'swiper/css/effect-fade';
 
-const HeroBanner = ({ banners = [], onSearchClick }) => {
-  return (
-    <div className="relative w-full overflow-hidden bg-white">
-      {/* Background Banner Slider */}
-      <div className="absolute inset-0 z-0">
-        <Swiper
-          modules={[Autoplay, Pagination, EffectFade]}
-          effect="fade"
-          spaceBetween={0}
-          slidesPerView={1}
-          autoplay={{
-            delay: 5000,
-            disableOnInteraction: false,
-          }}
-          className="w-full h-full"
-        >
-          {banners.length > 0 ? (
-            banners.map((banner) => (
-              <SwiperSlide key={banner._id}>
-                <div className="relative w-full h-[500px] lg:h-[600px] bg-[#F0F7FF]">
-                  <img
-                    src={banner.imageUrl}
-                    alt={banner.title || 'Promo'}
-                    className="w-full h-full object-contain object-top transition-transform duration-700"
-                  />
-                  {/* Overlay Gradient for readability */}
-                  <div className="absolute inset-0 bg-gradient-to-r from-white/60 via-transparent to-transparent lg:from-white/40 lg:via-transparent lg:to-transparent" />
-                </div>
-              </SwiperSlide>
-            ))
-          ) : (
-            <SwiperSlide>
-              <div className="w-full h-[500px] lg:h-[600px] bg-blue-50" />
-            </SwiperSlide>
-          )}
-        </Swiper>
-      </div>
+const HeroBanner = ({ banners = [], onSearchClick, heroData }) => {
+  const title = heroData?.title || 'Everything You Need, Delivered to You.';
+  const subtitle = heroData?.subtitle || 'One super app for all your daily needs. Fast, reliable & secure delivery at your doorstep.';
+  const primaryBtnText = heroData?.primaryBtnText || 'Get Started';
+  const secondaryBtnText = heroData?.secondaryBtnText || 'Explore Services';
+  const heroImage = heroData?.imageUrl || '/hero-illustration.png';
 
-      {/* Content Overlay */}
-      <div className="relative z-10 max-w-screen-2xl mx-auto px-6 lg:px-12 pt-6 pb-16 lg:pt-12 lg:pb-28 pointer-events-none">
+  return (
+    <div className="relative w-full overflow-hidden bg-[#F0F9FF]">
+      {/* Decorative Circles */}
+      <div className="absolute top-[-100px] right-[-100px] w-[500px] h-[500px] bg-blue-100/40 rounded-full blur-3xl -z-0" />
+      <div className="absolute bottom-[-100px] left-[-100px] w-[400px] h-[400px] bg-teal-50/50 rounded-full blur-3xl -z-0" />
+
+      <div className="relative z-10 max-w-screen-xl mx-auto px-6 lg:px-12 pt-16 pb-12">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           
           {/* Left Content */}
@@ -55,60 +30,90 @@ const HeroBanner = ({ banners = [], onSearchClick }) => {
             initial={{ opacity: 0, x: -30 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8, ease: "easeOut" }}
-            className="flex flex-col gap-6 pointer-events-auto"
+            className="flex flex-col gap-4 sm:gap-6 text-center lg:text-left items-center lg:items-start"
           >
-            <div className="space-y-2">
-              <h1 className="text-4xl md:text-6xl font-black text-gray-900 leading-[1.1] tracking-tight drop-shadow-sm">
-                Everything You Need,<br />
-                <span style={{ color: themeColors.primary }}>One Place</span>
-              </h1>
-              <p className="text-lg md:text-xl text-gray-700 font-bold max-w-md leading-relaxed drop-shadow-sm">
-                Grocery, Cleaning & Home Services at your doorstep
+            <div className="space-y-3 sm:space-y-4">
+              <h1 
+                className="text-3xl sm:text-5xl md:text-7xl font-[1000] text-gray-900 leading-[1.1] tracking-tight" 
+                dangerouslySetInnerHTML={{ __html: title }}
+              />
+              <p className="text-xs sm:text-lg text-gray-500 font-medium max-w-md mx-auto lg:mx-0 leading-relaxed">
+                {subtitle}
               </p>
             </div>
 
-            {/* Search Bar Overlay */}
-            <div className="relative max-w-xl group mt-4">
-              <div 
-                className="flex items-center bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden transition-all duration-300 focus-within:ring-4 focus-within:ring-blue-100 cursor-pointer"
+            <div className="flex flex-wrap justify-center lg:justify-start gap-4 mt-2 sm:mt-4 w-full">
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
                 onClick={onSearchClick}
+                className="w-full sm:w-auto px-10 py-4 bg-white text-gray-900 border border-gray-100 rounded-[22px] font-black shadow-xl shadow-blue-500/5 flex items-center justify-center gap-2"
               >
-                <div className="pl-5 pr-3 text-gray-400">
-                  <HiOutlineSearch className="w-6 h-6" />
-                </div>
-                <input 
-                  type="text" 
-                  placeholder="Search for products or services..." 
-                  className="flex-1 py-4 text-gray-700 bg-transparent outline-none text-base placeholder:text-gray-400 font-bold"
-                  readOnly
-                />
-                <button 
-                  className="px-8 py-4 text-white font-bold transition-all hover:brightness-110 active:scale-95"
-                  style={{ backgroundColor: themeColors.primary }}
-                >
-                  Search
-                </button>
-              </div>
+                {secondaryBtnText}
+              </motion.button>
             </div>
 
-            {/* Action Buttons */}
-            <div className="flex flex-wrap gap-4 mt-2">
-              <button 
-                className="flex items-center gap-2.5 px-10 py-4 rounded-xl text-white font-bold shadow-lg shadow-blue-900/20 transition-all hover:-translate-y-0.5 active:scale-95 pointer-events-auto"
-                style={{ backgroundColor: themeColors.primary }}
+            <div className="flex flex-wrap items-center justify-center lg:justify-start gap-x-6 gap-y-3 mt-6 sm:mt-8">
+              <div className="flex items-center gap-2 text-[9px] sm:text-[10px] font-black text-gray-400 uppercase tracking-widest">
+                <div className="w-5 h-5 bg-blue-100 rounded-md flex items-center justify-center text-blue-600">
+                  <FiCheckCircle className="w-3 h-3" />
+                </div>
+                Secure Payments
+              </div>
+              <div className="flex items-center gap-2 text-[9px] sm:text-[10px] font-black text-gray-400 uppercase tracking-widest">
+                <div className="w-5 h-5 bg-blue-100 rounded-md flex items-center justify-center text-blue-600">
+                  <FiClock className="w-3 h-3" />
+                </div>
+                24/7 Support
+              </div>
+              <div className="flex items-center gap-2 text-[9px] sm:text-[10px] font-black text-gray-400 uppercase tracking-widest">
+                <div className="w-5 h-5 bg-blue-100 rounded-md flex items-center justify-center text-blue-600">
+                  <FiTruck className="w-3 h-3" />
+                </div>
+                Fast Delivery
+              </div>
+            </div>
+          </motion.div>
+
+          {/* Right Content - Illustration (Now visible on mobile) */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.2 }}
+            className="flex justify-center lg:justify-end relative order-first lg:order-last mb-8 lg:mb-0"
+          >
+            <div className="relative w-full max-w-[280px] sm:max-w-[450px] lg:max-w-[600px]">
+              <img 
+                src={heroImage} 
+                alt="Delivery Illustration" 
+                className="w-full h-auto"
+                style={{
+                  maskImage: 'radial-gradient(circle at center, black 65%, transparent 100%)',
+                  WebkitMaskImage: 'radial-gradient(circle at center, black 65%, transparent 100%)',
+                  filter: 'drop-shadow(0 20px 20px rgba(0,0,0,0.08))'
+                }}
+              />
+              {/* Floating elements - simplified for mobile */}
+              <motion.div 
+                animate={{ y: [0, -8, 0] }}
+                transition={{ duration: 4, repeat: Infinity }}
+                className="absolute -top-4 -left-4 sm:top-10 sm:left-0 bg-white p-2 sm:p-3 rounded-xl sm:rounded-2xl shadow-xl border border-gray-50 flex items-center gap-2 sm:gap-3"
               >
-                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                </svg>
-                Book Service
-              </button>
+                <div className="w-8 h-8 sm:w-10 sm:h-10 bg-orange-100 rounded-lg sm:rounded-xl flex items-center justify-center text-orange-500">
+                  <FiBox className="w-4 h-4 sm:w-5 sm:h-5" />
+                </div>
+                <div>
+                  <div className="text-[7px] sm:text-[10px] font-black text-gray-400 uppercase tracking-tight">Delivered</div>
+                  <div className="text-[9px] sm:text-[12px] font-black text-gray-900 leading-none">Successful!</div>
+                </div>
+              </motion.div>
             </div>
           </motion.div>
         </div>
       </div>
       
-      {/* Scroll indicator or spacing if needed */}
-      <div className="h-4 w-full bg-gradient-to-t from-gray-50 to-transparent" />
+      {/* Reduced spacing indicator */}
+      <div className="h-2 w-full" />
     </div>
   );
 };

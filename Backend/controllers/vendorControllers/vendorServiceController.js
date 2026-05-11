@@ -33,13 +33,18 @@ const getMyServices = async (req, res) => {
       });
     }
 
-    // 2. Fetch Category details for each assigned name (using case-insensitive matching)
+    // 2. Fetch Category details:
+    // - Categories assigned by name in the vendor profile
+    // - Categories created specifically by this vendor (using vendorId)
     const categories = await Category.find({
-      title: { $in: assignedCategoryNames.map(name => new RegExp(`^${name}$`, 'i')) },
+      $or: [
+        { title: { $in: assignedCategoryNames.map(name => new RegExp(`^${name}$`, 'i')) } },
+        { vendorId: vendorId }
+      ],
       status: 'active'
-    }).select('title imageUrl homeIconUrl description slug');
+    }).select('title imageUrl homeIconUrl description slug vendorId');
     
-    console.log(`[getMyServices] Found ${categories.length} categories in DB for vendor ${vendorId}`);
+    console.log(`[getMyServices] Found ${categories.length} total categories (assigned + custom) for vendor ${vendorId}`);
 
     // 3. For each category, calculate performance stats
     const servicesWithStats = await Promise.all(categories.map(async (cat) => {

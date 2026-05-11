@@ -16,7 +16,7 @@ const BookingAlertCard = ({ booking, onAccept, onReject, onAssign, maxSearchTime
         }
       }
 
-      const totalDurationMins = Number(maxSearchTimeMins) || 5;
+      const totalDurationMins = Number(maxSearchTimeMins) || 1;
       const initialDurationSecs = totalDurationMins * 60;
 
       if (booking?.createdAt) {
@@ -57,7 +57,7 @@ const BookingAlertCard = ({ booking, onAccept, onReject, onAssign, maxSearchTime
     if (!booking) return;
 
     const bookingId = booking.id || booking._id;
-    const totalDurationMins = Number(maxSearchTimeMins) || 5;
+    const totalDurationMins = Number(maxSearchTimeMins) || 1;
     const initialDurationSecs = totalDurationMins * 60;
 
     const calculateRemaining = () => {
@@ -111,7 +111,7 @@ const BookingAlertCard = ({ booking, onAccept, onReject, onAssign, maxSearchTime
   const radius = 24;
   const circumference = 2 * Math.PI * radius;
   // Progress relative to the total max search time to ensure the circle shrinks correctly
-  const totalDurationSecs = (Number(maxSearchTimeMins) || 5) * 60;
+  const totalDurationSecs = (Number(maxSearchTimeMins) || 1) * 60;
   const progress = (timeLeft / totalDurationSecs) * circumference;
   const dashoffset = circumference - progress;
 

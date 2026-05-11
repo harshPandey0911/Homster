@@ -109,7 +109,6 @@ const BookingConfirmation = () => {
           // Calculate notional display values for plan_benefit
           if (data.paymentMethod === 'plan_benefit') {
             if (!data.tax) data.tax = (data.basePrice || 0) * 0.18;
-            if (!data.visitingCharges && !data.visitationFee) data.visitingCharges = 49;
           }
           setBooking(data);
 
@@ -148,7 +147,6 @@ const BookingConfirmation = () => {
           // Calculate notional display values for plan_benefit
           if (updatedBooking.paymentMethod === 'plan_benefit') {
             if (!updatedBooking.tax) updatedBooking.tax = (updatedBooking.basePrice || 0) * 0.18;
-            if (!updatedBooking.visitingCharges && !updatedBooking.visitationFee) updatedBooking.visitingCharges = 49;
           }
 
           setBooking(updatedBooking);
@@ -493,20 +491,7 @@ const BookingConfirmation = () => {
                 </div>
               )}
 
-              {/* Convenience Fee */}
-              {(booking.visitingCharges > 0 || booking.visitationFee > 0 || booking.paymentMethod === 'plan_benefit') && (
-                <div className="flex justify-between items-center text-sm">
-                  <span className="text-slate-500">Convenience Fee</span>
-                  {booking.paymentMethod === 'plan_benefit' ? (
-                    <div className="flex items-center gap-2">
-                      <span className="line-through text-slate-400 text-xs">₹{(booking.visitingCharges || booking.visitationFee || 0).toLocaleString('en-IN')}</span>
-                      <span className="text-emerald-600 font-bold text-xs bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-100">FREE ✓</span>
-                    </div>
-                  ) : (
-                    <span className="font-medium text-slate-700">₹{(booking.visitingCharges || booking.visitationFee || 0).toLocaleString('en-IN')}</span>
-                  )}
-                </div>
-              )}
+              {/* Convenience Fee removed */}
 
               {/* Total */}
               <div className="border-t border-slate-200 pt-4 mt-2">

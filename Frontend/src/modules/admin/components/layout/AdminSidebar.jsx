@@ -31,7 +31,7 @@ const iconMap = {
   Vendors: FiBriefcase,
   Workers: FiUser,
   Bookings: FiShoppingBag,
-  "User Catalog": FiGrid,
+  "Manage User App": FiGrid,
   "Vendor Services": FiGrid,
   "Vendor Parts": FiPackage,
   Payments: FiDollarSign,
@@ -75,7 +75,7 @@ const getChildRoute = (parentRoute, childName) => {
       "Booking Notifications": "/admin/bookings/notifications",
     },
     "/admin/user-categories": {
-      "Home": "/admin/user-categories/home",
+      "User Home UI": "/admin/user-categories/home",
       "Manage Categories": "/admin/user-categories/categories",
       "Manage Brands": "/admin/user-categories/brands",
       "Manage Services": "/admin/user-categories/sections",
@@ -227,7 +227,7 @@ const AdminSidebar = ({ isOpen, onClose }) => {
       return location.pathname === "/admin/dashboard";
     }
 
-    // Special case for User Catalog to avoid overlap with Vendor Services/Parts
+    // Special case for Manage User App to avoid overlap with Vendor Services/Parts
     if (route === "/admin/user-categories") {
       if (location.pathname.startsWith("/admin/user-categories/vendor-")) {
         return false;
@@ -235,7 +235,10 @@ const AdminSidebar = ({ isOpen, onClose }) => {
     }
 
     // Strict prefix check: either exact match OR followed by a slash
-    return location.pathname === route || location.pathname.startsWith(route + '/');
+    const normalizedPath = location.pathname.replace(/\/$/, "");
+    const normalizedRoute = route.replace(/\/$/, "");
+    
+    return normalizedPath === normalizedRoute || normalizedPath.startsWith(normalizedRoute + '/');
   };
 
   // Toggle expanded state for menu items with children

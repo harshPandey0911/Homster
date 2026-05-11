@@ -48,58 +48,60 @@ const SupportList = () => {
 
   const getStatusColor = (status) => {
     switch (status) {
-      case 'open': return 'bg-blue-100 text-blue-800';
-      case 'in_progress': return 'bg-yellow-100 text-yellow-800';
-      case 'waiting_on_user': return 'bg-orange-100 text-orange-800';
+      case 'open': return 'bg-black text-white';
+      case 'in_progress': return 'bg-gray-100 text-black';
+      case 'waiting_on_user': return 'bg-gray-50 text-gray-400 border border-gray-100';
       case 'resolved':
-      case 'closed': return 'bg-green-100 text-green-800';
-      default: return 'bg-gray-100 text-gray-800';
+      case 'closed': return 'bg-gray-100 text-gray-500';
+      default: return 'bg-gray-50 text-gray-400';
     }
   };
 
   const getStatusIcon = (status) => {
     switch (status) {
-      case 'open': return <FiMessageSquare className="w-4 h-4 mr-1" />;
-      case 'in_progress': return <FiClock className="w-4 h-4 mr-1" />;
-      case 'waiting_on_user': return <FiAlertCircle className="w-4 h-4 mr-1" />;
+      case 'open': return <FiMessageSquare className="w-3.5 h-3.5 mr-1.5" />;
+      case 'in_progress': return <FiClock className="w-3.5 h-3.5 mr-1.5" />;
+      case 'waiting_on_user': return <FiAlertCircle className="w-3.5 h-3.5 mr-1.5" />;
       case 'resolved':
-      case 'closed': return <FiCheckCircle className="w-4 h-4 mr-1" />;
+      case 'closed': return <FiCheckCircle className="w-3.5 h-3.5 mr-1.5" />;
       default: return null;
     }
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-20">
+    <div className="min-h-screen bg-white pb-20">
       <Header title="Helpdesk & Support" showBack={true} />
 
-      <div className="p-4">
-        {/* Header Action */}
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-xl font-bold text-gray-800">Your Tickets</h2>
+      <div className="p-5">
+        {/* Header Action (Black Theme) */}
+        <div className="flex justify-between items-center mb-8">
+          <div>
+            <h2 className="text-xl font-black text-gray-900 tracking-tighter">Support</h2>
+            <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">Communication History</p>
+          </div>
           <button
             onClick={() => setShowCreateModal(true)}
-            className="flex items-center px-4 py-2 rounded-xl text-white font-medium shadow-md transition-transform active:scale-95"
-            style={{ background: vendorTheme.primary }}
+            className="flex items-center px-5 py-2.5 rounded-xl bg-black text-white text-[10px] font-black uppercase tracking-widest shadow-xl shadow-gray-200 transition-all active:scale-95"
           >
-            <FiPlus className="mr-2" /> New Ticket
+            <FiPlus className="mr-2 w-4 h-4" /> New Ticket
           </button>
         </div>
 
-        {/* Ticket List */}
+        {/* Ticket List (Black Theme) */}
         {loading ? (
-          <div className="flex justify-center py-10">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+          <div className="flex justify-center py-20">
+            <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-black"></div>
           </div>
         ) : tickets.length === 0 ? (
-          <div className="bg-white rounded-2xl p-8 text-center shadow-sm border border-gray-100">
-            <div className="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-4">
-              <FiMessageSquare className="w-8 h-8 text-blue-500" />
+          <div className="bg-white rounded-[40px] p-12 text-center border border-gray-100 shadow-sm">
+            <div className="w-20 h-20 bg-gray-50 rounded-3xl flex items-center justify-center mx-auto mb-6 border border-gray-100">
+              <FiMessageSquare className="w-10 h-10 text-black" />
             </div>
-            <h3 className="text-lg font-bold text-gray-800 mb-2">No Support Tickets Yet</h3>
-            <p className="text-gray-500 text-sm mb-6">If you need help with anything, feel free to raise a ticket.</p>
+            <h3 className="text-sm font-black text-gray-900 uppercase tracking-widest mb-2">No Active Tickets</h3>
+            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-tighter mb-8 px-8">Our executive team is ready to assist you. Start a conversation if you need help.</p>
             <button
               onClick={() => setShowCreateModal(true)}
-              className="px-6 py-2 rounded-xl text-primary font-bold border-2 border-primary"
+              className="px-8 py-3 rounded-2xl bg-black text-white text-[10px] font-black uppercase tracking-[0.2em] shadow-lg shadow-gray-200"
             >
               Raise a Ticket
             </button>
@@ -110,22 +112,24 @@ const SupportList = () => {
               <div
                 key={ticket._id}
                 onClick={() => navigate(`/vendor/support/${ticket._id}`)}
-                className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 active:scale-[0.98] transition-transform cursor-pointer"
+                className="bg-white rounded-[32px] p-6 shadow-sm border border-gray-100 active:scale-[0.98] transition-all cursor-pointer group hover:border-black"
               >
-                <div className="flex justify-between items-start mb-2">
-                  <span className="text-xs font-bold text-gray-400">#{ticket.ticketNumber}</span>
-                  <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${getStatusColor(ticket.status)}`}>
+                <div className="flex justify-between items-start mb-4">
+                  <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">#{ticket.ticketNumber}</span>
+                  <span className={`inline-flex items-center px-3 py-1 rounded-full text-[8px] font-black uppercase tracking-widest ${getStatusColor(ticket.status)}`}>
                     {getStatusIcon(ticket.status)}
                     {ticket.status.replace(/_/g, ' ')}
                   </span>
                 </div>
-                <h3 className="font-bold text-gray-800 mb-1">{ticket.subject}</h3>
-                <p className="text-xs text-gray-500 line-clamp-2 mb-3">
+                <h3 className="text-sm font-black text-gray-900 uppercase tracking-widest mb-2 group-hover:text-black transition-colors">{ticket.subject}</h3>
+                <p className="text-[11px] font-medium text-gray-500 line-clamp-2 mb-4 leading-relaxed">
                   {ticket.messages[0]?.message}
                 </p>
-                <div className="flex justify-between items-center text-[10px] text-gray-400 font-medium">
-                  <span className="uppercase tracking-wider">{ticket.category}</span>
-                  <span>Updated: {new Date(ticket.updatedAt).toLocaleDateString()}</span>
+                <div className="flex justify-between items-center pt-4 border-t border-gray-50">
+                  <span className="text-[9px] font-black uppercase tracking-widest text-gray-400 bg-gray-50 px-2 py-0.5 rounded-md">{ticket.category}</span>
+                  <span className="text-[9px] font-black uppercase tracking-widest text-gray-300">
+                    {new Date(ticket.updatedAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}
+                  </span>
                 </div>
               </div>
             ))}
@@ -133,27 +137,27 @@ const SupportList = () => {
         )}
       </div>
 
-      {/* Create Modal */}
+      {/* Create Modal (Black Theme) */}
       {showCreateModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-          <div className="bg-white rounded-3xl w-full max-w-md overflow-hidden shadow-2xl">
-            <div className="p-4 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
-              <h3 className="font-bold text-gray-800">Create Support Ticket</h3>
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-6 bg-black/60 backdrop-blur-md">
+          <div className="bg-white rounded-[40px] w-full max-w-md overflow-hidden shadow-2xl border border-gray-100">
+            <div className="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50/30">
+              <h3 className="text-xs font-black text-gray-900 uppercase tracking-[0.3em]">New Request</h3>
               <button
                 onClick={() => setShowCreateModal(false)}
-                className="text-gray-400 hover:text-gray-600 p-1"
+                className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-400 hover:text-black transition-colors"
               >
                 ✕
               </button>
             </div>
-            <form onSubmit={handleCreate} className="p-4">
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-xs font-bold text-gray-700 mb-1">Category</label>
+            <form onSubmit={handleCreate} className="p-8">
+              <div className="space-y-6">
+                <div className="space-y-2">
+                  <label className="text-[9px] font-black text-gray-400 uppercase tracking-widest ml-1">Support Category</label>
                   <select
                     value={formData.category}
                     onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                    className="w-full border border-gray-200 rounded-xl p-3 text-sm focus:ring-2 focus:ring-primary/20 outline-none"
+                    className="w-full bg-gray-50 border border-gray-100 rounded-2xl p-4 text-[10px] font-black uppercase tracking-widest focus:border-black focus:bg-white outline-none transition-all"
                     required
                   >
                     <option value="general">General Inquiry</option>
@@ -163,36 +167,35 @@ const SupportList = () => {
                     <option value="technical">Technical Bug</option>
                   </select>
                 </div>
-                <div>
-                  <label className="block text-xs font-bold text-gray-700 mb-1">Subject</label>
+                <div className="space-y-2">
+                  <label className="text-[9px] font-black text-gray-400 uppercase tracking-widest ml-1">Subject</label>
                   <input
                     type="text"
                     value={formData.subject}
                     onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
-                    placeholder="Brief description of the issue"
-                    className="w-full border border-gray-200 rounded-xl p-3 text-sm focus:ring-2 focus:ring-primary/20 outline-none"
+                    placeholder="BRIEF OVERVIEW"
+                    className="w-full bg-gray-50 border border-gray-100 rounded-2xl p-4 text-[10px] font-black uppercase tracking-widest focus:border-black focus:bg-white outline-none transition-all"
                     required
                   />
                 </div>
-                <div>
-                  <label className="block text-xs font-bold text-gray-700 mb-1">Message</label>
+                <div className="space-y-2">
+                  <label className="text-[9px] font-black text-gray-400 uppercase tracking-widest ml-1">Message Detail</label>
                   <textarea
                     value={formData.message}
                     onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                    placeholder="Please explain the issue in detail..."
+                    placeholder="DESCRIBE THE ISSUE..."
                     rows="4"
-                    className="w-full border border-gray-200 rounded-xl p-3 text-sm focus:ring-2 focus:ring-primary/20 outline-none resize-none"
+                    className="w-full bg-gray-50 border border-gray-100 rounded-2xl p-4 text-[10px] font-black uppercase tracking-widest focus:border-black focus:bg-white outline-none transition-all resize-none"
                     required
                   ></textarea>
                 </div>
               </div>
-              <div className="mt-6">
+              <div className="mt-8">
                 <button
                   type="submit"
-                  className="w-full py-3 rounded-xl text-white font-bold shadow-md transition-transform active:scale-95"
-                  style={{ background: vendorTheme.primary }}
+                  className="w-full py-5 rounded-[24px] bg-black text-white text-[11px] font-black uppercase tracking-[0.3em] shadow-2xl shadow-gray-200 active:scale-95 transition-all"
                 >
-                  Submit Ticket
+                  Authorize Ticket
                 </button>
               </div>
             </form>
