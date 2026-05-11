@@ -103,7 +103,7 @@ export default function BookingDetails() {
         // Price Breakdown
         basePrice: parseFloat(apiData.basePrice || 0),
         tax: parseFloat(apiData.tax || (apiData.paymentMethod === 'plan_benefit' ? (apiData.basePrice || 0) * 0.18 : 0)),
-        visitingCharges: parseFloat(apiData.visitingCharges || apiData.visitationFee || (apiData.paymentMethod === 'plan_benefit' ? 49 : 0)),
+        visitingCharges: parseFloat(apiData.visitingCharges || apiData.visitationFee || 0),
         discount: parseFloat(apiData.discount || 0),
         platformCommission: parseFloat(apiData.adminCommission || apiData.platformFee || apiData.commission || 0),
         finalAmount: parseFloat(apiData.finalAmount || 0),
@@ -624,36 +624,25 @@ export default function BookingDetails() {
   const hasBill = !!bill;
 
   return (
-    <div className="min-h-screen pb-20" style={{ background: themeColors.backgroundGradient }}>
+    <div className="min-h-screen pb-36" style={{ background: '#FFFFFF' }}>
       <Header title="Booking Details" />
 
       <main className="px-4 py-6">
-        {/* Service Type Card */}
-        <div
-          className="bg-white rounded-xl p-4 mb-4 shadow-md"
-          style={{
-            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
-          }}
-        >
+        {/* Service Type Card (Black Theme) */}
+        <div className="bg-white rounded-[32px] p-6 mb-4 shadow-sm border border-gray-100">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600">Service Type</p>
-              <p className="text-xl font-bold" style={{ color: themeColors.button }}>
+              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 mb-1">Service Type</p>
+              <p className="text-2xl font-black text-gray-900">
                 {booking.serviceType}
               </p>
             </div>
-            <div className="flex flex-col items-end gap-1">
-              <div
-                className="px-3 py-1 rounded-full text-sm font-semibold"
-                style={{
-                  background: `${themeColors.button}15`,
-                  color: themeColors.button,
-                }}
-              >
-                {booking.status}
+            <div className="flex flex-col items-end gap-2">
+              <div className="px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest bg-black text-white shadow-lg shadow-gray-200">
+                {booking.status.replace('_', ' ')}
               </div>
               {booking.assignedTo?.name === 'You (Self)' && (
-                <span className="text-[10px] font-bold text-green-600 bg-green-50 px-2 py-0.5 rounded-md border border-green-100 uppercase tracking-wider">
+                <span className="text-[9px] font-black text-black bg-gray-50 px-2.5 py-1 rounded-lg border border-gray-100 uppercase tracking-widest">
                   Personal Job
                 </span>
               )}
@@ -661,54 +650,46 @@ export default function BookingDetails() {
           </div>
         </div>
 
-        {/* User Info Card */}
-        <div
-          className="bg-white rounded-xl p-4 mb-4 shadow-md"
-          style={{
-            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
-          }}
-        >
-          <div className="flex items-center justify-between mb-3">
-            <div className="flex items-center gap-3">
-              <div
-                className="w-12 h-12 rounded-full flex items-center justify-center"
-                style={{ backgroundColor: `${themeColors.icon}15` }}
-              >
-                <FiUser className="w-6 h-6" style={{ color: themeColors.icon }} />
+        {/* User Info Card (Black Theme) */}
+        <div className="bg-white rounded-[32px] p-6 mb-4 shadow-sm border border-gray-100">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <div className="w-14 h-14 rounded-2xl bg-gray-50 flex items-center justify-center border border-gray-100">
+                <FiUser className="w-7 h-7 text-black" />
               </div>
               <div>
-                <p className="font-semibold text-gray-800">{booking.user?.name || booking.customerName || 'Customer'}</p>
-                <p className="text-sm text-gray-600">{booking.user?.phone || booking.customerPhone || 'Phone hidden'}</p>
+                <p className="text-lg font-black text-gray-900">{booking.user?.name || booking.customerName || 'Customer'}</p>
+                <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mt-0.5">{booking.user?.phone || booking.customerPhone || 'Phone hidden'}</p>
               </div>
             </div>
             <button
               onClick={handleCallUser}
-              className="p-2 rounded-full hover:bg-gray-100 transition-colors"
-              style={{ backgroundColor: `${themeColors.button}15` }}
+              className="w-12 h-12 rounded-2xl bg-black flex items-center justify-center shadow-lg shadow-gray-200 active:scale-90 transition-all"
             >
-              <FiPhone className="w-5 h-5" style={{ color: themeColors.button }} />
+              <FiPhone className="w-5 h-5 text-white" />
             </button>
           </div>
         </div>
 
-        {/* Address Card with Map */}
-        <div
-          className="bg-white rounded-xl p-4 mb-4 shadow-md"
-          style={{
-            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
-          }}
-        >
-          <div className="flex items-start gap-3 mb-3">
-            <FiMapPin className="w-5 h-5 mt-0.5" style={{ color: themeColors.icon }} />
+        {/* Address Card with Map (Black Theme) */}
+        <div className="bg-white rounded-[32px] p-6 mb-4 shadow-sm border border-gray-100">
+          <div className="flex items-start gap-4 mb-4">
+            <div className="w-10 h-10 rounded-xl bg-gray-50 flex items-center justify-center shrink-0">
+              <FiMapPin className="w-5 h-5 text-black" />
+            </div>
             <div className="flex-1">
-              <p className="text-sm text-gray-600 mb-1">Address</p>
-              <p className="font-semibold text-gray-800">{booking.location.address}</p>
-              <p className="text-sm text-gray-500 mt-1">{booking.location.distance} away</p>
+              <p className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-1">Service Location</p>
+              <p className="text-sm font-black text-gray-900 leading-relaxed">{booking.location.address}</p>
+              <div className="flex items-center gap-2 mt-2">
+                <span className="text-[10px] font-black text-black bg-gray-50 px-2 py-0.5 rounded-md border border-gray-100 uppercase tracking-tighter">
+                  {booking.location.distance} away
+                </span>
+              </div>
             </div>
           </div>
 
           {/* Map Embed */}
-          <div className="w-full h-48 rounded-lg overflow-hidden mb-3 bg-gray-200 relative group cursor-pointer" onClick={() => navigate(`/vendor/booking/${booking.id}/map`)}>
+          <div className="w-full h-48 rounded-[24px] overflow-hidden mb-5 border border-gray-100 relative group cursor-pointer" onClick={() => navigate(`/vendor/booking/${booking.id}/map`)}>
             {(() => {
               const hasCoordinates = booking.location.lat && booking.location.lng && booking.location.lat !== 0 && booking.location.lng !== 0;
               const mapQuery = hasCoordinates
@@ -728,8 +709,8 @@ export default function BookingDetails() {
                   ></iframe>
                   {/* Overlay to intercept clicks */}
                   <div className="absolute inset-0 bg-transparent group-hover:bg-black/5 transition-colors flex items-center justify-center">
-                    <span className="bg-white/90 px-3 py-1 rounded-full text-xs font-medium text-gray-700 shadow-sm opacity-0 group-hover:opacity-100 transition-opacity">
-                      View Full Map
+                    <span className="bg-black text-white px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-xl opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-2 group-hover:translate-y-0">
+                      Open Full Map
                     </span>
                   </div>
                 </>
@@ -737,16 +718,12 @@ export default function BookingDetails() {
             })()}
           </div>
 
-          <div className="flex gap-3 mt-4">
+          <div className="flex gap-3">
             <button
               onClick={() => navigate(`/vendor/booking/${booking.id || id}/map`)}
-              className="flex-1 py-3.5 rounded-xl font-bold border-2 flex items-center justify-center gap-2 transition-all active:scale-95 bg-white"
-              style={{
-                borderColor: themeColors.button,
-                color: themeColors.button,
-              }}
+              className="flex-1 py-4 rounded-2xl font-black text-xs uppercase tracking-widest border border-gray-200 flex items-center justify-center gap-2 transition-all active:scale-95 bg-white text-black"
             >
-              <FiMapPin className="w-5 h-5" />
+              <FiMapPin className="w-4 h-4" />
               View Map
             </button>
             <button
@@ -755,16 +732,12 @@ export default function BookingDetails() {
                 const dest = hasCoords
                   ? `${booking.location.lat},${booking.location.lng}`
                   : encodeURIComponent(booking.location.address);
-                // Open directly to trigger app intent
                 window.location.href = `https://www.google.com/maps/dir/?api=1&destination=${dest}`;
               }}
-              className="flex-1 py-3.5 rounded-xl font-bold text-white flex items-center justify-center gap-2 transition-all active:scale-95 shadow-lg shadow-blue-200"
-              style={{
-                background: 'linear-gradient(135deg, #3B82F6, #2563EB)',
-              }}
+              className="flex-1 py-4 rounded-2xl font-black text-xs uppercase tracking-widest text-white flex items-center justify-center gap-2 transition-all active:scale-95 shadow-lg shadow-gray-200 bg-black"
             >
-              <FiNavigation className="w-5 h-5" />
-              Get Directions
+              <FiNavigation className="w-4 h-4" />
+              Navigate
             </button>
           </div>
         </div>
@@ -1446,57 +1419,96 @@ export default function BookingDetails() {
           </div>
         )}
 
-        {/* Action Buttons */}
-        <div className="space-y-3">
-          <button
-            onClick={handleViewTimeline}
-            className="w-full py-4 rounded-xl font-semibold text-white flex items-center justify-center gap-2 transition-all active:scale-95"
-            style={{
-              background: themeColors.button,
-              boxShadow: `0 4px 12px ${themeColors.button}40`,
-            }}
-          >
-            View Timeline
-            <FiArrowRight className="w-5 h-5" />
-          </button>
+        {/* Action Buttons & Assignment Selection */}
+        <div className="mt-8 mb-4">
+          {/* 1. INITIAL SELECTION: When no one is assigned yet */}
+          {(!booking.assignedTo || (booking.workerResponse === 'rejected' && (booking.status === 'confirmed' || booking.status === 'accepted'))) && (
+            <div className="space-y-4">
+              <div className="bg-white rounded-2xl p-6 shadow-xl border border-gray-100">
+                <h3 className="text-lg font-bold text-gray-800 mb-2 text-center">How will you handle this job?</h3>
+                <p className="text-sm text-gray-500 text-center mb-6">Choose whether you'll do it yourself or delegate to a worker.</p>
+                
+                <div className="grid grid-cols-2 gap-4">
+                  {/* Do it Myself Option */}
+                  <button
+                    onClick={handleAssignToSelf}
+                    className="flex flex-col items-center justify-center p-6 rounded-2xl border-2 transition-all active:scale-95 group"
+                    style={{
+                      borderColor: themeColors.button,
+                      backgroundColor: `${themeColors.button}08`,
+                    }}
+                  >
+                    <div className="w-14 h-14 rounded-full bg-white flex items-center justify-center mb-3 shadow-md group-hover:scale-110 transition-transform">
+                      <FiUser className="w-7 h-7" style={{ color: themeColors.button }} />
+                    </div>
+                    <span className="font-bold text-sm" style={{ color: themeColors.button }}>Do it Myself</span>
+                    <span className="text-[10px] text-gray-500 mt-1 text-center">You will perform the service</span>
+                  </button>
 
-          {(booking.status === 'confirmed' || (booking.assignedTo && booking.workerResponse === 'rejected')) && (
-            <div className="flex gap-3">
-              <button
-                onClick={handleAssignToSelf}
-                className="flex-1 py-4 rounded-xl font-semibold border-2 transition-all active:scale-95"
-                style={{
-                  borderColor: themeColors.button,
-                  color: themeColors.button,
-                  background: 'white',
-                }}
-              >
-                Do it Myself
-              </button>
+                  {/* Assign Worker Option */}
+                  <button
+                    onClick={handleAssignWorker}
+                    className="flex flex-col items-center justify-center p-6 rounded-2xl border-2 border-gray-200 bg-gray-50 transition-all active:scale-95 group hover:border-blue-400 hover:bg-blue-50"
+                  >
+                    <div className="w-14 h-14 rounded-full bg-white flex items-center justify-center mb-3 shadow-md group-hover:scale-110 transition-transform">
+                      <FiTool className="w-7 h-7 text-blue-500" />
+                    </div>
+                    <span className="font-bold text-sm text-gray-800">Assign Worker</span>
+                    <span className="text-[10px] text-gray-500 mt-1 text-center">Delegate to your team</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* 2. SELF JOB FLOW: Buttons shown ONLY if assigned to self */}
+          {booking.assignedTo?.name === 'You (Self)' && (
+            <div className="space-y-4">
+              <div className="bg-green-50 border border-green-100 rounded-xl p-4 flex items-center gap-3 mb-2">
+                <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center text-green-600">
+                  <FiUser className="w-5 h-5" />
+                </div>
+                <div>
+                  <p className="text-xs font-bold text-green-800 uppercase tracking-wider">Self Assignment</p>
+                  <p className="text-sm text-green-700">You are handling this job personally.</p>
+                </div>
+                <button 
+                  onClick={handleAssignWorker}
+                  className="ml-auto text-xs font-bold text-green-800 underline"
+                >
+                  Change
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* 1. INITIAL STATE: Assign Worker or Self */}
+          {!booking.assignedTo && booking.status === 'confirmed' && (
+            <div className="space-y-4">
               <button
                 onClick={handleAssignWorker}
-                className="flex-1 py-4 rounded-xl font-semibold text-white transition-all active:scale-95 px-4"
-                style={{
-                  background: themeColors.button,
-                  boxShadow: `0 4px 12px ${themeColors.button}40`,
-                }}
+                className="w-full py-5 rounded-[24px] font-black text-sm uppercase tracking-widest text-white bg-black shadow-xl shadow-gray-200 flex items-center justify-center gap-3 active:scale-95 transition-all"
               >
-                {booking.workerResponse === 'rejected' ? 'Reassign' : 'Assign'}
+                <FiUser className="w-5 h-5" />
+                Assign Worker
+              </button>
+              <button
+                onClick={handleAssignToSelf}
+                className="w-full py-5 rounded-[24px] font-black text-sm uppercase tracking-widest text-black bg-gray-50 border border-gray-100 flex items-center justify-center gap-3 active:scale-95 transition-all"
+              >
+                <FiTool className="w-5 h-5" />
+                Do it Myself
               </button>
             </div>
           )}
 
-          {/* Self-Job Operational Buttons */}
-          {booking.assignedTo?.name === 'You (Self)' && (
-            <div className="space-y-3 pt-2">
-              {(booking.status === 'confirmed' || booking.status === 'assigned') && (
+          {/* 2. SELF JOB FLOW: Active actions when assigned to self */}
+          {booking.assignedTo && booking.assignedTo.name === 'You (Self)' && (
+            <div className="space-y-4">
+              {booking.status === 'assigned' && (
                 <button
                   onClick={handleStartJourney}
-                  className="w-full py-4 rounded-xl font-bold text-white flex items-center justify-center gap-2 transition-all active:scale-95 shadow-lg"
-                  style={{
-                    background: 'linear-gradient(135deg, #10B981, #059669)',
-                    boxShadow: '0 4px 12px rgba(16, 185, 129, 0.4)',
-                  }}
+                  className="w-full py-5 rounded-[24px] font-black text-sm uppercase tracking-widest text-white bg-black shadow-xl shadow-gray-200 flex items-center justify-center gap-3 active:scale-95 transition-all"
                 >
                   <FiNavigation className="w-5 h-5" />
                   Start Journey
@@ -1513,32 +1525,80 @@ export default function BookingDetails() {
                       console.error('Failed to notify reached:', err);
                     }
                   }}
-                  className="w-full py-4 rounded-xl font-bold text-white flex items-center justify-center gap-2 transition-all active:scale-95 shadow-lg"
-                  style={{
-                    background: 'linear-gradient(135deg, #3B82F6, #2563EB)',
-                    boxShadow: '0 4px 12px rgba(59, 130, 246, 0.4)',
-                  }}
+                  className="w-full py-5 rounded-[24px] font-black text-sm uppercase tracking-widest text-white bg-black shadow-xl shadow-gray-200 flex items-center justify-center gap-3 active:scale-95 transition-all"
                 >
                   <FiMapPin className="w-5 h-5" />
-                  Arrived (Arrived at customer's site)
+                  I have Arrived
                 </button>
               )}
 
               {(booking.status === 'visited' || booking.status === 'in_progress') && (
                 <button
                   onClick={() => setIsWorkDoneModalOpen(true)}
-                  className="w-full py-4 rounded-xl font-bold text-white flex items-center justify-center gap-2 transition-all active:scale-95 shadow-lg"
-                  style={{
-                    background: 'linear-gradient(135deg, #10B981, #059669)',
-                    boxShadow: '0 4px 12px rgba(16, 185, 129, 0.4)',
-                  }}
+                  className="w-full py-5 rounded-[24px] font-black text-sm uppercase tracking-widest text-white bg-black shadow-xl shadow-gray-200 flex items-center justify-center gap-3 active:scale-95 transition-all"
                 >
                   <FiCheckCircle className="w-5 h-5" />
-                  Work Done
+                  Complete Work
                 </button>
               )}
             </div>
           )}
+
+          {/* 3. WORKER JOB FLOW: Status indicator when assigned to worker */}
+          {booking.assignedTo && booking.assignedTo.name !== 'You (Self)' && (
+            <div className="space-y-4">
+              <div className="bg-gray-50 border border-gray-100 rounded-[32px] p-6 shadow-sm">
+                <div className="flex items-center gap-4 mb-5">
+                  <div className="w-14 h-14 rounded-2xl bg-white border border-gray-100 flex items-center justify-center text-black shadow-sm">
+                    <FiTool className="w-7 h-7" />
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Assigned Worker</p>
+                    <h4 className="text-lg font-black text-gray-900">{booking.assignedTo.name}</h4>
+                    <div className="flex items-center gap-2 mt-1">
+                      <div className={`w-2 h-2 rounded-full animate-pulse ${booking.status === 'completed' ? 'bg-black' : 'bg-gray-400'}`} />
+                      <span className="text-[10px] font-black text-black uppercase tracking-widest">{booking.status.replace('_', ' ')}</span>
+                    </div>
+                  </div>
+                  <button 
+                    onClick={handleAssignWorker}
+                    className="w-10 h-10 rounded-xl bg-white border border-gray-100 text-black flex items-center justify-center shadow-sm active:scale-90 transition-all"
+                  >
+                    <FiEdit className="w-4 h-4" />
+                  </button>
+                </div>
+
+                {booking.status === 'work_done' && (
+                  <button
+                    onClick={handleApproveWork}
+                    className="w-full py-4 rounded-2xl font-black text-xs uppercase tracking-widest text-white bg-black shadow-lg shadow-gray-200 flex items-center justify-center gap-2 active:scale-95 transition-all"
+                  >
+                    <FiCheckCircle className="w-5 h-5" />
+                    Approve Work
+                  </button>
+                )}
+
+                {booking.status === 'completed' && canPayWorker(booking) && (
+                  <button
+                    onClick={handlePayWorkerClick}
+                    className="w-full py-4 rounded-2xl font-black text-xs uppercase tracking-widest text-white bg-black shadow-lg shadow-gray-200 flex items-center justify-center gap-2 active:scale-95 transition-all"
+                  >
+                    <FiDollarSign className="w-5 h-5" />
+                    Release Payment
+                  </button>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* Common Timeline Button */}
+          <button
+            onClick={handleViewTimeline}
+            className="w-full py-4 mt-4 rounded-2xl font-black text-[10px] uppercase tracking-widest text-gray-400 bg-white border border-gray-100 flex items-center justify-center gap-2 transition-all active:scale-95"
+          >
+            <FiClock className="w-4 h-4" />
+            View Full Timeline
+          </button>
         </div>
       </main>
 

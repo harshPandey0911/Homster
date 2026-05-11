@@ -4,7 +4,7 @@ import { FiArrowLeft, FiCheckCircle, FiUsers, FiShield, FiClock, FiAward, FiHear
 import { motion } from 'framer-motion';
 import Logo from '../../../../components/common/Logo';
 
-const AboutHomestr = () => {
+const AboutPlugPro = () => {
   const navigate = useNavigate();
 
   // Container animation variants
@@ -28,14 +28,6 @@ const AboutHomestr = () => {
         ease: [0.25, 0.1, 0.25, 1]
       }
     }
-  };
-
-  // Gradient Definition for re-use in inline styles
-  const homestrGradient = 'linear-gradient(135deg, #347989 0%, #BB5F36 100%)';
-  const homestrTextGradient = {
-    background: homestrGradient,
-    WebkitBackgroundClip: 'text',
-    WebkitTextFillColor: 'transparent',
   };
 
   const features = [
@@ -64,7 +56,7 @@ const AboutHomestr = () => {
   const stats = [
     { number: '10K+', label: 'Happy Customers' },
     { number: '500+', label: 'Service Partners' },
-    { number: '4.8', label: 'App Rating' },
+    { number: '4.8', label: 'Platform Rating' },
   ];
 
   return (
@@ -72,64 +64,47 @@ const AboutHomestr = () => {
       initial="hidden"
       animate="visible"
       variants={containerVariants}
-      className="min-h-screen bg-gray-50 pb-10"
+      className="min-h-screen bg-white pb-10"
     >
-      {/* SVG Gradient Definition */}
-      <svg width="0" height="0" className="absolute">
-        <linearGradient id="homestr-about-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor="#347989" />
-          <stop offset="50%" stopColor="#D68F35" />
-          <stop offset="100%" stopColor="#BB5F36" />
-        </linearGradient>
-      </svg>
-
       {/* Header */}
-      <header className="bg-white/80 backdrop-blur-md shadow-sm sticky top-0 z-30 border-b border-gray-100">
-        <div className="px-4 py-4 flex items-center gap-3">
+      <header className="bg-white/80 backdrop-blur-md sticky top-0 z-30 border-b border-gray-100">
+        <div className="px-5 py-5 flex items-center gap-4">
           <button
             onClick={() => navigate(-1)}
-            className="p-2 hover:bg-gray-100 rounded-full transition-colors active:scale-95"
+            className="w-10 h-10 flex items-center justify-center bg-gray-50 rounded-xl border border-gray-100 hover:bg-gray-100 transition-all active:scale-90"
           >
-            <FiArrowLeft className="w-5 h-5 text-gray-700" />
+            <FiArrowLeft className="w-5 h-5 text-black" />
           </button>
-          <span className="text-xl font-bold" style={homestrTextGradient}>About Homestr</span>
+          <span className="text-sm font-black uppercase tracking-[0.3em] text-black">About PlugPro</span>
         </div>
       </header>
 
-      <main className="px-5 py-6 space-y-8">
+      <main className="px-5 py-10 space-y-12 max-w-lg mx-auto">
         {/* Hero Section */}
         <motion.div variants={itemVariants} className="text-center">
-          <div className="relative w-28 h-28 mx-auto mb-6">
-            {/* Spinning Border */}
-            <div
-              className="absolute inset-[-3px] rounded-full opacity-70"
-              style={{
-                background: 'conic-gradient(from 0deg, #347989, #D68F35, #BB5F36, #347989)',
-                animation: 'spin 4s linear infinite',
-              }}
-            />
-            {/* White Background */}
-            <div className="absolute inset-0 bg-white rounded-full shadow-lg flex items-center justify-center">
-              <Logo className="w-16 h-16 object-contain" />
+          <div className="relative w-24 h-24 mx-auto mb-8">
+            <div className="absolute inset-0 bg-black rounded-[32px] shadow-2xl flex items-center justify-center transform rotate-6 scale-90 opacity-10" />
+            <div className="absolute inset-0 bg-white rounded-[32px] shadow-sm border border-gray-100 flex items-center justify-center relative z-10">
+              <Logo className="w-14 h-14 object-contain" />
             </div>
           </div>
 
-          <h1 className="text-3xl font-extrabold text-gray-900 mb-2">
-            Welcome to <span style={homestrTextGradient}>Homestr</span>
+          <h1 className="text-4xl font-black text-black mb-4 tracking-tighter">
+            PlugPro <span className="text-gray-200">Network</span>
           </h1>
-          <p className="text-gray-500 max-w-xs mx-auto leading-relaxed">
-            Your trusted partner for premium home and personal care services.
+          <p className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 max-w-xs mx-auto leading-loose">
+            Redefining professional service delivery through technology and trust.
           </p>
         </motion.div>
 
         {/* Stats Row */}
-        <motion.div variants={itemVariants} className="flex justify-between bg-white rounded-2xl p-6 shadow-sm border border-gray-100 divide-x divide-gray-100">
+        <motion.div variants={itemVariants} className="flex justify-between bg-black rounded-[40px] p-8 shadow-2xl shadow-gray-200">
           {stats.map((stat, idx) => (
             <div key={idx} className="flex-1 text-center px-2">
-              <div className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-[#347989] to-[#BB5F36]">
+              <div className="text-xl font-black text-white tracking-tighter">
                 {stat.number}
               </div>
-              <div className="text-[10px] uppercase tracking-wider text-gray-400 font-medium mt-1">
+              <div className="text-[8px] font-black uppercase tracking-[0.2em] text-white/40 mt-1">
                 {stat.label}
               </div>
             </div>
@@ -138,76 +113,48 @@ const AboutHomestr = () => {
 
         {/* Mission Statement */}
         <motion.div variants={itemVariants}>
-          <div className="bg-gradient-to-br from-[#347989]/5 to-[#BB5F36]/5 rounded-2xl p-6 border border-[#347989]/10 relative overflow-hidden">
-            <div className="absolute top-0 right-0 p-4 opacity-5">
-              <FiGlobe className="w-24 h-24" />
+          <div className="bg-gray-50 rounded-[40px] p-8 border border-gray-100 relative overflow-hidden">
+            <div className="absolute top-0 right-0 p-6 text-black opacity-[0.03]">
+              <FiGlobe className="w-32 h-32" />
             </div>
-            <h3 className="text-lg font-bold text-gray-800 mb-3">Our Mission</h3>
-            <p className="text-sm text-gray-600 leading-relaxed relative z-10">
-              Homestr is dedicated to revolutionizing how you experience home services. We connect you with top-tier professionals to deliver safe, reliable, and high-quality services right at your doorstep. We believe in making life simpler, one service at a time.
+            <h3 className="text-xs font-black text-black uppercase tracking-[0.3em] mb-4">Our Vision</h3>
+            <p className="text-[11px] font-bold text-gray-500 leading-relaxed relative z-10 tracking-tighter">
+              PlugPro is architecting a new standard for home and personal services. We bridge the gap between skilled experts and discerning users through a seamless, secure, and transparent marketplace. Our focus is quality at scale.
             </p>
           </div>
         </motion.div>
 
         {/* Why Choose Us Grid */}
         <motion.div variants={itemVariants}>
-          <h3 className="text-lg font-bold text-gray-800 mb-4 px-1">Why Choose Homestr?</h3>
-          <div className="grid grid-cols-2 gap-3">
+          <h3 className="text-xs font-black text-black uppercase tracking-[0.3em] mb-6 px-1 text-center">Core Pillars</h3>
+          <div className="grid grid-cols-2 gap-4">
             {features.map((feature, index) => (
               <div
                 key={index}
-                className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 hover:shadow-md transition-shadow group"
+                className="bg-white rounded-[32px] p-6 shadow-sm border border-gray-100 group hover:border-black transition-all"
               >
-                <div className="w-10 h-10 rounded-xl flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300"
-                  style={{ background: 'linear-gradient(135deg, rgba(52, 121, 137, 0.1), rgba(187, 95, 54, 0.1))' }}>
-                  <feature.icon className="w-5 h-5" style={{ stroke: 'url(#homestr-about-gradient)' }} />
+                <div className="w-12 h-12 rounded-2xl bg-gray-50 flex items-center justify-center mb-4 group-hover:bg-black group-hover:text-white transition-all border border-gray-100">
+                  <feature.icon className="w-5 h-5" />
                 </div>
-                <h4 className="text-sm font-bold text-gray-800 mb-1">{feature.title}</h4>
-                <p className="text-xs text-gray-500 leading-relaxed">{feature.description}</p>
-              </div>
-            ))}
-          </div>
-        </motion.div>
-
-        {/* How It Works */}
-        <motion.div variants={itemVariants}>
-          <h3 className="text-lg font-bold text-gray-800 mb-4 px-1">How We Work</h3>
-          <div className="bg-white rounded-2xl p-1 shadow-sm border border-gray-100">
-            {[
-              { title: 'Book Details', desc: 'Select service & schedule time', icon: FiSmartphone },
-              { title: 'Get Matched', desc: 'We assign a top-rated pro', icon: FiUsers },
-              { title: 'Relax', desc: 'Enjoy high-quality service', icon: FiSmile },
-            ].map((step, i) => (
-              <div key={i} className="flex items-center p-4 border-b last:border-0 border-gray-50 relative">
-                <div className="w-12 h-12 rounded-full flex items-center justify-center shrink-0 mr-4 shadow-sm text-white font-bold text-lg relative overflow-hidden">
-                  <div className="absolute inset-0 bg-gradient-to-br from-[#347989] to-[#BB5F36]" />
-                  <span className="relative z-10">{i + 1}</span>
-                </div>
-                <div>
-                  <h4 className="text-sm font-bold text-gray-800">{step.title}</h4>
-                  <p className="text-xs text-gray-500">{step.desc}</p>
-                </div>
+                <h4 className="text-[10px] font-black text-black uppercase tracking-widest mb-2">{feature.title}</h4>
+                <p className="text-[9px] font-bold text-gray-400 leading-relaxed tracking-tighter">{feature.description}</p>
               </div>
             ))}
           </div>
         </motion.div>
 
         {/* Footer Info */}
-        <motion.div variants={itemVariants} className="text-center pt-4 border-t border-gray-200">
-          <p className="text-xs text-gray-400 mb-1">Designed & Developed by</p>
-          <span className="text-sm font-bold tracking-wide" style={homestrTextGradient}>Homestr Team</span>
-          <p className="text-[10px] text-gray-300 mt-4">v7.6.27 • Made with ❤️ in India</p>
+        <motion.div variants={itemVariants} className="text-center pt-8 border-t border-gray-100">
+          <p className="text-[9px] font-black text-gray-300 uppercase tracking-[0.2em] mb-1">Ecosystem Managed By</p>
+          <span className="text-sm font-black text-black uppercase tracking-[0.4em]">PlugPro Elite</span>
+          <div className="flex items-center justify-center gap-2 mt-6">
+            <div className="w-1.5 h-1.5 rounded-full bg-black animate-pulse" />
+            <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest">Version 8.0.0 Global</p>
+          </div>
         </motion.div>
       </main>
-
-      <style jsx="true">{`
-        @keyframes spin {
-          from { transform: rotate(0deg); }
-          to { transform: rotate(360deg); }
-        }
-      `}</style>
     </motion.div>
   );
 };
 
-export default AboutHomestr;
+export default AboutPlugPro;

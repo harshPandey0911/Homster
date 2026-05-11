@@ -19,7 +19,10 @@ const categorySchema = z.object({
   showOnHome: z.boolean(),
 });
 
-const CategoriesPage = ({ catalog, setCatalog, selectedCity }) => {
+import { useOutletContext } from "react-router-dom";
+
+const CategoriesPage = () => {
+  const { catalog, setCatalog } = useOutletContext();
   const [editingId, setEditingId] = useState(null);
   const [loading, setLoading] = useState(false);
   const [fetching, setFetching] = useState(true);
@@ -46,9 +49,6 @@ const CategoriesPage = ({ catalog, setCatalog, selectedCity }) => {
         setFetching(true);
         // Pass city filters
         const params = { status: 'active' };
-        if (selectedCity) {
-          params.cityId = selectedCity;
-        }
 
         const response = await categoryService.getAll(params);
 
@@ -79,7 +79,7 @@ const CategoriesPage = ({ catalog, setCatalog, selectedCity }) => {
     };
 
     fetchCategories();
-  }, [selectedCity]); // Re-fetch when city changes
+  }, []); // Re-fetch only on mount
 
   useEffect(() => {
     if (!editing) {
@@ -168,24 +168,11 @@ const CategoriesPage = ({ catalog, setCatalog, selectedCity }) => {
         hasSaleBadge,
         showOnHome,
         homeOrder,
-        cityIds: selectedCity ? [selectedCity] : [],
+        cityIds: [],
       };
 
-      // For updates, we need to respect existing cityIds possibly, but for now we just set/add the current city
-      // If we are in "Global" mode (selectedCity is empty), we might want to keep existing cityIds?
-      // User request implies: "link it with city id" when selected.
-      if (editingId && !editingId.startsWith('ucat-')) {
-        const existingCat = categories.find(c => c.id === editingId);
-        // If editing, and we have a selectedCity, ensure it's in the list (or replace? usually specific intent)
-        // Assuming "Link it" implies making it available for this city.
-        // But usually in this UI, if you are filtering by a city, you are managing THAT city's entities.
-        // Let's stick to: If selectedCity is present, set cityIds = [selectedCity]. 
-        // If generic want to add multiple cities, that might need a multi-select UI. 
-        // For now, adhering to user request: "link it with city id".
-        if (selectedCity) {
-          categoryData.cityIds = [selectedCity];
-        }
-      }
+      // Global configuration update logic
+        // removed city auto-linking logic
 
       let savedCategory;
       if (editingId && editingId.startsWith('ucat-')) {
