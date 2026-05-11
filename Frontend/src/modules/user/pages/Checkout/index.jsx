@@ -57,7 +57,7 @@ const Checkout = () => {
   const [selectedDate, setSelectedDate] = useState(null);
 
   const [selectedTime, setSelectedTime] = useState(null);
-  const [visitedFee, setVisitedFee] = useState(29);
+  const [visitedFee, setVisitedFee] = useState(0); // Convenience fee disabled
   const [gstPercentage, setGstPercentage] = useState(18);
   const [bookingType, setBookingType] = useState('instant'); // 'instant' | 'scheduled'
 
@@ -122,7 +122,7 @@ const Checkout = () => {
           // Still need config and address for plan checkout
           const response = await userAuthService.getCheckoutData();
           if (response.success) {
-            setVisitedFee(0); // Plans usually have 0 visitor fee
+            setVisitedFee(0); // Convenience fee disabled
             setGstPercentage(response.settings?.serviceGstPercentage || 18);
 
             if (response.user?.addresses?.length > 0) {
@@ -144,7 +144,7 @@ const Checkout = () => {
           const response = await userAuthService.getCheckoutData();
           if (response.success) {
             // Set Config
-            setVisitedFee(response.settings?.visitedCharges || 29);
+            setVisitedFee(0); // Convenience fee disabled
             setGstPercentage(response.settings?.serviceGstPercentage || 18);
 
             // Set Addresses
@@ -351,7 +351,7 @@ const Checkout = () => {
         basePrice: totalOriginalPrice,
         discount: savings,
         tax: taxesAndFee,
-        visitationFee: finalVisitedFee,
+        visitationFee: 0, // Convenience fee disabled
 
         // Metadata for better data capture
         serviceCategory: firstItem.categoryTitle || firstItem.category || 'General',
@@ -584,7 +584,7 @@ const Checkout = () => {
         basePrice: totalOriginalPrice,
         discount: savings,
         tax: taxesAndFee,
-        visitationFee: finalVisitedFee,
+        visitationFee: 0, // Convenience fee disabled
 
         // Metadata for better data capture
         serviceCategory: firstItem.categoryTitle || firstItem.category || 'General',
@@ -1033,9 +1033,9 @@ const Checkout = () => {
   // I'll set visitedFee to 0 if itemTotal is 0?
   // Configurable?
   // Assuming "Free under plan" means NO Payment.
-  const finalVisitedFee = itemTotal === 0 ? 0 : visitedFee;
+  const finalVisitedFee = 0; // Convenience fee permanently disabled
 
-  const totalAmount = itemTotal + taxesAndFee + finalVisitedFee;
+  const totalAmount = itemTotal + taxesAndFee; // No convenience fee
   const amountToPay = totalAmount;
 
   // Helper for Free Plan Full Breakdown Display
@@ -1352,13 +1352,7 @@ const Checkout = () => {
               </div>
             )}
 
-            {/* Visited Fee */}
-            {displayFee > 0 && (
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-slate-500">Convenience Fee</span>
-                <span className="text-sm font-medium text-slate-700">₹{displayFee.toLocaleString('en-IN')}</span>
-              </div>
-            )}
+            {/* Convenience Fee removed */}
 
             {/* Divider */}
             <div className="border-t border-slate-200 pt-4 mt-2">

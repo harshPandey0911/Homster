@@ -52,7 +52,7 @@ const createBooking = async (req, res) => {
       bookingType // Extract bookingType
     } = req.body;
 
-    let visitingCharges = reqVisitingCharges !== undefined ? reqVisitingCharges : (reqVisitationFee || 0);
+    let visitingCharges = 0; // Convenience fee disabled
 
     // Calculate total value from booked items or fallback to base (Move to top)
     let totalServiceValue = 0;
@@ -127,8 +127,7 @@ const createBooking = async (req, res) => {
     // CUSTOM - Check Cash Limit only if payment method is CASH
     const vendorFilters = {
       ...(category ? { service: category.title } : {}),
-      checkCashLimit: paymentMethod === 'cash',
-      city: address.city
+      checkCashLimit: paymentMethod === 'cash'
     };
 
     let nearbyVendors = [];
@@ -238,23 +237,23 @@ const createBooking = async (req, res) => {
           basePrice = reqBasePrice;
           discount = reqDiscount || 0;
           tax = reqTax;
-          visitingCharges = (reqVisitingCharges !== undefined) ? reqVisitingCharges : (visitingCharges || 49);
-          finalAmount = (basePrice - discount + tax + visitingCharges) + pendingPenalty;
+          visitingCharges = 0; // Convenience fee disabled
+          finalAmount = (basePrice - discount + tax) + pendingPenalty;
         } else {
           // Backward compatibility: Reverse calculate
-          if (!visitingCharges) visitingCharges = 49;
-          basePrice = Math.round((amount - visitingCharges) / 1.18);
-          tax = amount - basePrice - visitingCharges;
+          visitingCharges = 0; // Convenience fee disabled
+          basePrice = Math.round(amount / 1.18);
+          tax = amount - basePrice;
           discount = 0;
           finalAmount = amount + pendingPenalty;
         }
       } else {
         // Fallback to service pricing (if no amount sent)
-        if (!visitingCharges) visitingCharges = 49;
+        visitingCharges = 0; // Convenience fee disabled
         basePrice = service.basePrice || 500;
         discount = service.discountPrice ? (basePrice - service.discountPrice) : 0;
         tax = Math.round(basePrice * 0.18);
-        finalAmount = (basePrice - discount + tax + visitingCharges) + pendingPenalty;
+        finalAmount = (basePrice - discount + tax) + pendingPenalty;
       }
     }
 
@@ -441,7 +440,7 @@ const createBooking = async (req, res) => {
             wave: 1,
             distance: vendor.distance || null,
             sentAt: new Date(),
-            expiresAt: new Date(Date.now() + 60 * 60 * 1000) // Expires in 1 hour
+            expiresAt: new Date(Date.now() + 60 * 1000) // 1 min fallback
           }));
 
           try {
@@ -482,7 +481,7 @@ const createBooking = async (req, res) => {
               brandIcon: bookingForBackground.brandIcon,
               categoryIcon: bookingForBackground.categoryIcon,
               createdAt: bookingForBackground.createdAt || new Date(),
-              expiresAt: new Date(new Date(bookingForBackground.createdAt || Date.now()).getTime() + (60 * 1000)).toISOString(),
+              expiresAt: new Date(new Date(bookingForBackground.createdAt || Date.now()).getTime() + (1 * 60 * 1000)).toISOString(),
               playSound: true,
               message: `New booking request within ${vendor.distance?.toFixed(1) || '?'}km!`
             });

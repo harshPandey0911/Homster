@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FiStar, FiArrowLeft, FiUser, FiCalendar, FiMessageSquare, FiFilter, FiLoader } from 'react-icons/fi';
+import { FiStar, FiUser, FiMessageSquare, FiFilter, FiLoader } from 'react-icons/fi';
 import { toast } from 'react-hot-toast';
 import { vendorTheme as themeColors } from '../../../../theme';
 import { getRatings } from '../../services/bookingService';
-import Header from '../../components/layout/Header';
 
 const MyRatings = () => {
   const navigate = useNavigate();
@@ -51,11 +50,11 @@ const MyRatings = () => {
       <div className="flex items-center gap-3">
         <div className="flex items-center gap-1 w-8">
           <span className="text-xs font-bold text-gray-600">{star}</span>
-          <FiStar className="w-3 h-3 text-yellow-400 fill-yellow-400" />
+          <FiStar className="w-3 h-3 text-black fill-black" />
         </div>
         <div className="flex-1 h-2 bg-gray-100 rounded-full overflow-hidden">
           <div
-            className="h-full bg-yellow-400 rounded-full transition-all duration-500"
+            className="h-full bg-black rounded-full transition-all duration-500"
             style={{ width: `${percentage}%` }}
           />
         </div>
@@ -66,23 +65,30 @@ const MyRatings = () => {
 
   if (isLoading && pagination.page === 1) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <FiLoader className="w-10 h-10 text-teal-600 animate-spin mx-auto mb-4" />
-          <p className="text-gray-500 font-medium">Loading your ratings...</p>
-        </div>
+  if (isLoading && pagination.page === 1) {
+    return (
+      <div className="min-h-screen bg-[#FFFFFF] flex items-center justify-center">
+      <div className="text-center">
+        <FiLoader className="w-10 h-10 text-black animate-spin mx-auto mb-4" />
+        <p className="text-gray-400 font-bold text-sm uppercase tracking-widest">Analyzing feedback...</p>
       </div>
+    </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-24">
-      <Header title="My Ratings" />
+    <div className="min-h-screen pb-24" style={{ background: '#FFFFFF' }}>
+      <header className="px-6 py-5 flex items-center justify-between bg-transparent">
+        <h1 className="text-xl font-black text-gray-900">My Ratings</h1>
+        <div className="w-10 h-10 rounded-2xl bg-white shadow-sm flex items-center justify-center border border-gray-100">
+          <FiStar className="w-5 h-5 text-black fill-black" />
+        </div>
+      </header>
 
-      <main className="px-4 py-6 space-y-6">
-        {/* Overall Rating Stats */}
+      <main className="px-5 py-2 space-y-6">
+        {/* Overall Rating Stats (Black Theme) */}
         {stats && (
-          <div className="bg-white rounded-[32px] p-6 shadow-xl shadow-gray-200/50 border border-white">
+          <div className="bg-white rounded-[32px] p-6 shadow-sm border border-gray-100">
             <div className="grid grid-cols-5 gap-6">
               <div className="col-span-2 flex flex-col items-center justify-center border-r border-gray-100">
                 <h2 className="text-5xl font-black text-gray-900 mb-2">
@@ -92,7 +98,7 @@ const MyRatings = () => {
                   {[1, 2, 3, 4, 5].map((s) => (
                     <FiStar
                       key={s}
-                      className={`w-4 h-4 ${s <= Math.round(stats.averageRating) ? 'text-yellow-400 fill-yellow-400' : 'text-gray-200'}`}
+                      className={`w-4 h-4 ${s <= Math.round(stats.averageRating) ? 'text-black fill-black' : 'text-gray-200'}`}
                     />
                   ))}
                 </div>
@@ -122,14 +128,14 @@ const MyRatings = () => {
 
           {ratings.length > 0 ? (
             ratings.map((rating, idx) => (
-              <div key={idx} className="bg-white rounded-3xl p-5 shadow-sm border border-gray-50 space-y-4">
+              <div key={idx} className="bg-white rounded-3xl p-5 shadow-sm border border-gray-100 space-y-4">
                 <div className="flex justify-between items-start">
                   <div className="flex gap-3">
-                    <div className="w-12 h-12 rounded-2xl bg-teal-50 flex items-center justify-center overflow-hidden border border-teal-100/50">
+                    <div className="w-12 h-12 rounded-2xl bg-gray-50 flex items-center justify-center overflow-hidden border border-gray-100">
                       {rating.userId?.profilePhoto ? (
                         <img src={rating.userId.profilePhoto} alt={rating.userId.name} className="w-full h-full object-cover" />
                       ) : (
-                        <FiUser className="w-6 h-6 text-teal-400" />
+                        <FiUser className="w-6 h-6 text-gray-300" />
                       )}
                     </div>
                     <div>
@@ -139,7 +145,7 @@ const MyRatings = () => {
                           {[1, 2, 3, 4, 5].map((s) => (
                             <FiStar
                               key={s}
-                              className={`w-3 h-3 ${s <= rating.rating ? 'text-yellow-400 fill-yellow-400' : 'text-gray-200'}`}
+                              className={`w-3 h-3 ${s <= rating.rating ? 'text-black fill-black' : 'text-gray-200'}`}
                             />
                           ))}
                         </div>
@@ -153,7 +159,7 @@ const MyRatings = () => {
                 </div>
 
                 {rating.review && (
-                  <p className="text-gray-600 text-sm leading-relaxed font-medium pl-2 border-l-4 border-teal-500/20">
+                  <p className="text-gray-600 text-sm leading-relaxed font-medium pl-2 border-l-4 border-black">
                     "{rating.review}"
                   </p>
                 )}
@@ -170,7 +176,7 @@ const MyRatings = () => {
                   <div className="pt-3 border-t border-gray-50 flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <span className="text-[10px] font-bold text-gray-400 uppercase">Service by:</span>
-                      <span className="text-[11px] font-black text-teal-600">{rating.workerId.name}</span>
+                      <span className="text-[11px] font-black text-black">{rating.workerId.name}</span>
                     </div>
                     <span className="text-[10px] font-bold text-gray-300">#{rating.bookingNumber}</span>
                   </div>
@@ -178,7 +184,7 @@ const MyRatings = () => {
               </div>
             ))
           ) : (
-            <div className="text-center py-20 bg-white rounded-[32px] border border-dashed border-gray-200">
+            <div className="text-center py-20 bg-white rounded-[32px] border border-gray-100">
               <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4">
                 <FiMessageSquare className="w-8 h-8 text-gray-200" />
               </div>

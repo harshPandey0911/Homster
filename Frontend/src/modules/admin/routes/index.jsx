@@ -3,47 +3,41 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import AdminLayout from '../components/layout/AdminLayout';
 import ProtectedRoute from '../../../components/auth/ProtectedRoute';
 import PublicRoute from '../../../components/auth/PublicRoute';
-import useAppNotifications from '../../../hooks/useAppNotifications.jsx';
-import LogoLoader from '../../../components/common/LogoLoader';
+import Login from '../pages/Login';
 
-// Login page (not lazy loaded for faster initial access)
-import Login from '../pages/login';
-
-// Lazy load admin pages for code splitting
+// Lazy loaded pages
 const Dashboard = lazy(() => import('../pages/Dashboard'));
-const Settings = lazy(() => import('../pages/Settings'));
-const UserCategories = lazy(() => import('../pages/UserCategories'));
 const Users = lazy(() => import('../pages/Users'));
 const Vendors = lazy(() => import('../pages/Vendors'));
 const Workers = lazy(() => import('../pages/Workers'));
+const UserCategories = lazy(() => import('../pages/UserCategories'));
 const Bookings = lazy(() => import('../pages/Bookings'));
-const BookingTracking = lazy(() => import('../pages/Bookings/Tracking'));
-const BookingNotifications = lazy(() => import('../pages/Bookings/BookingNotifications'));
+const ScrapItems = lazy(() => import('../pages/Scrap'));
 const Payments = lazy(() => import('../pages/Payments'));
-const Reports = lazy(() => import('../pages/Reports'));
-const Notifications = lazy(() => import('../pages/Notifications'));
-const AdminSupport = lazy(() => import('../pages/Support/index'));
-const TrainingManagement = lazy(() => import('../pages/TrainingManagement'));
-const CommissionSettings = lazy(() => import('../pages/Commission'));
-const OfferBanners = lazy(() => import('../pages/OfferBanners'));
-
-const Plans = lazy(() => import('../pages/Plans/Plans'));
-const Scrap = lazy(() => import('../pages/Scrap'));
 const Settlements = lazy(() => import('../pages/Settlements'));
-const Reviews = lazy(() => import('../pages/Reviews'));
+const Reports = lazy(() => import('../pages/Reports'));
 
+// User App Config Pages
+const HomePage = lazy(() => import('../pages/UserCategories/pages/HomePage'));
+const CategoriesPage = lazy(() => import('../pages/UserCategories/pages/CategoriesPage'));
+const ServicesPage = lazy(() => import('../pages/UserCategories/pages/ServicesPage'));
+const BrandsPage = lazy(() => import('../pages/UserCategories/pages/BrandsPage'));
 
+// Vendor Specific Catalog Pages
+const VendorServicesPage = lazy(() => import('../pages/UserCategories/pages/VendorServicesPage'));
+const VendorPartsPage = lazy(() => import('../pages/UserCategories/pages/VendorPartsPage'));
 
 // Loading fallback component
 const LoadingFallback = () => (
-  <LogoLoader />
+  <div className="flex items-center justify-center min-h-screen bg-slate-50">
+    <div className="flex flex-col items-center gap-4">
+      <div className="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+      <p className="text-slate-500 font-bold animate-pulse uppercase tracking-widest text-xs">Loading Nexora Admin...</p>
+    </div>
+  </div>
 );
 
 const AdminRoutes = () => {
-  // Enable global notifications for admin
-  // Global notifications are now handled by SocketProvider at App level
-  // useAppNotifications('admin');
-
   return (
     <Suspense fallback={<LoadingFallback />}>
       <Routes>
@@ -58,30 +52,35 @@ const AdminRoutes = () => {
         }>
           <Route index element={<Navigate to="dashboard" replace />} />
           <Route path="dashboard" element={<Dashboard />} />
+          
+          {/* Catalog Routes */}
+          <Route path="user-categories/vendor-services" element={<VendorServicesPage />} />
+          <Route path="user-categories/vendor-parts" element={<VendorPartsPage />} />
+          
+          <Route path="user-categories/*" element={<UserCategories />}>
+            <Route index element={<Navigate to="home" replace />} />
+            <Route path="home" element={<HomePage />} />
+            <Route path="categories" element={<CategoriesPage />} />
+            <Route path="sections" element={<ServicesPage />} />
+            <Route path="brands" element={<BrandsPage />} />
+          </Route>
+          
+          {/* Management Routes */}
           <Route path="users/*" element={<Users />} />
           <Route path="vendors/*" element={<Vendors />} />
           <Route path="workers/*" element={<Workers />} />
-          <Route path="bookings" element={<Bookings />} />
-          <Route path="bookings/tracking" element={<BookingTracking />} />
-          <Route path="bookings/notifications" element={<BookingNotifications />} />
-          <Route path="user-categories/*" element={<UserCategories />} />
+          <Route path="bookings/*" element={<Bookings />} />
+          <Route path="scrap-items" element={<ScrapItems />} />
           <Route path="payments/*" element={<Payments />} />
-          <Route path="reports/*" element={<Reports />} />
-          <Route path="notifications/*" element={<Notifications />} />
-          <Route path="scrap" element={<Scrap />} />
-          <Route path="plans" element={<Plans />} />
-          <Route path="reviews" element={<Reviews />} />
           <Route path="settlements/*" element={<Settlements />} />
-          <Route path="commission" element={<CommissionSettings />} />
-          <Route path="settings/*" element={<Settings />} />
-          <Route path="support/*" element={<AdminSupport />} />
-          <Route path="training" element={<TrainingManagement />} />
-          <Route path="offer-banners" element={<OfferBanners />} />
+          <Route path="reports/*" element={<Reports />} />
         </Route>
+
+        {/* 404 Redirect */}
+        <Route path="*" element={<Navigate to="/admin/dashboard" replace />} />
       </Routes>
     </Suspense>
   );
 };
 
 export default AdminRoutes;
-

@@ -260,7 +260,98 @@ const homeContentSchema = new mongoose.Schema({
   isNoteworthyVisible: { type: Boolean, default: true },
   isBookedVisible: { type: Boolean, default: true },
   isCategorySectionsVisible: { type: Boolean, default: true },
-  isCategoriesVisible: { type: Boolean, default: true }
+  isCategoriesVisible: { type: Boolean, default: true },
+  isStatsVisible: { type: Boolean, default: true },
+  isAppDownloadVisible: { type: Boolean, default: true },
+  isOrderTrackingVisible: { type: Boolean, default: true },
+
+  // Hero Section Customization
+  heroSection: {
+    title: { type: String, default: 'Everything You Need, Delivered to You.' },
+    subtitle: { type: String, default: 'One super app for all your daily needs. Fast, reliable & secure delivery at your doorstep.' },
+    primaryBtnText: { type: String, default: 'Get Started' },
+    secondaryBtnText: { type: String, default: 'Explore Services' },
+    imageUrl: { type: String, default: '' }
+  },
+
+  // Site Identity
+  siteIdentity: {
+    brandName: { type: String, default: 'NEXORA GO' },
+    slogan: { type: String, default: 'Everything you need, one place' }
+  },
+
+  // Stats Bar
+  stats: [{
+    label: { type: String, default: '' },
+    value: { type: String, default: '' },
+    icon: { type: String, default: '' }
+  }],
+
+  // App Download Section
+  appDownload: {
+    title: { type: String, default: 'Download the Nexora GO App' },
+    subtitle: { type: String, default: 'Better experience, exclusive offers & faster everything. Scan to download or use the stores.' },
+    playStoreUrl: { type: String, default: '#' },
+    appStoreUrl: { type: String, default: '#' },
+    qrCodeUrl: { type: String, default: '' },
+    imageUrl: { type: String, default: '' }
+  },
+  
+  // Navigation Links
+  navLinks: [{
+    label: { type: String, required: true },
+    path: { type: String, required: true },
+    order: { type: Number, default: 0 }
+  }],
+
+  // How It Works Section
+  isHowItWorksVisible: { type: Boolean, default: true },
+  howItWorks: {
+    title: { type: String, default: 'How It Works' },
+    subtitle: { type: String, default: 'Simple steps to get your services done' },
+    items: [{
+      title: { type: String, default: '' },
+      description: { type: String, default: '' },
+      icon: { type: String, default: 'FiCheckCircle' }
+    }]
+  },
+
+  // About Us Section
+  isAboutUsVisible: { type: Boolean, default: true },
+  aboutUs: {
+    title: { type: String, default: 'About Us' },
+    content: { type: String, default: '' },
+    imageUrl: { type: String, default: '' },
+    features: [{
+      title: { type: String, default: '' },
+      description: { type: String, default: '' }
+    }]
+  },
+
+  // Offers Section
+  isOffersVisible: { type: Boolean, default: true },
+  offers: {
+    title: { type: String, default: 'Exclusive Offers' },
+    subtitle: { type: String, default: 'Save more with our latest deals' },
+    items: [{
+      title: { type: String, default: '' },
+      code: { type: String, default: '' },
+      discount: { type: String, default: '' },
+      description: { type: String, default: '' },
+      imageUrl: { type: String, default: '' }
+    }]
+  },
+
+  // Contact Us Section
+  isContactUsVisible: { type: Boolean, default: true },
+  contactUs: {
+    title: { type: String, default: 'Contact Us' },
+    subtitle: { type: String, default: 'We are here to help' },
+    email: { type: String, default: '' },
+    phone: { type: String, default: '' },
+    address: { type: String, default: '' },
+    workingHours: { type: String, default: '' }
+  }
 }, {
   timestamps: true
 });

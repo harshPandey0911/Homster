@@ -89,15 +89,29 @@ const brandSchema = new mongoose.Schema({
   timestamps: true
 });
 
-// Generate slug from title before saving
+// Generate slug from title before saving with duplicate handling
 brandSchema.pre('save', async function (next) {
   if (this.isModified('title') && !this.slug) {
-    this.slug = this.title
+    let baseSlug = this.title
       .toLowerCase()
       .replace(/[^a-z0-9\s-]/g, '')
       .replace(/\s+/g, '-')
       .replace(/-+/g, '-')
       .replace(/(^-|-$)/g, '');
+
+    let generatedSlug = baseSlug;
+    let count = 1;
+
+    // Check for uniqueness within the Brand collection
+    while (true) {
+      const existingBrand = await mongoose.models.Brand.findOne({ slug: generatedSlug });
+      if (!existingBrand || (this._id && existingBrand._id.equals(this._id))) {
+        break;
+      }
+      generatedSlug = `${baseSlug}-${count++}`;
+    }
+
+    this.slug = generatedSlug;
   }
   // Auto-generate routePath from slug
   if (this.isModified('slug') && !this.routePath) {

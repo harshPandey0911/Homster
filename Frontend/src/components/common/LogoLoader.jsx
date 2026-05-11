@@ -37,9 +37,12 @@ const LogoLoader = ({ fullScreen = false, overlay = false, inline = false, size 
         className={`relative ${size} flex items-center justify-center`}
       >
         <img
-          src="/cleaning-expert-logo.png"
-          alt="Loading..."
-          className="w-full h-full object-cover rounded-full shadow-lg"
+          src="/nexora-go-logo.png"
+          alt="Nexora Go"
+          className="w-full h-full object-contain rounded-full shadow-lg"
+          onError={(e) => {
+            e.target.src = "https://img.icons8.com/color/96/n.png";
+          }}
         />
         {/* Subtle ripple effect */}
         <motion.div

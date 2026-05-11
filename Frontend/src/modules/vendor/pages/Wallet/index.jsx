@@ -2,7 +2,6 @@ import React, { useState, useEffect, useLayoutEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FiDollarSign, FiArrowUp, FiArrowDown, FiArrowRight, FiClock, FiCheckCircle, FiAlertCircle, FiSend } from 'react-icons/fi';
 import { vendorTheme as themeColors } from '../../../../theme';
-import Header from '../../components/layout/Header';
 import BottomNav from '../../components/layout/BottomNav';
 import LogoLoader from '../../../../components/common/LogoLoader';
 import vendorWalletService from '../../../../services/vendorWalletService';
@@ -130,245 +129,172 @@ const Wallet = () => {
   }
 
   return (
-    <div className="min-h-screen pb-24" style={{ background: themeColors.backgroundGradient }}>
-      <Header title="Wallet & Ledger" />
+    <div className="min-h-screen pb-24" style={{ background: '#FFFFFF' }}>
+      <header className="px-6 py-5 flex items-center justify-between bg-transparent">
+        <h1 className="text-xl font-black text-gray-900">Wallet & Ledger</h1>
+        <div className="w-10 h-10 rounded-2xl bg-white shadow-sm flex items-center justify-center border border-gray-100">
+          <FiDollarSign className="w-5 h-5 text-black" />
+        </div>
+      </header>
 
-      <main className="px-4 py-6">
-        {/* Earnings Card (Green) */}
-        <div className="rounded-2xl p-6 shadow-xl relative overflow-hidden mb-4 bg-gradient-to-br from-green-600 to-green-800">
-          <div className="relative z-10 text-white">
-            <div className="flex justify-between items-start">
-              <div>
-                <p className="text-white/80 text-sm font-medium mb-1">Available Earnings</p>
-                <p className="text-3xl font-bold mb-4">₹{wallet.earnings?.toLocaleString() || 0}</p>
+      <main className="px-5">
+        {/* Available Earnings Card (Accent Gradient) */}
+        <div 
+          className="rounded-[32px] p-6 shadow-xl shadow-gray-200/20 mb-6 relative overflow-hidden"
+          style={{ background: themeColors.accentGradient }}
+        >
+          <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_20%_20%,rgba(255,255,255,0.05)_0%,transparent_50%)]" />
+          
+          <div className="relative z-10">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center backdrop-blur-sm">
+                <FiArrowUp className="w-5 h-5 text-white" />
               </div>
-              <div className="bg-white/20 p-2 rounded-lg backdrop-blur-sm">
-                <FiDollarSign className="w-6 h-6 text-white" />
+              <p className="text-[11px] font-black text-white/60 uppercase tracking-widest">Available Earnings</p>
+            </div>            
+            <div className="flex items-end justify-between">
+              <div>
+                <p className="text-3xl font-black text-white leading-none">₹{wallet.balance.toFixed(2)}</p>
+                <p className="text-[10px] font-bold text-white/40 mt-3 uppercase tracking-wider">Settlements are processed weekly</p>
+              </div>
+              <div className="bg-white/10 px-3 py-1.5 rounded-xl backdrop-blur-sm">
+                <span className="text-[10px] font-black text-white uppercase tracking-widest">Auto Settlement</span>
               </div>
             </div>
-
-            <button
-              onClick={() => navigate('/vendor/wallet/withdraw')}
-              className="w-full bg-white text-green-700 py-3 rounded-xl font-bold text-sm hover:bg-green-50 active:scale-95 transition-all shadow-sm"
-            >
-              Request Withdrawal
-            </button>
           </div>
         </div>
 
-        {/* Dues Card (Red) */}
-        <div className="rounded-2xl p-6 shadow-xl relative overflow-hidden mb-6 bg-gradient-to-br from-red-600 to-red-800">
-          <div className="relative z-10 text-white">
-            <div className="flex justify-between items-start">
-              <div>
-                <div className="flex items-center gap-2 mb-1">
-                  <p className="text-white/80 text-sm font-medium">Amount Due to Admin</p>
-                  {wallet.dues > 0 && <FiAlertCircle className="w-4 h-4 text-red-200 animate-pulse" />}
-                </div>
-                <p className="text-3xl font-bold mb-4">₹{wallet.dues?.toLocaleString() || 0}</p>
+        <div className="grid grid-cols-2 gap-4 mb-6">
+          <div className="bg-white rounded-[28px] p-5 shadow-sm border border-gray-100">
+            <div className="flex items-center gap-2 mb-3">
+              <div className="w-8 h-8 rounded-lg bg-gray-50 flex items-center justify-center">
+                <FiArrowDown className="w-4 h-4 text-black" />
               </div>
-              <div className="bg-white/20 p-2 rounded-lg backdrop-blur-sm">
-                <FiArrowDown className="w-6 h-6 text-white" />
-              </div>
+              <p className="text-[10px] font-black text-gray-400 uppercase tracking-wider">Amount Due</p>
             </div>
-
-            {wallet.dues > 0 ? (
-              <button
+            <p className="text-xl font-black text-gray-900">₹{wallet.dues?.toLocaleString() || 0}</p>
+            {wallet.dues > 0 && (
+              <button 
                 onClick={() => navigate('/vendor/wallet/settle')}
-                className="w-full bg-white text-red-700 py-3 rounded-xl font-bold text-sm hover:bg-red-50 active:scale-95 transition-all shadow-sm"
+                className="mt-3 w-full py-2 bg-black text-white rounded-xl text-[10px] font-black uppercase tracking-widest"
               >
                 Pay Now
               </button>
-            ) : (
-              <div className="w-full bg-white/10 text-white py-3 rounded-xl font-medium text-sm text-center border border-white/20">
-                No Dues Pending
-              </div>
             )}
           </div>
-        </div>
 
-        {/* Summary Cards */}
-        <div className="grid grid-cols-2 gap-4 mb-6">
-          {/* Cash Collected */}
-          <div className="bg-white rounded-2xl p-4 shadow-lg border border-red-100">
-            <div className="flex items-center gap-2 mb-2">
-              <div className="p-2 rounded-lg bg-red-50">
-                <FiArrowDown className="w-4 h-4 text-red-500" />
+          <div className="bg-white rounded-[28px] p-5 shadow-sm border border-gray-100">
+            <div className="flex items-center gap-2 mb-3">
+              <div className="w-8 h-8 rounded-lg bg-gray-50 flex items-center justify-center">
+                <FiCheckCircle className="w-4 h-4 text-black" />
               </div>
-              <p className="text-xs text-gray-600 font-semibold">Cash Collected</p>
+              <p className="text-[10px] font-black text-gray-400 uppercase tracking-wider">Total Settled</p>
             </div>
-            <p className="text-xl font-bold text-red-600">
-              ₹{wallet.totalCashCollected?.toLocaleString() || 0}
-            </p>
-          </div>
-
-          {/* Total Settled */}
-          <div className="bg-white rounded-2xl p-4 shadow-lg border border-green-100">
-            <div className="flex items-center gap-2 mb-2">
-              <div className="p-2 rounded-lg bg-green-50">
-                <FiArrowUp className="w-4 h-4 text-green-500" />
-              </div>
-              <p className="text-xs text-gray-600 font-semibold">Total Settled</p>
-            </div>
-            <p className="text-xl font-bold text-green-600">
-              ₹{wallet.totalSettled?.toLocaleString() || 0}
-            </p>
+            <p className="text-xl font-black text-gray-900">₹{wallet.totalSettled?.toLocaleString() || 0}</p>
           </div>
         </div>
 
-        {/* Blocked Status Notice */}
-        {wallet.isBlocked && (
-          <div className="bg-red-50 border border-red-200 rounded-xl p-4 mb-6">
-            <div className="flex items-start gap-3">
-              <FiX className="w-5 h-5 text-red-600 mt-0.5" />
-              <div>
-                <p className="font-bold text-red-800">Account Blocked</p>
-                <p className="text-sm text-red-600 mb-2">
-                  {wallet.blockReason || 'Your account is blocked due to excessive dues.'}
-                </p>
-                <button
-                  onClick={() => navigate('/vendor/wallet/settle')}
-                  className="text-xs font-bold uppercase tracking-wider text-white bg-red-600 px-3 py-1.5 rounded-lg shadow-sm active:scale-95 transition-all"
-                >
-                  Pay Now to Unblock
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Cash Limit Indicator */}
-        <div className="bg-white rounded-2xl p-4 shadow-lg mb-6 border border-blue-50">
-          <div className="flex items-center justify-between mb-2">
-            <p className="text-sm font-semibold text-gray-700">Cash Collection Limit</p>
-            <p className="text-xs font-medium text-gray-500">
+        {/* Cash Limit Indicator (Black Theme) */}
+        <div className="bg-white rounded-[28px] p-5 shadow-sm border border-gray-100 mb-8">
+          <div className="flex items-center justify-between mb-3">
+            <p className="text-[11px] font-black text-gray-900 uppercase tracking-wider">Cash Collection Limit</p>
+            <p className="text-[11px] font-black text-black">
               ₹{(wallet.dues || 0).toLocaleString()} / ₹{(wallet.cashLimit || 10000).toLocaleString()}
             </p>
           </div>
-          <div className="w-full h-2 bg-gray-100 rounded-full overflow-hidden">
+          <div className="w-full h-2 bg-gray-50 rounded-full overflow-hidden mb-2">
             <div
-              className={`h-full transition-all duration-500 ${(wallet.dues / (wallet.cashLimit || 10000)) > 0.8 ? 'bg-red-500' : 'bg-blue-500'
-                }`}
+              className={`h-full transition-all duration-700 ${
+                (wallet.dues / (wallet.cashLimit || 10000)) > 0.8 ? 'bg-red-500' : 'bg-black'
+              }`}
               style={{ width: `${Math.min(100, (wallet.dues / (wallet.cashLimit || 10000)) * 100)}%` }}
             />
           </div>
-          <p className="text-[10px] text-gray-400 mt-2">
-            * Your account will be auto-blocked if you exceed the ₹{(wallet.cashLimit || 10000).toLocaleString()} limit.
+          <p className="text-[9px] font-bold text-gray-300">
+            * Pay dues regularly to avoid account blocking.
           </p>
         </div>
 
-
-
-        {/* Filter Buttons */}
-        <div className="flex gap-2 mb-4 overflow-x-auto pb-2 scrollbar-hide">
+        {/* Filter Buttons (Black Theme) */}
+        <div className="flex gap-2 mb-6 overflow-x-auto pb-2 scrollbar-hide">
           {[
             { id: 'all', label: 'All' },
-            { id: 'cash_collected', label: 'Cash Collected' },
+            { id: 'cash_collected', label: 'Cash' },
             { id: 'settlement', label: 'Settlements' },
-            { id: 'withdrawal', label: 'Withdrawals' },
-            { id: 'tds_deduction', label: 'TDS' },
-            { id: 'platform_fee', label: 'Platform Fees' },
+            { id: 'withdrawal', label: 'Payouts' },
           ].map((filterOption) => (
             <button
               key={filterOption.id}
               onClick={() => setFilter(filterOption.id)}
-              className={`px-4 py-2 rounded-full font-semibold text-sm whitespace-nowrap transition-all ${filter === filterOption.id
-                ? 'text-white'
-                : 'bg-white text-gray-700'
-                }`}
-              style={
+              className={`px-6 py-2.5 rounded-full font-black text-xs whitespace-nowrap transition-all duration-300 ${
                 filter === filterOption.id
-                  ? {
-                    background: themeColors.button,
-                    boxShadow: `0 2px 8px ${themeColors.button}40`,
-                  }
-                  : {
-                    boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
-                  }
-              }
+                  ? 'bg-black text-white shadow-lg shadow-gray-200'
+                  : 'bg-white text-gray-400 border border-gray-100'
+              }`}
             >
               {filterOption.label}
             </button>
           ))}
         </div>
 
-        {/* Transactions/Ledger */}
-        <div>
-          <h3 className="font-bold text-gray-800 mb-4">Transaction History</h3>
+        {/* Transactions List */}
+        <div className="space-y-4">
+          <div className="flex items-center justify-between mb-2 px-1">
+            <h3 className="text-sm font-black text-gray-900 uppercase tracking-widest">Transaction History</h3>
+          </div>
+          
           {filteredTransactions.length === 0 ? (
-            <div className="bg-white rounded-xl p-8 text-center shadow-md">
-              <FiDollarSign className="w-16 h-16 mx-auto mb-4 text-gray-300" />
-              <p className="text-gray-600 font-semibold mb-2">No transactions yet</p>
-              <p className="text-sm text-gray-500">Your ledger will appear here</p>
+            <div className="bg-white rounded-[32px] p-12 text-center border border-gray-100">
+              <FiDollarSign className="w-12 h-12 mx-auto mb-4 text-gray-200" />
+              <p className="text-sm font-bold text-gray-400">No transactions yet</p>
             </div>
           ) : (
-            <div className="space-y-3">
-              {filteredTransactions.map((txn) => (
-                <div
-                  key={txn._id}
-                  className="bg-white rounded-xl p-4 shadow-md border-l-4"
-                  style={{
-                    borderLeftColor:
-                      txn.type === 'cash_collected' ? '#DC2626' :
-                        txn.type === 'settlement' ? '#10B981' :
-                          txn.type === 'withdrawal' ? '#8B5CF6' :
-                            txn.type === 'tds_deduction' ? '#F59E0B' :
-                              txn.type === 'platform_fee' ? '#E11D48' : '#F97316'
-                  }}
-                >
-                  <div className="flex items-center gap-3">
-                    <div
-                      className="w-12 h-12 rounded-xl flex items-center justify-center"
-                      style={{
-                        background:
-                          txn.type === 'cash_collected' ? '#FEE2E2' :
-                            txn.type === 'settlement' ? '#D1FAE5' :
-                              txn.type === 'withdrawal' ? '#EDE9FE' :
-                                txn.type === 'tds_deduction' ? '#FEF3C7' :
-                                  txn.type === 'platform_fee' ? '#FFF1F2' : '#FFEDD5'
-                      }}
-                    >
+            <div className="space-y-4">
+              {filteredTransactions.map((txn) => {
+                const isNegative = ['cash_collected', 'tds_deduction', 'withdrawal', 'platform_fee'].includes(txn.type);
+                
+                return (
+                  <div
+                    key={txn._id}
+                    className="bg-white rounded-[24px] p-4 shadow-sm border border-gray-100 flex items-center gap-4"
+                  >
+                    <div className={`w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 ${
+                      isNegative ? 'bg-red-50 text-red-500' : 'bg-gray-50 text-black'
+                    }`}>
                       {getTransactionIcon(txn.type)}
                     </div>
 
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-center justify-between mb-1">
-                        <p className="font-bold text-gray-900 text-sm">
+                      <div className="flex items-center justify-between mb-0.5">
+                        <p className="text-sm font-black text-gray-900 truncate">
                           {getTransactionLabel(txn.type)}
                         </p>
-                        <p className={`text-lg font-bold ${['cash_collected', 'tds_deduction', 'withdrawal', 'platform_fee'].includes(txn.type)
-                          ? 'text-red-600'
-                          : 'text-green-600'
-                          }`}>
-                          {['cash_collected', 'tds_deduction', 'withdrawal', 'platform_fee'].includes(txn.type) ? '-' : '+'}₹{Math.abs(txn.amount).toLocaleString()}
+                        <p className={`text-sm font-black ${isNegative ? 'text-red-500' : 'text-gray-900'}`}>
+                          {isNegative ? '-' : '+'}₹{Math.abs(txn.amount).toLocaleString()}
                         </p>
                       </div>
-
-                      <p className="text-xs text-gray-600 truncate mb-1">{txn.description}</p>
-
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs text-gray-400">{formatDate(txn.createdAt)}</span>
-                        <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${txn.status === 'completed' ? 'bg-green-100 text-green-700' :
-                          txn.status === 'pending' ? 'bg-orange-100 text-orange-700' : 'bg-gray-100 text-gray-600'
-                          }`}>
-                          {txn.status}
+                      <div className="flex items-center justify-between">
+                        <p className="text-[10px] font-bold text-gray-400 truncate max-w-[150px]">
+                          {txn.description}
+                        </p>
+                        <span className="text-[9px] font-black text-gray-300 uppercase">
+                          {formatDate(txn.createdAt)}
                         </span>
                       </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
         </div>
 
-        {/* View Settlements Link */}
+        {/* Footer Actions */}
         <button
           onClick={() => navigate('/vendor/wallet/settlements')}
-          className="w-full mt-6 py-3 rounded-xl font-semibold text-gray-700 bg-white border border-gray-200 flex items-center justify-center gap-2 transition-all active:scale-95"
+          className="w-full mt-10 mb-10 py-4 rounded-[20px] font-black text-xs text-gray-400 bg-white border border-gray-100 flex items-center justify-center gap-2 active:scale-95 transition-all uppercase tracking-widest"
         >
-          View Settlement History
-          <FiArrowRight className="w-4 h-4" />
+          View Full Ledger <FiArrowRight className="w-4 h-4" />
         </button>
       </main>
 
