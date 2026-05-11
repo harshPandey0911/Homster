@@ -34,7 +34,9 @@ const isWorker = (req, res, next) => {
 };
 
 const isAdmin = (req, res, next) => {
+  // console.log('Checking Admin Role:', req.userRole);
   if (req.userRole !== USER_ROLES.ADMIN && req.userRole !== 'super_admin' && req.userRole !== 'admin' && req.userRole !== 'ADMIN') {
+    console.warn(`Access denied for role: ${req.userRole} at ${req.originalUrl}`);
     return res.status(403).json({
       success: false,
       message: 'Access denied. Admin role required.'

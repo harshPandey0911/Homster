@@ -3,11 +3,13 @@ import { Link, useLocation } from 'react-router-dom';
 import { FiFacebook, FiTwitter, FiInstagram, FiLinkedin, FiMail, FiPhone, FiMapPin } from 'react-icons/fi';
 import Logo from '../../../../components/common/Logo';
 import { configService } from '../../../../services/configService';
+import api from '../../../../services/api';
 
 const Footer = () => {
   const location = useLocation();
   const currentYear = new Date().getFullYear();
   const [settings, setSettings] = useState(null);
+  const [dynamicLinks, setDynamicLinks] = useState([]);
 
   useEffect(() => {
     const fetchSettings = async () => {
@@ -16,7 +18,18 @@ const Footer = () => {
         setSettings(data.settings);
       }
     };
+    const fetchLinks = async () => {
+      try {
+        const response = await api.get('/footer-links');
+        if (response.data.success) {
+          setDynamicLinks(response.data.data);
+        }
+      } catch (error) {
+        console.error('Failed to fetch footer links:', error);
+      }
+    };
     fetchSettings();
+    fetchLinks();
   }, []);
 
   // Only show on home page as per user request
@@ -24,45 +37,37 @@ const Footer = () => {
     return null;
   }
 
+  // Group dynamic links by section
+  const groupedLinks = dynamicLinks.reduce((acc, link) => {
+    const sec = link.section.toUpperCase();
+    if (!acc[sec]) acc[sec] = [];
+    acc[sec].push({ label: link.title, path: link.url });
+    return acc;
+  }, {});
+
   const footerSections = [
     {
       title: 'Company',
-      links: [
-        { label: 'About Us', path: '/user/about-homestr' },
-        { label: 'Help & Support', path: '/user/help-support' },
-        { label: 'Cancellation Policy', path: '/user/cancellation-policy' },
-        { label: 'Terms & Conditions', path: '#' },
-        { label: 'Privacy Policy', path: '#' },
-      ]
+      links: groupedLinks['COMPANY'] || []
     },
     {
       title: 'Quick Links',
-      links: [
-        { label: 'My Bookings', path: '/user/my-bookings' },
-        { label: 'My Wallet', path: '/user/wallet' },
-        { label: 'My Plan', path: '/user/my-plan' },
-        { label: 'Register as Vendor', path: '/vendor/signup' },
-        { label: 'Register as Worker', path: '/worker/signup' },
-      ]
+      links: groupedLinks['QUICK LINKS'] || []
     },
     {
-      title: 'Contact Us',
+      title: 'Support & Services',
       links: [
+        ...(groupedLinks['USER BOTTOM'] || []),
         {
           label: settings?.supportEmail || settings?.companyEmail || 'support@homestr.in',
           path: `mailto:${settings?.supportEmail || settings?.companyEmail || 'support@homestr.in'}`,
           icon: FiMail
         },
         {
-          label: settings?.supportPhone || settings?.companyPhone || '+91 98765 43210',
-          path: `tel:${(settings?.supportPhone || settings?.companyPhone || '+91 98765 43210').replace(/\s/g, '')}`,
+          label: settings?.supportPhone || settings?.companyPhone || '+91 7014641102',
+          path: `tel:${(settings?.supportPhone || settings?.companyPhone || '+91 7014641102').replace(/\s/g, '')}`,
           icon: FiPhone
-        },
-        {
-          label: settings?.companyAddress ? `${settings.companyAddress}, ${settings.companyCity}, ${settings.companyState} - ${settings.companyPincode}` : 'Bhopal, Madhya Pradesh, India',
-          path: '#',
-          icon: FiMapPin
-        },
+        }
       ]
     }
   ];
@@ -81,7 +86,7 @@ const Footer = () => {
               <Logo className="h-10 w-auto" />
             </Link>
             <p className="text-gray-500 text-sm leading-relaxed max-w-xs">
-              {settings?.companyName || 'Homestr'} is your one-stop destination for all home services. From electrical repairs to premium salon services, we bring the experts to your doorstep.
+              Nexora Go is your one-stop destination for all home services. From electrical repairs to premium salon services, we bring the experts to your doorstep.
             </p>
             <div className="flex items-center gap-4">
               {[FiFacebook, FiTwitter, FiInstagram, FiLinkedin].map((Icon, i) => (
@@ -97,7 +102,7 @@ const Footer = () => {
           </div>
 
           {/* Navigation Sections */}
-          {footerSections.map((section) => (
+          {footerSections.filter(section => section.links && section.links.length > 0).map((section) => (
             <div key={section.title} className="space-y-6">
               <h3 className="text-sm font-bold text-gray-900 uppercase tracking-widest">{section.title}</h3>
               <ul className="space-y-4">
@@ -133,7 +138,7 @@ const Footer = () => {
         {/* Bottom Row */}
         <div className="flex flex-col md:flex-row items-center justify-between gap-6">
           <p className="text-gray-400 text-sm">
-            © {currentYear} {settings?.companyName || 'Homestr'}. All rights reserved.
+            © {currentYear} {settings?.companyName || 'Nexora Go'}. All rights reserved.
           </p>
           <div className="flex items-center gap-6">
             <Link to="#" className="text-xs text-gray-400 hover:text-gray-600 transition-colors">Privacy</Link>

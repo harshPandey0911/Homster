@@ -98,14 +98,14 @@
     ]
   },
   {
-    "title": "User Catalog",
+    "title": "Manage User App",
     "route": "/admin/user-categories",
     "allowedRoles": [
       "super_admin",
       "admin"
     ],
     "children": [
-      "Home",
+      "User Home UI",
       "Manage Categories",
       "Manage Brands",
       "Manage Services"
@@ -168,6 +168,15 @@
   {
     "title": "Offer Banners",
     "route": "/admin/offer-banners",
+    "allowedRoles": [
+      "super_admin",
+      "admin"
+    ],
+    "children": []
+  },
+  {
+    "title": "Footer Management",
+    "route": "/admin/footer-links",
     "allowedRoles": [
       "super_admin",
       "admin"

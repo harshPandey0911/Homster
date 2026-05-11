@@ -6,6 +6,7 @@ import AppRoutes from './routes';
 import { SocketProvider } from './context/SocketContext';
 import { CartProvider } from './context/CartContext';
 import { CityProvider } from './context/CityContext';
+import { AuthProvider } from './context/AuthContext';
 import { initializePushNotifications, setupForegroundNotificationHandler } from './services/pushNotificationService';
 import { LocationPermissionChecker } from './components/common';
 
@@ -41,41 +42,43 @@ function App() {
 
   return (
     <BrowserRouter>
-      <SocketProvider>
-        <CityProvider>
-          <CartProvider>
-            <div className="App">
-              <AppRoutes />
-              <LocationPermissionChecker />
-              <Toaster
-                position="top-center"
-                reverseOrder={false}
-                toastOptions={{
-                  duration: 2000, // Global default (reduced from 3000)
-                  style: {
-                    background: '#333',
-                    color: '#fff',
-                    borderRadius: '10px',
-                    padding: '12px 20px',
-                  },
-                  success: {
-                    duration: 1000, // 1 second as requested
+      <AuthProvider>
+        <SocketProvider>
+          <CityProvider>
+            <CartProvider>
+              <div className="App">
+                <AppRoutes />
+                <LocationPermissionChecker />
+                <Toaster
+                  position="top-center"
+                  reverseOrder={false}
+                  toastOptions={{
+                    duration: 2000, // Global default (reduced from 3000)
                     style: {
-                      background: '#10B981',
+                      background: '#333',
+                      color: '#fff',
+                      borderRadius: '10px',
+                      padding: '12px 20px',
                     },
-                  },
-                  error: {
-                    duration: 2000, // Reduced from 4000
-                    style: {
-                      background: '#EF4444',
+                    success: {
+                      duration: 1000, // 1 second as requested
+                      style: {
+                        background: '#10B981',
+                      },
                     },
-                  },
-                }}
-              />
-            </div>
-          </CartProvider>
-        </CityProvider>
-      </SocketProvider>
+                    error: {
+                      duration: 2000, // Reduced from 4000
+                      style: {
+                        background: '#EF4444',
+                      },
+                    },
+                  }}
+                />
+              </div>
+            </CartProvider>
+          </CityProvider>
+        </SocketProvider>
+      </AuthProvider>
     </BrowserRouter>
   );
 }

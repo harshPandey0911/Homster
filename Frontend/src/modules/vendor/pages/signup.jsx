@@ -365,39 +365,36 @@ const VendorSignup = () => {
   const brandColor = themeColors.brand?.teal || '#347989';
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-8 relative">
-      {/* Decorative Background Elements - Fixed Container to prevent scroll issues */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-[#347989] opacity-[0.03] rounded-full blur-3xl animate-floating" />
-        <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-[#D68F35] opacity-[0.03] rounded-full blur-3xl animate-floating" style={{ animationDelay: '2s' }} />
-      </div>
-
-      <div className="sm:mx-auto sm:w-full sm:max-w-2xl text-center mb-8 relative z-10 animate-fade-in">
-        <Logo className="h-16 w-auto mx-auto transform hover:scale-110 transition-transform duration-500" />
-        <h2 className="mt-4 text-3xl font-extrabold text-gray-900 tracking-tight">
-          {step === 'details' ? 'Vendor Registration' : 'Verify Identity'}
+  return (
+    <div className="min-h-screen bg-white flex flex-col justify-center py-12 px-5 relative overflow-hidden">
+      
+      <div className="sm:mx-auto sm:w-full sm:max-w-2xl text-center mb-12 relative z-10 animate-fade-in">
+        <div className="w-24 h-24 bg-black rounded-[40px] flex items-center justify-center mx-auto mb-8 shadow-2xl shadow-gray-200 transform hover:rotate-6 transition-transform duration-500">
+          <Logo className="h-10 w-auto invert" />
+        </div>
+        <h2 className="text-sm font-black text-black uppercase tracking-[0.4em] mb-3">
+          {step === 'details' ? 'Network Enrollment' : 'Security Clearance'}
         </h2>
-        <p className="mt-2 text-sm text-gray-600 animate-stagger-1 animate-fade-in">
-          Partner with Homestr and grow your business
+        <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest leading-loose">
+          Partner with PlugPro and scale your operations
         </p>
       </div>
 
       <div className="sm:mx-auto sm:w-full sm:max-w-2xl relative z-10">
-        <div className="bg-white py-8 px-4 shadow-2xl shadow-gray-200/50 sm:rounded-2xl sm:px-10 border border-gray-100 relative overflow-hidden animate-slide-in-bottom">
-          <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-[#347989] via-[#D68F35] to-[#BB5F36]" />
-
+        <div className="bg-white py-12 px-8 shadow-2xl shadow-gray-200/50 rounded-[64px] border border-gray-50 relative overflow-hidden animate-slide-in-bottom">
+          
           {step === 'details' ? (
-            <form onSubmit={handleDetailsSubmit} className="space-y-8">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <form onSubmit={handleDetailsSubmit} className="space-y-12">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
                 {/* Basic Details */}
-                <div className="space-y-4 animate-stagger-1 animate-fade-in">
-                  <h3 className="text-lg font-bold text-gray-900 border-b pb-2">Business Profile</h3>
+                <div className="space-y-6">
+                  <h3 className="text-xs font-black text-black uppercase tracking-[0.3em] border-b border-gray-50 pb-4">Professional Identity</h3>
 
-                  <div className="animate-fade-in" style={{ animationDelay: '0.1s' }}>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+                  <div className="space-y-2">
+                    <label className="text-[9px] font-black text-gray-400 uppercase tracking-widest ml-1">Legal Name</label>
                     <div className="relative group">
-                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none group-focus-within:text-[#347989] transition-colors">
-                        <FiUser className="text-gray-400" />
+                      <div className="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none text-black">
+                        <FiUser className="w-4 h-4" />
                       </div>
                       <input
                         ref={nameInputRef}
@@ -406,18 +403,17 @@ const VendorSignup = () => {
                         required
                         value={formData.name}
                         onChange={handleInputChange}
-                        className="block w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-offset-2 transition-all duration-300 outline-none hover:border-gray-400"
-                        style={{ '--tw-ring-color': brandColor }}
-                        placeholder="Organization name"
+                        className="block w-full pl-12 pr-5 py-4 bg-gray-50 border border-gray-100 rounded-2xl text-[11px] font-black uppercase tracking-widest focus:bg-white focus:border-black outline-none transition-all duration-300"
+                        placeholder="ENTER NAME"
                       />
                     </div>
                   </div>
 
-                  <div className="animate-fade-in" style={{ animationDelay: '0.2s' }}>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
+                  <div className="space-y-2">
+                    <label className="text-[9px] font-black text-gray-400 uppercase tracking-widest ml-1">Email Interface</label>
                     <div className="relative group">
-                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none group-focus-within:text-[#347989] transition-colors">
-                        <FiMail className="text-gray-400" />
+                      <div className="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none text-black">
+                        <FiMail className="w-4 h-4" />
                       </div>
                       <input
                         type="email"
@@ -425,64 +421,60 @@ const VendorSignup = () => {
                         required
                         value={formData.email}
                         onChange={handleInputChange}
-                        className="block w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-offset-2 transition-all duration-300 outline-none hover:border-gray-400"
-                        style={{ '--tw-ring-color': brandColor }}
-                        placeholder="vendor@example.com"
+                        className="block w-full pl-12 pr-5 py-4 bg-gray-50 border border-gray-100 rounded-2xl text-[11px] font-black uppercase tracking-widest focus:bg-white focus:border-black outline-none transition-all duration-300"
+                        placeholder="EMAIL@DOMAIN.COM"
                       />
                     </div>
                   </div>
 
                   {!verificationToken && (
-                    <div className="animate-fade-in" style={{ animationDelay: '0.3s' }}>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
+                    <div className="space-y-2">
+                      <label className="text-[9px] font-black text-gray-400 uppercase tracking-widest ml-1">Verified Mobile</label>
                       <div className="relative group">
-                        <div className="absolute inset-y-0 left-0 pl-3 border-r pr-2 flex items-center pointer-events-none">
-                          <span className="text-gray-500 text-sm font-bold">+91</span>
+                        <div className="absolute inset-y-0 left-0 pl-5 pr-3 flex items-center pointer-events-none text-black">
+                          <span className="text-[10px] font-black border-r border-gray-100 pr-3">+91</span>
                         </div>
                         <input
                           type="tel"
                           required
                           value={formData.phoneNumber}
                           onChange={(e) => setFormData(p => ({ ...p, phoneNumber: e.target.value.replace(/\D/g, '').slice(0, 10) }))}
-                          className="block w-full pl-14 pr-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-offset-2 transition-all duration-300 outline-none hover:border-gray-400"
-                          style={{ '--tw-ring-color': brandColor }}
-                          placeholder="9876543210"
+                          className="block w-full pl-16 pr-5 py-4 bg-gray-50 border border-gray-100 rounded-2xl text-[11px] font-black tracking-[0.2em] focus:bg-white focus:border-black outline-none transition-all duration-300"
+                          placeholder="0000000000"
                         />
                       </div>
                     </div>
                   )}
 
-                  <div className="animate-fade-in" style={{ animationDelay: '0.4s' }}>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Aadhar Number</label>
+                  <div className="space-y-2">
+                    <label className="text-[9px] font-black text-gray-400 uppercase tracking-widest ml-1">Aadhar Identification</label>
                     <div className="relative group">
-                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none group-focus-within:text-[#347989] transition-colors">
-                        <FiFileText className="text-gray-400" />
+                      <div className="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none text-black">
+                        <FiFileText className="w-4 h-4" />
                       </div>
                       <input
                         type="text"
                         required
                         value={formData.aadhar}
                         onChange={(e) => setFormData(p => ({ ...p, aadhar: e.target.value.replace(/\D/g, '').slice(0, 12) }))}
-                        className="block w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-offset-2 transition-all duration-300 outline-none hover:border-gray-400"
-                        style={{ '--tw-ring-color': brandColor }}
-                        placeholder="1234 5678 9012"
+                        className="block w-full pl-12 pr-5 py-4 bg-gray-50 border border-gray-100 rounded-2xl text-[11px] font-black tracking-[0.3em] focus:bg-white focus:border-black outline-none transition-all duration-300"
+                        placeholder="0000 0000 0000"
                       />
                     </div>
                   </div>
 
-                  <div className="animate-fade-in" style={{ animationDelay: '0.5s' }}>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">PAN Number</label>
+                  <div className="space-y-2">
+                    <label className="text-[9px] font-black text-gray-400 uppercase tracking-widest ml-1">PAN Certification</label>
                     <div className="relative group">
-                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none group-focus-within:text-[#347989] transition-colors">
-                        <FiFileText className="text-gray-400" />
+                      <div className="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none text-black">
+                        <FiFileText className="w-4 h-4" />
                       </div>
                       <input
                         type="text"
                         required
                         value={formData.pan}
                         onChange={(e) => setFormData(p => ({ ...p, pan: e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 10) }))}
-                        className="block w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-offset-2 transition-all duration-300 outline-none hover:border-gray-400"
-                        style={{ '--tw-ring-color': brandColor }}
+                        className="block w-full pl-12 pr-5 py-4 bg-gray-50 border border-gray-100 rounded-2xl text-[11px] font-black tracking-[0.3em] focus:bg-white focus:border-black outline-none transition-all duration-300"
                         placeholder="ABCDE1234F"
                       />
                     </div>
@@ -490,35 +482,32 @@ const VendorSignup = () => {
                 </div>
 
                 {/* Documents Section */}
-                <div className="space-y-4 animate-stagger-2 animate-fade-in">
-                  <h3 className="text-lg font-bold text-gray-900 border-b pb-2">Verification Docs</h3>
+                <div className="space-y-6">
+                  <h3 className="text-xs font-black text-black uppercase tracking-[0.3em] border-b border-gray-50 pb-4">Verification Vault</h3>
 
-                  <div className="grid grid-cols-2 gap-4">
-                    {/* Aadhar Upload */}
+                  <div className="grid grid-cols-1 gap-4">
                     {/* Aadhar Front Upload */}
-                    <div className="space-y-2 animate-fade-in" style={{ animationDelay: '0.2s' }}>
-                      <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Aadhar Front</p>
+                    <div className="space-y-2">
+                      <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest ml-1">Aadhar Certification (Front)</p>
                       {documentPreview.aadhar ? (
-                        <div className="relative group overflow-hidden rounded-xl">
-                          <img src={documentPreview.aadhar} className="w-full h-28 object-cover border transform group-hover:scale-110 transition-transform duration-500" />
-                          <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                            <button type="button" onClick={() => removeDocument('aadhar')} className="bg-red-500 text-white rounded-full p-2 shadow-xl hover:bg-red-600 transition-colors">
+                        <div className="relative group overflow-hidden rounded-3xl border border-gray-100">
+                          <img src={documentPreview.aadhar} className="w-full h-24 object-cover transform group-hover:scale-105 transition-transform duration-500" />
+                          <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                            <button type="button" onClick={() => removeDocument('aadhar')} className="bg-white text-black rounded-xl p-2.5 shadow-xl">
                               <FiX size={16} />
                             </button>
                           </div>
                         </div>
                       ) : (
-                        <div className="flex flex-col items-center justify-center w-full h-28 border-2 border-dashed border-gray-200 rounded-xl hover:bg-gray-50 transition-all duration-300 hover:border-[#347989] group bg-white relative">
-                          {uploadingDocs.aadhar ? (
-                            <div className="absolute inset-0 flex items-center justify-center bg-white/80 z-10 rounded-xl">
-                              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#347989]"></div>
+                        <div className="flex flex-col items-center justify-center w-full h-24 border-2 border-dashed border-gray-100 rounded-3xl hover:border-black transition-all duration-300 bg-gray-50 group relative">
+                          {uploadingDocs.aadhar && (
+                            <div className="absolute inset-0 flex items-center justify-center bg-white/80 z-10 rounded-3xl">
+                              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-black"></div>
                             </div>
-                          ) : null}
-                          <label className="flex flex-col items-center cursor-pointer w-full h-full justify-center">
-                            <div className="p-2.5 bg-blue-50 text-blue-600 rounded-full mb-1 hover:bg-blue-100">
-                              <FiUpload className="w-5 h-5" />
-                            </div>
-                            <span className="text-[10px] text-gray-500 font-bold">Upload Front</span>
+                          )}
+                          <label className="flex items-center gap-4 cursor-pointer w-full h-full justify-center px-6">
+                            <FiUpload className="w-5 h-5 text-gray-300 group-hover:text-black transition-colors" />
+                            <span className="text-[10px] text-gray-400 font-black uppercase tracking-widest">Select Image</span>
                             <input type="file" className="hidden" accept="image/*,application/pdf" onChange={(e) => handleDocumentUpload(e, 'aadhar')} disabled={uploadingDocs.aadhar} />
                           </label>
                         </div>
@@ -526,29 +515,27 @@ const VendorSignup = () => {
                     </div>
 
                     {/* Aadhar Back Upload */}
-                    <div className="space-y-2 animate-fade-in" style={{ animationDelay: '0.25s' }}>
-                      <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Aadhar Back</p>
+                    <div className="space-y-2">
+                      <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest ml-1">Aadhar Certification (Back)</p>
                       {documentPreview.aadharBack ? (
-                        <div className="relative group overflow-hidden rounded-xl">
-                          <img src={documentPreview.aadharBack} className="w-full h-28 object-cover border transform group-hover:scale-110 transition-transform duration-500" />
-                          <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                            <button type="button" onClick={() => removeDocument('aadharBack')} className="bg-red-500 text-white rounded-full p-2 shadow-xl hover:bg-red-600 transition-colors">
+                        <div className="relative group overflow-hidden rounded-3xl border border-gray-100">
+                          <img src={documentPreview.aadharBack} className="w-full h-24 object-cover transform group-hover:scale-105 transition-transform duration-500" />
+                          <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                            <button type="button" onClick={() => removeDocument('aadharBack')} className="bg-white text-black rounded-xl p-2.5 shadow-xl">
                               <FiX size={16} />
                             </button>
                           </div>
                         </div>
                       ) : (
-                        <div className="flex flex-col items-center justify-center w-full h-28 border-2 border-dashed border-gray-200 rounded-xl hover:bg-gray-50 transition-all duration-300 hover:border-[#347989] group bg-white relative">
-                          {uploadingDocs.aadharBack ? (
-                            <div className="absolute inset-0 flex items-center justify-center bg-white/80 z-10 rounded-xl">
-                              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#347989]"></div>
+                        <div className="flex flex-col items-center justify-center w-full h-24 border-2 border-dashed border-gray-100 rounded-3xl hover:border-black transition-all duration-300 bg-gray-50 group relative">
+                          {uploadingDocs.aadharBack && (
+                            <div className="absolute inset-0 flex items-center justify-center bg-white/80 z-10 rounded-3xl">
+                              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-black"></div>
                             </div>
-                          ) : null}
-                          <label className="flex flex-col items-center cursor-pointer w-full h-full justify-center">
-                            <div className="p-2.5 bg-blue-50 text-blue-600 rounded-full mb-1 hover:bg-blue-100">
-                              <FiUpload className="w-5 h-5" />
-                            </div>
-                            <span className="text-[10px] text-gray-500 font-bold">Upload Back</span>
+                          )}
+                          <label className="flex items-center gap-4 cursor-pointer w-full h-full justify-center px-6">
+                            <FiUpload className="w-5 h-5 text-gray-300 group-hover:text-black transition-colors" />
+                            <span className="text-[10px] text-gray-400 font-black uppercase tracking-widest">Select Image</span>
                             <input type="file" className="hidden" accept="image/*,application/pdf" onChange={(e) => handleDocumentUpload(e, 'aadharBack')} disabled={uploadingDocs.aadharBack} />
                           </label>
                         </div>
@@ -556,29 +543,27 @@ const VendorSignup = () => {
                     </div>
 
                     {/* PAN Upload */}
-                    <div className="space-y-2 animate-fade-in" style={{ animationDelay: '0.3s' }}>
-                      <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">PAN Card</p>
+                    <div className="space-y-2">
+                      <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest ml-1">Taxation Certification (PAN)</p>
                       {documentPreview.pan ? (
-                        <div className="relative group overflow-hidden rounded-xl">
-                          <img src={documentPreview.pan} className="w-full h-28 object-cover border transform group-hover:scale-110 transition-transform duration-500" />
-                          <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                            <button type="button" onClick={() => removeDocument('pan')} className="bg-red-500 text-white rounded-full p-2 shadow-xl hover:bg-red-600 transition-colors">
+                        <div className="relative group overflow-hidden rounded-3xl border border-gray-100">
+                          <img src={documentPreview.pan} className="w-full h-24 object-cover transform group-hover:scale-105 transition-transform duration-500" />
+                          <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                            <button type="button" onClick={() => removeDocument('pan')} className="bg-white text-black rounded-xl p-2.5 shadow-xl">
                               <FiX size={16} />
                             </button>
                           </div>
                         </div>
                       ) : (
-                        <div className="flex flex-col items-center justify-center w-full h-28 border-2 border-dashed border-gray-200 rounded-xl hover:bg-gray-50 transition-all duration-300 hover:border-[#347989] group bg-white relative">
-                          {uploadingDocs.pan ? (
-                            <div className="absolute inset-0 flex items-center justify-center bg-white/80 z-10 rounded-xl">
-                              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#347989]"></div>
+                        <div className="flex flex-col items-center justify-center w-full h-24 border-2 border-dashed border-gray-100 rounded-3xl hover:border-black transition-all duration-300 bg-gray-50 group relative">
+                          {uploadingDocs.pan && (
+                            <div className="absolute inset-0 flex items-center justify-center bg-white/80 z-10 rounded-3xl">
+                              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-black"></div>
                             </div>
-                          ) : null}
-                          <label className="flex flex-col items-center cursor-pointer w-full h-full justify-center">
-                            <div className="p-2.5 bg-blue-50 text-blue-600 rounded-full mb-1 hover:bg-blue-100">
-                              <FiUpload className="w-5 h-5" />
-                            </div>
-                            <span className="text-[10px] text-gray-500 font-bold">Upload Image</span>
+                          )}
+                          <label className="flex items-center gap-4 cursor-pointer w-full h-full justify-center px-6">
+                            <FiUpload className="w-5 h-5 text-gray-300 group-hover:text-black transition-colors" />
+                            <span className="text-[10px] text-gray-400 font-black uppercase tracking-widest">Select Image</span>
                             <input type="file" className="hidden" accept="image/*,application/pdf" onChange={(e) => handleDocumentUpload(e, 'pan')} disabled={uploadingDocs.pan} />
                           </label>
                         </div>
@@ -586,52 +571,45 @@ const VendorSignup = () => {
                     </div>
                   </div>
 
-                  <div className="p-4 bg-teal-50 border border-teal-100 rounded-xl mt-4 animate-pulse-subtle">
-                    <p className="text-xs text-teal-700 leading-relaxed italic">
-                      "Homestr values trust. Please ensure all documents are clear and valid for faster approval."
+                  <div className="p-6 bg-gray-50 rounded-[28px] border border-gray-100">
+                    <p className="text-[9px] font-black text-gray-400 leading-loose uppercase tracking-widest">
+                      PlugPro Security Protocol: Ensure all visual documents are legible and officially issued to expedite verification.
                     </p>
                   </div>
                 </div>
               </div>
 
-              <div className="animate-stagger-3 animate-fade-in">
-                <button
-                  type="submit"
-                  disabled={isLoading}
-                  className="group relative w-full flex justify-center py-4 px-4 border border-transparent text-base font-bold rounded-xl text-white transition-all transform hover:-translate-y-1 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed overflow-hidden"
-                  style={{
-                    backgroundColor: brandColor,
-                    boxShadow: `0 10px 15px -3px ${brandColor}4D`
-                  }}
-                >
-                  <span className="absolute inset-0 w-full h-full bg-white/10 group-hover:translate-x-full transition-transform duration-700 -translate-x-full" />
-                  {isLoading ? (
-                    <LogoLoader fullScreen={false} inline={true} size="w-6 h-6" />
-                  ) : (
-                    <span className="flex items-center relative z-10">
-                      {verificationToken ? 'Finish Application' : 'Proceed to Verify'}
-                      <FiArrowRight className="ml-2 group-hover:translate-x-1 transition-transform" />
-                    </span>
-                  )}
-                </button>
-              </div>
+              <button
+                type="submit"
+                disabled={isLoading}
+                className="group relative w-full flex justify-center py-6 px-6 bg-black text-white text-[12px] font-black uppercase tracking-[0.3em] rounded-[32px] shadow-2xl shadow-gray-200 transition-all duration-500 hover:scale-[1.01] active:scale-95 disabled:opacity-20"
+              >
+                {isLoading ? (
+                  'Synchronizing...'
+                ) : (
+                  <span className="flex items-center">
+                    {verificationToken ? 'Finalize Application' : 'Proceed to Security Check'}
+                    <FiArrowRight className="ml-3 group-hover:translate-x-2 transition-transform" />
+                  </span>
+                )}
+              </button>
             </form>
           ) : (
-            <div className="space-y-6">
+            <div className="space-y-10">
               <button
                 onClick={() => setStep('details')}
-                className="flex items-center text-sm text-gray-500 hover:text-[#347989] transition-colors mb-4 animate-fade-in"
+                className="inline-flex items-center text-[10px] font-black text-gray-400 uppercase tracking-widest hover:text-black transition-colors"
               >
-                <FiChevronLeft className="mr-1" /> Re-check details
+                <FiChevronLeft className="mr-2" /> Re-check profile
               </button>
 
-              <div className="text-center animate-fade-in">
-                <h3 className="text-xl font-bold text-gray-900">One Last Step</h3>
-                <p className="text-sm text-gray-500">Enter the 6-digit code sent to your phone</p>
+              <div className="text-center">
+                <h3 className="text-sm font-black text-black uppercase tracking-[0.3em] mb-2">Biometric Verification</h3>
+                <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Enter authentication code</p>
               </div>
 
-              <form onSubmit={handleOtpSubmit} className="space-y-8">
-                <div className="flex justify-between gap-3 px-4 sm:px-12 animate-stagger-1 animate-fade-in">
+              <form onSubmit={handleOtpSubmit} className="space-y-12">
+                <div className="flex justify-between gap-4 px-2 sm:px-12">
                   {otp.map((digit, index) => (
                     <input
                       key={index}
@@ -642,13 +620,12 @@ const VendorSignup = () => {
                       value={digit}
                       onChange={(e) => handleOtpChange(index, e.target.value)}
                       onKeyDown={(e) => handleOtpKeyDown(index, e)}
-                      className="w-full h-14 text-center text-xl font-bold border border-gray-300 rounded-xl focus:ring-2 focus:ring-offset-2 outline-none transition-all duration-300 hover:border-gray-400"
-                      style={{ '--tw-ring-color': brandColor, backgroundColor: digit ? `${brandColor}05` : 'white' }}
+                      className="w-full h-16 text-center text-xl font-black bg-gray-50 border border-gray-100 rounded-2xl focus:bg-white focus:border-black outline-none transition-all duration-300"
                     />
                   ))}
                 </div>
 
-                <div className="text-center animate-stagger-2 animate-fade-in">
+                <div className="text-center">
                   <button
                     type="button"
                     onClick={async () => {
@@ -658,50 +635,47 @@ const VendorSignup = () => {
                         if (response.success) {
                           setOtpToken(response.token);
                           setResendTimer(120);
-                          toast.success('OTP sent again');
+                          toast.success('Code re-transmitted');
                         }
-                      } catch (e) { toast.error('Resend failed'); }
+                      } catch (e) { toast.error('Transmission failed'); }
                     }}
                     disabled={resendTimer > 0}
-                    className="text-sm font-semibold transition-colors duration-300 opacity-70 hover:opacity-100 disabled:opacity-50 disabled:cursor-not-allowed"
-                    style={{ color: brandColor }}
+                    className="text-[10px] font-black uppercase tracking-widest text-black disabled:text-gray-200"
                   >
                     {resendTimer > 0
-                      ? `Resend in ${Math.floor(resendTimer / 60)}:${String(resendTimer % 60).padStart(2, '0')}`
-                      : 'Resend Code'}
+                      ? `Transmit available in ${Math.floor(resendTimer / 60)}:${String(resendTimer % 60).padStart(2, '0')}`
+                      : 'Transmit Code'}
                   </button>
                 </div>
 
-                <div className="animate-stagger-3 animate-fade-in">
-                  <button
-                    type="submit"
-                    disabled={isLoading || otp.join('').length !== 6}
-                    className="group relative w-full py-4 rounded-xl text-white font-bold transition-all transform hover:-translate-y-1 shadow-lg disabled:opacity-50 overflow-hidden"
-                    style={{ backgroundColor: brandColor, boxShadow: `0 10px 15px -3px ${brandColor}4D` }}
-                  >
-                    <span className="absolute inset-0 w-full h-full bg-white/10 group-hover:translate-x-full transition-transform duration-700 -translate-x-full" />
-                    <span className="relative z-10 flex items-center justify-center">
-                      {isLoading ? (
-                        <LogoLoader fullScreen={false} inline={true} size="w-6 h-6" />
-                      ) : (
-                        'Verify & Register'
-                      )}
-                    </span>
-                  </button>
-                </div>
+                <button
+                  type="submit"
+                  disabled={isLoading || otp.join('').length !== 6}
+                  className="group relative w-full flex justify-center py-6 px-6 bg-black text-white text-[12px] font-black uppercase tracking-[0.3em] rounded-[32px] shadow-2xl shadow-gray-200 transition-all duration-500 hover:scale-[1.01] active:scale-95 disabled:opacity-20"
+                >
+                  <span className="relative z-10 flex items-center justify-center">
+                    {isLoading ? (
+                      'Authenticating...'
+                    ) : (
+                      'Authorize & Register'
+                    )}
+                  </span>
+                </button>
               </form>
             </div>
           )}
         </div>
 
-        <p className="mt-8 text-center text-sm text-gray-600 animate-fade-in animate-stagger-4">
-          Already a partner?{' '}
-          <Link to="/vendor/login" className="font-bold hover:text-[#D68F35] transition-colors" style={{ color: brandColor }}>
-            Login here
+        <p className="mt-12 text-center">
+          <span className="text-[10px] font-black text-gray-300 uppercase tracking-widest">Already a network partner?</span>{' '}
+          <Link to="/vendor/login" className="text-[10px] font-black text-black uppercase tracking-widest border-b-2 border-black ml-2 hover:bg-black hover:text-white transition-all px-1">
+            Sign In
           </Link>
         </p>
       </div >
     </div >
+  );
+};
   );
 };
 
