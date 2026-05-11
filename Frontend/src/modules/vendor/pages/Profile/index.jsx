@@ -1,11 +1,10 @@
 import React, { useState, useEffect, useLayoutEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FiUser, FiEdit2, FiMapPin, FiPhone, FiMail, FiBriefcase, FiStar, FiArrowRight, FiSettings, FiChevronRight, FiCreditCard, FiLogOut, FiTrash2, FiPlus } from 'react-icons/fi';
+import { FiUser, FiEdit2, FiMapPin, FiBriefcase, FiStar, FiSettings, FiChevronRight, FiLogOut, FiPlus } from 'react-icons/fi';
 import { FaWallet } from 'react-icons/fa';
 import { toast } from 'react-hot-toast';
 import { vendorTheme as themeColors } from '../../../../theme';
 import { vendorAuthService } from '../../../../services/authService';
-import Header from '../../components/layout/Header';
 import BottomNav from '../../components/layout/BottomNav';
 import LogoLoader from '../../../../components/common/LogoLoader';
 
@@ -27,7 +26,7 @@ const Profile = () => {
     { id: 11, label: 'Add Custom Offering', icon: FiPlus, path: '/vendor/add-custom-content', highlight: true },
     { id: 7, label: 'Manage Address', icon: FiMapPin, path: '/vendor/address-management' },
     { id: 8, label: 'Settings', icon: FiSettings, path: '/vendor/settings' },
-    { id: 9, label: 'About Cleaning Expert Services', icon: null, customIcon: 'S', path: '/vendor/about-cleaning-expert' },
+    { id: 9, label: 'About Nexora', icon: null, customIcon: 'S', path: '/vendor/about-cleaning-expert' },
   ];
 
   const [profile, setProfile] = useState(null);
@@ -161,305 +160,134 @@ const Profile = () => {
   }
 
   return (
-    <div className="min-h-screen pb-20" style={{ background: themeColors.backgroundGradient }}>
-      <Header title="Profile" />
+    <div className="min-h-screen pb-24" style={{ background: '#FFFFFF' }}>
+      <header className="px-6 py-5 flex items-center justify-between bg-transparent">
+        <h1 className="text-xl font-black text-gray-900">My Profile</h1>
+        <div className="w-10 h-10 rounded-2xl bg-white shadow-sm flex items-center justify-center border border-gray-100">
+          <FiSettings className="w-5 h-5 text-black" />
+        </div>
+      </header>
 
-      <main className="px-4 pt-4 pb-6">
-        {/* Profile Header Card with Phone & Email */}
-        <div
-          className="rounded-2xl p-5 mb-4 shadow-xl relative overflow-hidden"
-          style={{
-            background: themeColors.button,
-            border: `2px solid ${themeColors.button}`,
-            boxShadow: `0 8px 24px ${hexToRgba(themeColors.button, 0.3)}, 0 4px 12px ${hexToRgba(themeColors.button, 0.2)}`,
-          }}
+      <main className="px-5">
+        {/* Profile Header Card (Teal Gradient) */}
+        <div 
+          className="rounded-[32px] p-6 shadow-xl shadow-gray-200/20 mb-8 relative overflow-hidden"
+          style={{ background: themeColors.accentGradient }}
         >
-          {/* Decorative Patterns */}
-          <div
-            className="absolute top-0 right-0 w-32 h-32 rounded-full opacity-10"
-            style={{
-              background: `radial-gradient(circle, rgba(255, 255, 255, 0.4) 0%, transparent 70%)`,
-              transform: 'translate(30px, -30px)',
-            }}
-          />
-          <div
-            className="absolute bottom-0 left-0 w-24 h-24 rounded-full opacity-8"
-            style={{
-              background: `radial-gradient(circle, rgba(255, 255, 255, 0.3) 0%, transparent 70%)`,
-              transform: 'translate(-20px, 20px)',
-            }}
-          />
+          {/* Ambient Glow */}
+          <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_20%_20%,rgba(255,255,255,0.05)_0%,transparent_50%)]" />
 
-          <div className="relative z-10">
-            <div className="flex items-start gap-4">
-              {/* Profile Photo - Circle with Rating Below */}
-              <div className="flex flex-col items-center flex-shrink-0">
-                <div
-                  className="w-18 h-18 rounded-full flex items-center justify-center overflow-hidden mb-2"
-                  style={{
-                    background: 'rgba(255, 255, 255, 0.35)',
-                    backdropFilter: 'blur(15px)',
-                    boxShadow: '0 8px 20px rgba(0, 0, 0, 0.25), inset 0 2px 6px rgba(255, 255, 255, 0.5)',
-                    border: '3.5px solid rgba(255, 255, 255, 0.6)',
-                    width: '72px',
-                    height: '72px',
-                  }}
-                >
-                  {profile.photo ? (
-                    <img
-                      src={profile.photo}
-                      alt={profile.name}
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <FiUser className="w-9 h-9 text-white" />
-                  )}
-                </div>
-                {/* Star Rating Below Photo */}
-                {profile.rating > 0 && (
-                  <div className="flex items-center gap-1 px-2 py-1 rounded-full bg-white/25 backdrop-blur-sm">
-                    <FiStar className="w-3 h-3 text-yellow-300" style={{ filter: 'drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3))' }} />
-                    <span className="text-xs font-bold text-white">{profile.rating.toFixed(1)}</span>
-                  </div>
+          <div className="relative z-10 flex items-center gap-5">
+            {/* Profile Image */}
+            <div className="relative shrink-0">
+              <div className="w-20 h-20 rounded-[24px] bg-white/20 border-2 border-white/30 overflow-hidden backdrop-blur-md flex items-center justify-center">
+                {profile.photo ? (
+                  <img src={profile.photo} alt={profile.name} className="w-full h-full object-cover" />
+                ) : (
+                  <FiUser className="w-10 h-10 text-white/40" />
                 )}
               </div>
+              <button 
+                onClick={() => navigate('/vendor/profile/details')}
+                className="absolute -bottom-1 -right-1 w-7 h-7 bg-white rounded-xl shadow-md flex items-center justify-center border border-gray-100"
+              >
+                <FiEdit2 className="w-3.5 h-3.5 text-black" />
+              </button>
+            </div>
 
-              {/* Name and Info */}
-              <div className="flex-1 min-w-0 flex flex-col">
-                <h2 className="text-xl font-bold text-white mb-1 break-words" style={{ wordBreak: 'break-word', overflowWrap: 'break-word' }}>{profile.name}</h2>
-                <p className="text-white text-sm opacity-95 mb-2.5 font-medium break-words" style={{ wordBreak: 'break-word', overflowWrap: 'break-word' }}>{profile.businessName}</p>
-
-                {/* Phone and Email */}
-                <div className="space-y-1.5">
-                  <div className="flex items-center gap-2">
-                    <div className="p-1 rounded-md bg-white/15 backdrop-blur-sm flex-shrink-0">
-                      <FiPhone className="w-3 h-3 text-white" />
-                    </div>
-                    <span className="text-xs text-white font-semibold break-words" style={{ wordBreak: 'break-word', overflowWrap: 'break-word' }}>{profile.phone}</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <div className="p-1 rounded-md bg-white/15 backdrop-blur-sm flex-shrink-0">
-                      <FiMail className="w-3 h-3 text-white" />
-                    </div>
-                    <span className="text-xs text-white font-semibold break-words" style={{ wordBreak: 'break-word', overflowWrap: 'break-word' }}>{profile.email}</span>
-                  </div>
+            <div className="flex-1 min-w-0">
+              <h2 className="text-lg font-black text-white truncate mb-0.5">{profile.name}</h2>
+              <p className="text-xs font-bold text-white/60 mb-3 truncate">{profile.businessName || 'PlugPro Partner'}</p>
+              
+              <div className="flex items-center gap-3">
+                <div className="px-2.5 py-1.5 bg-white/10 rounded-xl backdrop-blur-md flex items-center gap-1.5">
+                  <FiStar className="w-3 h-3 text-white fill-white" />
+                  <span className="text-[10px] font-black text-white">{profile.rating.toFixed(1)}</span>
+                </div>
+                <div className="px-2.5 py-1.5 bg-white/10 rounded-xl backdrop-blur-md flex items-center gap-1.5">
+                  <FiBriefcase className="w-3 h-3 text-white" />
+                  <span className="text-[10px] font-black text-white">{profile.totalJobs} Jobs</span>
                 </div>
               </div>
-
-              {/* Navigate Button */}
-              <button
-                onClick={() => navigate('/vendor/profile/details')}
-                className="p-3.5 rounded-xl flex-shrink-0 transition-all duration-300 active:scale-95 mt-1"
-                style={{
-                  background: 'rgba(255, 255, 255, 0.28)',
-                  backdropFilter: 'blur(12px)',
-                  boxShadow: '0 4px 14px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.4)',
-                  border: '1.5px solid rgba(255, 255, 255, 0.35)',
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.transform = 'scale(1.12) rotate(5deg)';
-                  e.currentTarget.style.background = 'rgba(255, 255, 255, 0.38)';
-                  e.currentTarget.style.boxShadow = '0 6px 18px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.5)';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.transform = 'scale(1) rotate(0deg)';
-                  e.currentTarget.style.background = 'rgba(255, 255, 255, 0.28)';
-                  e.currentTarget.style.boxShadow = '0 4px 14px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.4)';
-                }}
-              >
-                <FiArrowRight className="w-5 h-5 text-white" style={{ fontWeight: 'bold' }} />
-              </button>
             </div>
           </div>
         </div>
 
-        {/* Three Cards Section - Horizontal */}
-        <div className="px-4 mb-5">
-          <div className="grid grid-cols-3 gap-3">
-            {/* Active Jobs */}
+        {/* Quick Summary Grid (Black theme) */}
+        <div className="grid grid-cols-3 gap-4 mb-8">
+          {[
+            { label: 'Wallet', icon: FaWallet, path: '/vendor/wallet' },
+            { label: 'Jobs', icon: FiBriefcase, path: '/vendor/jobs' },
+            { label: 'Workers', icon: FiUsers, path: '/vendor/workers' },
+          ].map((item, idx) => (
             <button
-              onClick={() => navigate('/vendor/jobs')}
-              className="flex flex-col items-center justify-center p-4 rounded-2xl active:scale-95 transition-all duration-300 relative overflow-hidden bg-white"
-              style={{
-                boxShadow: '0 4px 12px rgba(0, 0, 0, 0.08), 0 2px 6px rgba(0, 0, 0, 0.05)',
-                border: '1.5px solid rgba(0, 166, 166, 0.15)',
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.transform = 'translateY(-2px)';
-                e.currentTarget.style.boxShadow = '0 6px 16px rgba(0, 166, 166, 0.15), 0 3px 8px rgba(0, 0, 0, 0.08)';
-                e.currentTarget.style.borderColor = hexToRgba(themeColors.button, 0.25);
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.transform = 'translateY(0)';
-                e.currentTarget.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.08), 0 2px 6px rgba(0, 0, 0, 0.05)';
-                e.currentTarget.style.borderColor = hexToRgba(themeColors.button, 0.15);
-              }}
+              key={idx}
+              onClick={() => navigate(item.path)}
+              className="bg-white rounded-[24px] p-4 shadow-sm border border-gray-100 flex flex-col items-center text-center active:scale-95 transition-all group"
             >
-              <div
-                className="w-10 h-10 rounded-xl flex items-center justify-center mb-2"
-                style={{
-                  backgroundColor: hexToRgba(themeColors.button, 0.12),
-                  boxShadow: `0 2px 8px ${hexToRgba(themeColors.button, 0.2)}`,
-                }}
-              >
-                <FiBriefcase className="w-5 h-5" style={{ color: themeColors.button }} />
+              <div className="w-10 h-10 rounded-2xl bg-gray-50 flex items-center justify-center mb-2 group-hover:bg-black transition-all">
+                <item.icon className="w-5 h-5 text-black group-hover:text-white" />
               </div>
-              <span className="text-[11px] font-bold text-gray-800 text-center leading-tight">
-                Active Jobs
-              </span>
+              <span className="text-[10px] font-black text-gray-900 uppercase tracking-wider">{item.label}</span>
             </button>
-
-            {/* Wallet */}
-            <button
-              onClick={() => navigate('/vendor/wallet')}
-              className="flex flex-col items-center justify-center p-4 rounded-2xl active:scale-95 transition-all duration-300 relative overflow-hidden bg-white"
-              style={{
-                boxShadow: '0 4px 12px rgba(0, 166, 166, 0.08), 0 2px 6px rgba(0, 0, 0, 0.05)',
-                border: '1.5px solid rgba(0, 166, 166, 0.15)',
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.transform = 'translateY(-2px)';
-                e.currentTarget.style.boxShadow = '0 6px 16px rgba(0, 166, 166, 0.15), 0 3px 8px rgba(0, 0, 0, 0.08)';
-                e.currentTarget.style.borderColor = hexToRgba(themeColors.button, 0.25);
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.transform = 'translateY(0)';
-                e.currentTarget.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.08), 0 2px 6px rgba(0, 0, 0, 0.05)';
-                e.currentTarget.style.borderColor = hexToRgba(themeColors.button, 0.15);
-              }}
-            >
-              <div
-                className="w-10 h-10 rounded-xl flex items-center justify-center mb-2"
-                style={{
-                  backgroundColor: hexToRgba(themeColors.button, 0.12),
-                  boxShadow: `0 2px 8px ${hexToRgba(themeColors.button, 0.2)}`,
-                }}
-              >
-                <FaWallet className="w-5 h-5" style={{ color: themeColors.button }} />
-              </div>
-              <span className="text-[11px] font-bold text-gray-800 text-center leading-tight">
-                Wallet
-              </span>
-            </button>
-
-            {/* Workers */}
-            <button
-              onClick={() => navigate('/vendor/workers')}
-              className="flex flex-col items-center justify-center p-4 rounded-2xl active:scale-95 transition-all duration-300 relative overflow-hidden bg-white"
-              style={{
-                boxShadow: '0 4px 12px rgba(0, 166, 166, 0.08), 0 2px 6px rgba(0, 0, 0, 0.05)',
-                border: '1.5px solid rgba(0, 166, 166, 0.15)',
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.transform = 'translateY(-2px)';
-                e.currentTarget.style.boxShadow = '0 6px 16px rgba(0, 166, 166, 0.15), 0 3px 8px rgba(0, 0, 0, 0.08)';
-                e.currentTarget.style.borderColor = hexToRgba(themeColors.button, 0.25);
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.transform = 'translateY(0)';
-                e.currentTarget.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.08), 0 2px 6px rgba(0, 0, 0, 0.05)';
-                e.currentTarget.style.borderColor = hexToRgba(themeColors.button, 0.15);
-              }}
-            >
-              <div
-                className="w-10 h-10 rounded-xl flex items-center justify-center mb-2"
-                style={{
-                  backgroundColor: hexToRgba(themeColors.button, 0.12),
-                  boxShadow: `0 2px 8px ${hexToRgba(themeColors.button, 0.2)}`,
-                }}
-              >
-                <FiUser className="w-5 h-5" style={{ color: themeColors.button }} />
-              </div>
-              <span className="text-[11px] font-bold text-gray-800 text-center leading-tight">
-                Workers
-              </span>
-            </button>
-          </div>
+          ))}
         </div>
 
-        {/* Menu List Section */}
-        <div className="px-4 mb-4 space-y-3">
+        {/* Settings Menu (Minimalist Black) */}
+        <div className="space-y-4 mb-8">
+          <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-4 px-1">Management</h3>
+          
           {menuItems.map((item) => {
-            const IconComponent = item.icon;
+            const IconComponent = item.icon || FiSettings;
             return (
               <button
                 key={item.id}
                 onClick={() => navigate(item.path)}
-                className={`w-full flex items-center justify-between p-4 rounded-2xl shadow-sm border transition-all active:scale-[0.98] ${
+                className={`w-full flex items-center justify-between p-4 rounded-[28px] border transition-all active:scale-[0.98] ${
                   item.highlight 
-                  ? 'bg-gradient-to-r from-teal-50 to-white border-teal-200 shadow-md ring-1 ring-teal-100' 
-                  : 'bg-white border-gray-100 hover:border-teal-200 hover:shadow-md'
+                  ? 'bg-black border-black shadow-lg shadow-gray-200 text-white' 
+                  : 'bg-white border-gray-100 text-gray-900 shadow-sm'
                 }`}
               >
                 <div className="flex items-center gap-4">
-                  {item.customIcon ? (
-                    <div
-                      className="w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 transition-colors group-hover:bg-teal-50"
-                      style={{
-                        backgroundColor: hexToRgba(themeColors.button, 0.1),
-                        border: `1px solid ${hexToRgba(themeColors.button, 0.2)}`,
-                      }}
-                    >
-                      <span className="text-sm font-bold" style={{ color: themeColors.button }}>{item.customIcon}</span>
-                    </div>
-                  ) : (
-                    IconComponent && (
-                      <div
-                        className="w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 transition-colors"
-                        style={{ backgroundColor: item.highlight ? hexToRgba(themeColors.button, 0.2) : hexToRgba(themeColors.button, 0.1) }}
-                      >
-                        <IconComponent className={`w-6 h-6 ${item.highlight ? 'scale-110' : ''}`} style={{ color: themeColors.button }} />
-                      </div>
-                    )
-                  )}
-                  <span className={`text-[15px] font-bold text-left ${item.highlight ? 'text-teal-800' : 'text-gray-800'}`}>
-                    {item.label}
-                    {item.highlight && <span className="ml-2 text-[10px] bg-teal-100 text-teal-700 px-1.5 py-0.5 rounded-full uppercase tracking-wider">New</span>}
-                  </span>
+                  <div className={`w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 ${
+                    item.highlight ? 'bg-white/10' : 'bg-gray-50'
+                  }`}>
+                    {item.customIcon ? (
+                      <span className={`text-sm font-black ${item.highlight ? 'text-white' : 'text-black'}`}>{item.customIcon}</span>
+                    ) : (
+                      <IconComponent className={`w-5 h-5 ${item.highlight ? 'text-white' : 'text-black'}`} />
+                    )}
+                  </div>
+                  <span className="text-sm font-black tracking-tight">{item.label}</span>
                 </div>
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center ${item.highlight ? 'bg-teal-100' : 'bg-gray-50'}`}>
-                  <FiChevronRight className={`w-5 h-5 ${item.highlight ? 'text-teal-600' : 'text-gray-400'}`} />
+                <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                  item.highlight ? 'bg-white/10' : 'bg-gray-50'
+                }`}>
+                  <FiChevronRight className={`w-5 h-5 ${item.highlight ? 'text-white' : 'text-gray-300'}`} />
                 </div>
               </button>
             );
           })}
         </div>
 
-        {/* Logout Button */}
-        <div className="px-4 mb-3">
+        {/* Danger Zone */}
+        <div className="mb-10">
           <button
-            type="button"
-            onClick={async (e) => {
-              e.preventDefault();
-              e.stopPropagation();
+            onClick={async () => {
               try {
                 await vendorAuthService.logout();
-                toast.success('Logged out successfully');
+                toast.success('Logged out');
                 navigate('/vendor/login');
-              } catch (error) {
-                localStorage.removeItem('vendorAccessToken');
-                localStorage.removeItem('vendorRefreshToken');
-                localStorage.removeItem('vendorData');
-                toast.success('Logged out successfully');
+              } catch (e) {
+                localStorage.clear();
                 navigate('/vendor/login');
               }
             }}
-            className="w-full font-semibold py-3 rounded-xl active:scale-98 transition-all text-white flex items-center justify-center gap-2"
-            style={{
-              backgroundColor: '#EF4444',
-              boxShadow: '0 4px 12px rgba(239, 68, 68, 0.3)',
-            }}
-            onMouseEnter={(e) => {
-              e.target.style.backgroundColor = '#DC2626';
-              e.target.style.boxShadow = '0 6px 16px rgba(239, 68, 68, 0.4)';
-            }}
-            onMouseLeave={(e) => {
-              e.target.style.backgroundColor = '#EF4444';
-              e.target.style.boxShadow = '0 4px 12px rgba(239, 68, 68, 0.3)';
-            }}
+            className="w-full py-5 rounded-[28px] bg-red-50 border border-red-100 text-red-500 text-sm font-black flex items-center justify-center gap-3 active:scale-95 transition-all"
           >
             <FiLogOut className="w-5 h-5" />
-            Logout
+            LOGOUT ACCOUNT
           </button>
         </div>
       </main>

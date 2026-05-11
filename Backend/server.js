@@ -221,6 +221,8 @@ app.use('/api/admin/settlements', require('./routes/admin-routes/settlementManag
 app.use('/api/admin/admins', require('./routes/admin-routes/adminManagement.routes'));
 app.use('/api/admin/support', require('./routes/admin-routes/support.routes'));
 app.use('/api/admin/banners', require('./routes/admin-routes/banner.routes'));
+app.use('/api/footer-links', require('./routes/admin-routes/footerLinkRoutes'));
+app.use('/api/admin/footer-links', require('./routes/admin-routes/footerLinkRoutes'));
 app.use('/api/admin/training', require('./routes/admin-routes/training.routes'));
 app.use('/api/image', require('./routes/admin-routes/image.routes'));
 app.use('/api', require('./routes/admin-routes/upload.routes')); // Generic upload access

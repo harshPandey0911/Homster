@@ -101,7 +101,7 @@ const BookingDetails = () => {
         // Calculate notional display values for plan_benefit
         if (data.paymentMethod === 'plan_benefit') {
           if (!data.tax) data.tax = (data.basePrice || 0) * 0.18;
-          if (!data.visitingCharges && !data.visitationFee) data.visitingCharges = 49;
+          if (!data.visitingCharges && !data.visitationFee) data.visitingCharges = 0;
         }
         setBooking(data);
       } else {
@@ -185,7 +185,7 @@ const BookingDetails = () => {
             // Calculate notional display values for plan_benefit
             if (newData.paymentMethod === 'plan_benefit') {
               if (!newData.tax) newData.tax = (newData.basePrice || 0) * 0.18;
-              if (!newData.visitingCharges && !newData.visitationFee) newData.visitingCharges = 49;
+              if (!newData.visitingCharges && !newData.visitationFee) newData.visitingCharges = 0;
             }
             return newData;
           });
@@ -1334,19 +1334,8 @@ const BookingDetails = () => {
                         </div>
                       )}
 
-                      {(booking.visitingCharges > 0 || booking.visitationFee > 0 || booking.paymentMethod === 'plan_benefit') && (
-                        <div className="flex justify-between items-center text-gray-600">
-                          <span>Convenience Fee</span>
-                          {booking.paymentMethod === 'plan_benefit' ? (
-                            <div className="flex items-center gap-2">
-                              <span className="line-through text-gray-400 text-xs">₹{(booking.visitingCharges || booking.visitationFee || 0).toLocaleString('en-IN')}</span>
-                              <span className="text-emerald-600 font-bold text-xs bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-100">FREE ✓</span>
-                            </div>
-                          ) : (
-                            <span className="font-medium text-gray-900">₹{(booking.visitingCharges || booking.visitationFee || 0).toLocaleString('en-IN')}</span>
-                          )}
-                        </div>
-                      )}
+                      {/* Convenience Fee removed */}
+
 
                       {booking.paymentMethod !== 'plan_benefit' && booking.discount > 0 && (
                         <div className="flex justify-between text-sm">

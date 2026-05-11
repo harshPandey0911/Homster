@@ -302,28 +302,14 @@ const Cart = () => {
                     {/* Action Buttons */}
                     <div className="flex gap-2">
                       <button
-                        onClick={() => handleAddServices(category)}
-                        className="flex-1 px-4 py-2.5 bg-white border-2 border-gray-300 rounded-xl text-sm font-semibold text-gray-700 hover:bg-gray-50 hover:border-gray-400 transition-all active:scale-95"
-                      >
-                        Add Services
-                      </button>
-                      <button
                         onClick={() => handleCategoryCheckout(category)}
-                        className="flex-1 px-4 py-2.5 rounded-xl text-sm font-semibold text-white transition-all active:scale-95 shadow-md"
+                        className="w-full px-4 py-3 rounded-xl text-base font-bold text-white transition-all active:scale-95 shadow-lg flex items-center justify-center gap-2"
                         style={{
                           backgroundColor: themeColors.button,
-                          boxShadow: `0 2px 6px ${getColorWithOpacity('teal', 0.3)}`
-                        }}
-                        onMouseEnter={(e) => {
-                          e.target.style.backgroundColor = 'var(--brand-teal)';
-                          e.target.style.boxShadow = `0 4px 12px ${getColorWithOpacity('teal', 0.4)}`;
-                        }}
-                        onMouseLeave={(e) => {
-                          e.target.style.backgroundColor = themeColors.button;
-                          e.target.style.boxShadow = `0 2px 6px ${getColorWithOpacity('teal', 0.3)}`;
+                          boxShadow: `0 4px 14px ${getColorWithOpacity('teal', 0.4)}`
                         }}
                       >
-                        Book
+                        Book Now
                       </button>
                     </div>
                   </div>

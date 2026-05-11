@@ -47,26 +47,69 @@ const LocationPicker = ({ onLocationSelect, initialPosition = null }) => {
     }
   }, [isLoaded]);
 
-  // Reverse geocode to get address from coordinates
+  // Reverse geocode to get address from coordinates with Nominatim fallback
   const reverseGeocode = async (position) => {
-    if (!window.google) return;
-
     setLoading(true);
-    const geocoder = new window.google.maps.Geocoder();
 
-    geocoder.geocode({ location: position }, (results, status) => {
-      setLoading(false);
-      if (status === 'OK' && results[0]) {
-        if (onLocationSelect) {
+    // 1. Try Google Maps first if initialized
+    if (window.google && window.google.maps) {
+      const geocoder = new window.google.maps.Geocoder();
+      try {
+        const result = await new Promise((resolve, reject) => {
+          geocoder.geocode({ location: position }, (results, status) => {
+            if (status === 'OK' && results[0]) resolve(results[0]);
+            else reject(status);
+          });
+        });
+
+        if (result && onLocationSelect) {
+          setLoading(false);
           onLocationSelect({
             lat: position.lat,
             lng: position.lng,
-            address: results[0].formatted_address,
-            components: results[0].address_components
+            address: result.formatted_address,
+            components: result.address_components
           });
+          return;
         }
+      } catch (err) {
+        console.warn("Google Geocoding failed, falling back to Nominatim:", err);
       }
-    });
+    }
+
+    // 2. Fallback to Nominatim (OpenStreetMap)
+    try {
+      const response = await fetch(
+        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${position.lat}&lon=${position.lng}&addressdetails=1`,
+        { headers: { 'Accept-Language': 'en' } }
+      );
+      const data = await response.json();
+
+      if (data && data.display_name && onLocationSelect) {
+        // Map Nominatim address components to a format similar to Google
+        const components = [];
+        if (data.address.city || data.address.town || data.address.village) 
+          components.push({ long_name: data.address.city || data.address.town || data.address.village, types: ['locality'] });
+        if (data.address.state) 
+          components.push({ long_name: data.address.state, types: ['administrative_area_level_1'] });
+        if (data.address.postcode) 
+          components.push({ long_name: data.address.postcode, types: ['postal_code'] });
+        if (data.address.suburb || data.address.neighbourhood) 
+          components.push({ long_name: data.address.suburb || data.address.neighbourhood, types: ['sublocality'] });
+
+        onLocationSelect({
+          lat: position.lat,
+          lng: position.lng,
+          address: data.display_name,
+          components: components
+        });
+      }
+    } catch (err) {
+      console.error("Nominatim Geocoding failed:", err);
+      toast.error("Could not fetch address. Please enter manually.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   // Handle map click

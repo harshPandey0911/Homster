@@ -179,37 +179,35 @@ const VendorLogin = () => {
   const brandColor = themeColors.brand?.teal || '#347989';
 
   return (
-    <div className="min-h-[100dvh] bg-gray-50 flex flex-col justify-start sm:justify-center py-12 sm:px-6 lg:px-8 relative overflow-x-hidden">
-      {/* Decorative Background Elements */}
-      <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-[#347989] opacity-[0.03] rounded-full blur-3xl animate-floating" />
-      <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-[#D68F35] opacity-[0.03] rounded-full blur-3xl animate-floating" style={{ animationDelay: '2s' }} />
-
-      <div className="sm:mx-auto sm:w-full sm:max-w-md text-center mb-8 relative z-10 animate-fade-in">
-        <Logo className="h-24 w-24 mx-auto transform hover:scale-110 transition-transform duration-500" />
-        <h2 className="mt-4 text-3xl font-extrabold text-gray-900 tracking-tight">
-          {step === 'phone' ? 'Vendor Sign In' : 'Verify Identity'}
+    <div className="min-h-[100dvh] bg-white flex flex-col justify-center py-12 px-5 relative overflow-hidden">
+      
+      <div className="sm:mx-auto sm:w-full sm:max-w-md text-center mb-12 relative z-10 animate-fade-in">
+        <div className="w-24 h-24 bg-black rounded-[40px] flex items-center justify-center mx-auto mb-8 shadow-2xl shadow-gray-200 transform hover:rotate-6 transition-transform duration-500">
+          <Logo className="h-12 w-auto invert" />
+        </div>
+        <h2 className="text-sm font-black text-black uppercase tracking-[0.4em] mb-3">
+          {step === 'phone' ? 'Authorized Access' : 'Security Verification'}
         </h2>
-        <p className="mt-2 text-sm text-gray-600 animate-stagger-1 animate-fade-in">
-          {step === 'phone' ? 'Manage your services and bookings' : `We've sent a 6-digit code to ${phoneNumber}`}
+        <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest leading-loose">
+          {step === 'phone' ? 'Nexora Go Network Gateway' : `Encryption Code Sent to ${phoneNumber}`}
         </p>
       </div>
 
-      <div className="sm:mx-auto sm:w-full sm:max-w-md px-4 sm:px-0 relative z-10">
-        <div className="bg-white py-8 px-4 shadow-2xl shadow-gray-200/50 sm:rounded-2xl sm:px-10 border border-gray-100 relative overflow-hidden animate-slide-in-bottom">
-          <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-[#347989] via-[#D68F35] to-[#BB5F36]" />
-
+      <div className="sm:mx-auto sm:w-full sm:max-w-md relative z-10">
+        <div className="bg-white py-10 px-8 shadow-2xl shadow-gray-200/50 rounded-[48px] border border-gray-50 relative overflow-hidden animate-slide-in-bottom">
+          
           {step === 'phone' ? (
-            <form onSubmit={handlePhoneSubmit} className="space-y-6">
-              <div className="animate-stagger-1 animate-fade-in">
-                <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-1">
-                  Phone Number
+            <form onSubmit={handlePhoneSubmit} className="space-y-8">
+              <div className="space-y-2">
+                <label htmlFor="phone" className="text-[9px] font-black text-gray-400 uppercase tracking-widest ml-1">
+                  Mobile Identity
                 </label>
-                <div className="relative rounded-xl shadow-sm group">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none group-focus-within:text-[#347989] transition-colors">
-                    <FiPhone className="h-5 w-5 text-gray-400" />
+                <div className="relative group">
+                  <div className="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none text-black">
+                    <FiPhone className="h-5 w-5" />
                   </div>
-                  <div className="absolute inset-y-0 left-10 flex items-center pointer-events-none">
-                    <span className="text-gray-500 font-medium border-r border-gray-300 pr-2">+91</span>
+                  <div className="absolute inset-y-0 left-12 flex items-center pointer-events-none">
+                    <span className="text-gray-300 font-black text-xs border-r border-gray-100 pr-3">+91</span>
                   </div>
                   <input
                     ref={phoneInputRef}
@@ -219,35 +217,27 @@ const VendorLogin = () => {
                     required
                     value={phoneNumber}
                     onChange={(e) => setPhoneNumber(e.target.value.replace(/\D/g, '').slice(0, 10))}
-                    className="block w-full pl-24 pr-4 py-3 border border-gray-300 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 transition-all duration-300 hover:border-gray-400"
-                    placeholder="9876543210"
-                    style={{ '--tw-ring-color': brandColor }}
+                    className="block w-full pl-24 pr-6 py-5 bg-gray-50 border border-gray-100 rounded-3xl text-gray-900 text-sm font-black tracking-[0.2em] focus:bg-white focus:border-black outline-none transition-all duration-300"
+                    placeholder="0000000000"
                   />
                 </div>
               </div>
 
-              <div className="animate-stagger-2 animate-fade-in">
-                <button
-                  type="submit"
-                  disabled={isLoading || !phoneNumber || phoneNumber.length < 10}
-                  className="group relative w-full flex justify-center py-3.5 px-4 border border-transparent text-sm font-bold rounded-xl text-white transition-all duration-500 shadow-lg hover:shadow-xl hover:-translate-y-1 transform disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0 overflow-hidden"
-                  style={{
-                    backgroundColor: brandColor,
-                    boxShadow: `0 10px 15px -3px ${brandColor}4D`
-                  }}
-                >
-                  <span className="absolute inset-0 w-full h-full bg-white/10 group-hover:translate-x-full transition-transform duration-700 -translate-x-full" />
-                  {isLoading ? 'Sending OTP...' : (
-                    <span className="flex items-center relative z-10">
-                      Get Started
-                      <FiArrowRight className="ml-2 group-hover:translate-x-1 transition-transform" />
-                    </span>
-                  )}
-                </button>
-              </div>
+              <button
+                type="submit"
+                disabled={isLoading || !phoneNumber || phoneNumber.length < 10}
+                className="group relative w-full flex justify-center py-5 px-6 bg-black text-white text-[11px] font-black uppercase tracking-[0.3em] rounded-[24px] shadow-2xl shadow-gray-200 transition-all duration-500 hover:scale-[1.02] active:scale-95 disabled:opacity-20"
+              >
+                {isLoading ? 'Processing...' : (
+                  <span className="flex items-center">
+                    Initiate Login
+                    <FiArrowRight className="ml-3 group-hover:translate-x-2 transition-transform" />
+                  </span>
+                )}
+              </button>
             </form>
           ) : (
-            <div className="space-y-6">
+            <div className="space-y-8">
               <button
                 type="button"
                 onClick={(e) => {
@@ -257,13 +247,13 @@ const VendorLogin = () => {
                   setStep('phone');
                   setResendTimer(0);
                 }}
-                className="flex items-center text-sm text-gray-500 hover:text-[#347989] transition-colors mb-4 animate-stagger-1 animate-fade-in"
+                className="inline-flex items-center text-[10px] font-black text-gray-400 uppercase tracking-widest hover:text-black transition-colors"
               >
-                <FiChevronLeft className="mr-1" /> Edit number
+                <FiChevronLeft className="mr-2" /> Modify Identity
               </button>
 
-              <form onSubmit={handleOtpSubmit} className="space-y-8">
-                <div className="flex justify-between gap-2 sm:gap-4 animate-stagger-2 animate-fade-in">
+              <form onSubmit={handleOtpSubmit} className="space-y-10">
+                <div className="flex justify-between gap-3">
                   {otp.map((digit, index) => (
                     <input
                       key={index}
@@ -274,17 +264,15 @@ const VendorLogin = () => {
                       value={digit}
                       onChange={(e) => handleOtpChange(index, e.target.value)}
                       onKeyDown={(e) => handleOtpKeyDown(index, e)}
-                      className="w-full h-14 text-center text-xl font-bold border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-offset-2 transition-all duration-300 hover:border-gray-400"
+                      className="w-full h-16 text-center text-xl font-black bg-gray-50 border border-gray-100 rounded-2xl focus:bg-white focus:border-black outline-none transition-all duration-300"
                       style={{
-                        '--tw-ring-color': brandColor,
-                        caretColor: brandColor,
-                        backgroundColor: digit ? `${brandColor}05` : 'white'
+                        color: digit ? 'black' : 'gray'
                       }}
                     />
                   ))}
                 </div>
 
-                <div className="text-center animate-stagger-3 animate-fade-in">
+                <div className="text-center">
                   <button
                     type="button"
                     onClick={async () => {
@@ -294,50 +282,42 @@ const VendorLogin = () => {
                         if (response.success) {
                           setOtpToken(response.token);
                           setResendTimer(120);
-                          toast.success('New code sent!');
+                          toast.success('Security code re-issued');
                         }
                       } catch (error) {
-                        toast.error('Failed to resend code');
+                        toast.error('Re-issue failed');
                       }
                     }}
                     disabled={resendTimer > 0}
-                    className="text-sm font-semibold hover:text-[#D68F35] transition-colors duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
-                    style={{ color: brandColor }}
+                    className="text-[10px] font-black uppercase tracking-widest text-black disabled:text-gray-300 transition-all"
                   >
                     {resendTimer > 0
-                      ? `Resend in ${Math.floor(resendTimer / 60)}:${String(resendTimer % 60).padStart(2, '0')}`
-                      : 'Resend code'}
+                      ? `Resend available in ${Math.floor(resendTimer / 60)}:${String(resendTimer % 60).padStart(2, '0')}`
+                      : 'Resend security code'}
                   </button>
                 </div>
 
-                <div className="animate-stagger-4 animate-fade-in">
-                  <button
-                    type="submit"
-                    disabled={isLoading || otp.join('').length !== 6}
-                    className="group relative w-full flex justify-center py-3.5 px-4 border border-transparent text-sm font-bold rounded-xl text-white transition-all duration-500 shadow-lg hover:shadow-xl hover:-translate-y-1 transform disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0 overflow-hidden"
-                    style={{
-                      backgroundColor: brandColor,
-                      boxShadow: `0 10px 15px -3px ${brandColor}4D`
-                    }}
-                  >
-                    <span className="absolute inset-0 w-full h-full bg-white/10 group-hover:translate-x-full transition-transform duration-700 -translate-x-full" />
-                    {isLoading ? 'Verifying...' : (
-                      <span className="flex items-center relative z-10">
-                        Login to Dashboard
-                        <FiArrowRight className="ml-2 group-hover:translate-x-1 transition-transform" />
-                      </span>
-                    )}
-                  </button>
-                </div>
+                <button
+                  type="submit"
+                  disabled={isLoading || otp.join('').length !== 6}
+                  className="group relative w-full flex justify-center py-5 px-6 bg-black text-white text-[11px] font-black uppercase tracking-[0.3em] rounded-[24px] shadow-2xl shadow-gray-200 transition-all duration-500 hover:scale-[1.02] active:scale-95 disabled:opacity-20"
+                >
+                  {isLoading ? 'Verifying...' : (
+                    <span className="flex items-center">
+                      Authorize Portal
+                      <FiArrowRight className="ml-3 group-hover:translate-x-2 transition-transform" />
+                    </span>
+                  )}
+                </button>
               </form>
             </div>
           )}
         </div>
 
-        <p className="mt-8 text-center text-sm text-gray-500 animate-fade-in animate-stagger-5">
-          Don't have a vendor account?{' '}
-          <Link to="/vendor/signup" className="font-semibold text-[#347989] hover:text-[#D68F35] transition-colors duration-300">
-            Register Now
+        <p className="mt-12 text-center">
+          <span className="text-[10px] font-black text-gray-300 uppercase tracking-widest">New to the network?</span>{' '}
+          <Link to="/vendor/signup" className="text-[10px] font-black text-black uppercase tracking-widest border-b-2 border-black ml-2 hover:bg-black hover:text-white transition-all px-1">
+            Apply Now
           </Link>
         </p>
       </div>

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useLayoutEffect, useCallback, useMemo, memo, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { FiBriefcase, FiUsers, FiBell, FiArrowRight, FiUser, FiClock, FiMapPin, FiCheckCircle, FiTrendingUp, FiChevronRight } from 'react-icons/fi';
+import { FiBriefcase, FiUsers, FiBell, FiArrowRight, FiUser, FiClock, FiMapPin, FiCheckCircle, FiTrendingUp, FiChevronRight, FiStar } from 'react-icons/fi';
 import { FaWallet } from 'react-icons/fa';
 import { motion } from 'framer-motion';
 import { vendorTheme as themeColors } from '../../../../theme';
@@ -39,6 +39,9 @@ const Dashboard = memo(() => {
     totalEarnings: 0,
     completedJobs: 0,
     rating: 0,
+    performanceScore: 0,
+    level: 1,
+    commissionRate: 0
   });
   const [isOnline, setIsOnline] = useState(false);
   const [isToggling, setIsToggling] = useState(false);
@@ -61,7 +64,8 @@ const Dashboard = memo(() => {
     const html = document.documentElement;
     const body = document.body;
     const root = document.getElementById('root');
-    const bgStyle = themeColors.backgroundGradient;
+    // Using the same premium background as user
+    const bgStyle = '#FFFFFF';
 
     if (html) html.style.background = bgStyle;
     if (body) body.style.background = bgStyle;
@@ -71,7 +75,6 @@ const Dashboard = memo(() => {
       if (html) html.style.background = '';
       if (body) body.style.background = '';
       if (root) root.style.background = '';
-
     };
   }, []);
 
@@ -486,467 +489,269 @@ const Dashboard = memo(() => {
   }
 
   return (
-    <div className="min-h-screen pb-20" style={{ background: themeColors.backgroundGradient }}>
-      <Header title="Dashboard" showBack={false} notificationCount={stats.pendingAlerts} />
+    <div className="min-h-screen pb-20 relative bg-white">
+      {/* Premium Background Pattern */}
+      <div className="fixed inset-0 z-0 pointer-events-none">
+        <div className="absolute inset-0"
+          style={{
+            background: `
+              radial-gradient(at 0% 0%, rgba(var(--brand-teal-rgb), 0.15) 0%, transparent 70%),
+              radial-gradient(at 100% 0%, rgba(var(--brand-yellow-rgb), 0.10) 0%, transparent 70%),
+              radial-gradient(at 100% 100%, rgba(var(--brand-orange-rgb), 0.05) 0%, transparent 75%),
+              radial-gradient(at 0% 100%, rgba(var(--brand-teal-rgb), 0.08) 0%, transparent 70%),
+              #F8FAFC
+            `
+          }}
+        />
+        <div className="absolute inset-0 opacity-[0.03]"
+          style={{
+            backgroundImage: `radial-gradient(var(--brand-teal) 0.8px, transparent 0.8px)`,
+            backgroundSize: '32px 32px'
+          }}
+        />
+      </div>
+
+      <header className="sticky top-0 z-50 backdrop-blur-xl bg-white/40 border-b border-black/[0.03] px-6 py-5 flex items-center justify-between relative z-10">
+        <div className="flex items-center gap-2">
+          <div className="w-10 h-10 bg-white rounded-xl shadow-sm border border-black/[0.02] flex items-center justify-center">
+            <FiBriefcase className="w-5 h-5 text-gray-900" />
+          </div>
+          <h1 className="text-xl font-[1000] text-gray-900 tracking-tight flex items-center gap-1">
+            Vendor<span className="text-teal-600">Hub</span>
+          </h1>
+        </div>
+        <div className="flex items-center gap-3">
+          <motion.div 
+            whileTap={{ scale: 0.9 }}
+            className="w-11 h-11 rounded-2xl bg-white shadow-sm flex items-center justify-center relative border border-black/[0.03]"
+            onClick={() => navigate('/vendor/notifications')}
+          >
+            <FiBell className="w-5 h-5 text-gray-400" />
+            {stats.pendingAlerts > 0 && (
+              <span className="absolute top-3 right-3 w-2 h-2 bg-red-500 rounded-full border-2 border-white" />
+            )}
+          </motion.div>
+          <motion.div 
+            whileTap={{ scale: 0.9 }}
+            className="w-11 h-11 rounded-2xl bg-white shadow-sm overflow-hidden border border-black/[0.03] cursor-pointer"
+            onClick={() => navigate('/vendor/profile')}
+          >
+            {vendorProfile?.photo ? (
+              <img src={vendorProfile.photo} alt="Profile" className="w-full h-full object-cover" />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center bg-gray-50">
+                <FiUser className="w-6 h-6 text-gray-400" />
+              </div>
+            )}
+          </motion.div>
+        </div>
+      </header>
 
       <main className="pt-0">
-        {/* Profile Card Section */}
-        <div className="px-4 pt-4 pb-2">
-          <div
-            className="rounded-2xl p-4 cursor-pointer active:scale-98 transition-all duration-200 relative overflow-hidden"
-            onClick={() => navigate('/vendor/profile')}
-            style={{
-              background: themeColors.button,
-              border: `2px solid ${themeColors.button}`,
-            }}
-          >
-            {/* Decorative Pattern */}
-            <div
-              className="absolute top-0 right-0 w-24 h-24 rounded-full opacity-10"
-              style={{
-                background: `radial-gradient(circle, ${themeColors.button} 0%, transparent 70%)`,
-                transform: 'translate(20px, -20px)',
-              }}
-            />
-
-            <div className="relative z-10 flex items-center gap-3">
-              {/* Profile Photo */}
-              <div
-                className="w-14 h-14 rounded-full flex items-center justify-center flex-shrink-0 overflow-hidden"
-                style={{
-                  background: `linear-gradient(135deg, ${themeColors.button} 0%, ${themeColors.button}dd 100%)`,
-                  border: `2.5px solid #FFFFFF`,
-                }}
-              >
-                {vendorProfile.photo ? (
-                  <img
-                    src={vendorProfile.photo}
-                    alt={vendorProfile.name}
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <FiUser className="w-7 h-7" style={{ color: '#FFFFFF' }} />
-                )}
+        {/* Simplified Status Toggle (Black Theme) */}
+        <div className="px-5 pb-5 pt-2">
+          <div className="bg-white rounded-[24px] p-4 shadow-sm border border-gray-100 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-gray-50 flex items-center justify-center border border-gray-100">
+                <div className={`w-2.5 h-2.5 rounded-full ${isOnline ? 'bg-green-500' : 'bg-gray-300'} animate-pulse`} />
               </div>
-
-              {/* Profile Info */}
-              <div className="flex-1 min-w-0">
-                <p className="text-lg font-bold uppercase tracking-wider mb-0.5" style={{
-                  color: '#FFFFFF',
-                  textShadow: `1px 1px 0px rgba(0, 0, 0, 0.2)`,
-                  letterSpacing: '0.12em',
-                }}>
-                  WELCOME !
+              <div>
+                <h3 className="text-xs font-black text-gray-900">{isOnline ? 'System Online' : 'System Offline'}</h3>
+                <p className="text-[9px] font-bold text-gray-400 uppercase tracking-wider">
+                  {isOnline ? 'Receiving new leads' : 'Unavailable for leads'}
                 </p>
-                <h2 className="text-base font-bold text-white truncate mb-0.5">{vendorProfile.name}</h2>
-                <p className="text-xs text-white truncate font-medium opacity-90">{vendorProfile.businessName}</p>
-                
-                {/* Online/Offline Badge */}
-                <div className="flex items-center gap-1.5 mt-2">
-                  <div className={`w-2 h-2 rounded-full animate-pulse ${isOnline ? 'bg-green-400' : 'bg-gray-400'}`} />
-                  <span className="text-[10px] font-black uppercase tracking-wider text-white">
-                    {isOnline ? 'Active Now' : 'Offline'}
-                  </span>
-                </div>
               </div>
-
-              {/* Online/Offline Toggle Button */}
-              <div className="flex flex-col items-center gap-2 mr-1">
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleToggleOnline();
-                  }}
-                  disabled={isToggling}
-                  className={`relative w-14 h-7 rounded-full transition-all duration-500 flex items-center px-1 shadow-inner ${isOnline ? 'bg-green-500' : 'bg-gray-300'
-                    }`}
-                >
-                  <motion.div
-                    animate={{ x: isOnline ? 28 : 0 }}
-                    transition={{ type: "spring", stiffness: 500, damping: 30 }}
-                    className="w-5 h-5 bg-white rounded-full shadow-md flex items-center justify-center"
-                  >
-                    {isToggling ? (
-                      <div className="w-3 h-3 border-2 border-teal-500 border-t-transparent rounded-full animate-spin" />
-                    ) : (
-                      <div className={`w-1.5 h-1.5 rounded-full ${isOnline ? 'bg-green-500' : 'bg-gray-400'}`} />
-                    )}
-                  </motion.div>
-                </button>
-                <span className="text-[9px] font-bold text-white uppercase tracking-tighter opacity-80">
-                  {isOnline ? 'Go Offline' : 'Go Online'}
-                </span>
-              </div>
-
-              {/* Arrow Icon */}
-              <div
-                className="p-2.5 rounded-lg flex-shrink-0"
-                style={{
-                  background: 'rgba(255, 255, 255, 0.35)',
-                  backdropFilter: 'blur(10px)',
-                  boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)',
-                  border: '1px solid rgba(255, 255, 255, 0.4)',
-                }}
-              >
-                <FiChevronRight className="w-6 h-6" style={{ color: '#FFFFFF', fontWeight: 'bold' }} />
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Vendor Level & Performance Score */}
-        <div className="px-4 pt-4">
-          <div className="bg-white rounded-[24px] p-5 shadow-xl border border-gray-100 relative overflow-hidden">
-            {/* Background Accent */}
-            <div className="absolute top-0 right-0 w-32 h-32 bg-teal-50 rounded-full -mr-16 -mt-16 opacity-50" />
-            
-            <div className="flex items-center justify-between relative z-10">
-              <div className="flex items-center gap-3">
-                <div className={`w-12 h-12 rounded-2xl flex items-center justify-center shadow-lg ${
-                  stats.level === 1 ? 'bg-amber-100' : stats.level === 2 ? 'bg-slate-100' : 'bg-orange-50'
-                }`}>
-                  <span className="text-2xl">
-                    {stats.level === 1 ? '🏆' : stats.level === 2 ? '🥈' : '🥉'}
-                  </span>
-                </div>
-                <div>
-                  <div className="flex items-center gap-2">
-                    <h3 className="text-lg font-black text-gray-900">Level {stats.level}</h3>
-                    <span className="px-2 py-0.5 rounded-md bg-teal-50 text-[10px] font-bold text-teal-600 uppercase tracking-tighter">
-                      {stats.commissionRate}% Commission
-                    </span>
-                  </div>
-                  <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">Vendor Standing</p>
-                </div>
-              </div>
-              
-              <div className="text-right">
-                <p className="text-2xl font-black text-teal-600">{stats.performanceScore}%</p>
-                <p className="text-[10px] font-bold text-gray-400 uppercase">Perf. Score</p>
-              </div>
-            </div>
-
-            {/* Progress Bar */}
-            <div className="mt-4 relative h-2 bg-gray-100 rounded-full overflow-hidden">
-              <motion.div
-                initial={{ width: 0 }}
-                animate={{ width: `${stats.performanceScore}%` }}
-                transition={{ duration: 1, ease: "easeOut" }}
-                className="absolute inset-y-0 left-0 bg-gradient-to-r from-teal-500 to-emerald-400 rounded-full shadow-[0_0_8px_rgba(20,184,166,0.5)]"
-              />
             </div>
             
-            <div className="mt-3 flex justify-between items-center">
-              <p className="text-[10px] font-medium text-gray-500 italic">
-                {stats.level === 1 ? 'You are a Top Professional!' : stats.level === 2 ? 'Almost at the top! Keep it up.' : 'Complete more jobs to level up.'}
-              </p>
-              <span className="text-[10px] font-black text-teal-600 uppercase">Next Level: {stats.performanceScore < 50 ? '50%' : stats.performanceScore < 80 ? '80%' : '100%'}</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Incomplete Profile Prompt */}
-        {(!vendorProfile.service || vendorProfile.service.length === 0) && (
-          <div className="px-4 pt-2 -mb-2">
-            <div
-              onClick={() => navigate('/vendor/profile')}
-              className="bg-orange-50 border-l-4 border-orange-500 p-4 rounded-r shadow-sm cursor-pointer hover:bg-orange-100 transition-colors"
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                handleToggleOnline();
+              }}
+              disabled={isToggling}
+              className={`relative w-14 h-7 rounded-full transition-all duration-500 flex items-center px-1 shadow-inner ${
+                isOnline ? 'bg-black' : 'bg-gray-200'
+              }`}
             >
-              <div className="flex items-center">
-                <div className="flex-shrink-0">
-                  <FiClock className="h-5 w-5 text-orange-500" />
+              <motion.div
+                animate={{ x: isOnline ? 28 : 0 }}
+                transition={{ type: "spring", stiffness: 500, damping: 30 }}
+                className="w-5 h-5 bg-white rounded-full shadow-md flex items-center justify-center"
+              >
+                {isToggling ? (
+                  <div className="w-3 h-3 border-2 border-black border-t-transparent rounded-full animate-spin" />
+                ) : (
+                  <div className={`w-1.5 h-1.5 rounded-full ${isOnline ? 'bg-black' : 'bg-gray-300'}`} />
+                )}
+              </motion.div>
+            </button>
+          </div>
+        </div>
+
+        {/* Premium Performance Card */}
+        <div className="px-5 pb-8 relative z-10">
+          <div 
+            className="rounded-[32px] p-8 shadow-[0_32px_64px_-16px_rgba(13,148,136,0.2)] relative overflow-hidden"
+            style={{ background: 'linear-gradient(135deg, #0D9488 0%, #064E3B 100%)' }}
+          >
+            {/* Ambient Background Glows */}
+            <div className="absolute top-0 right-0 w-48 h-48 bg-teal-400/20 rounded-full blur-[80px] -mr-20 -mt-20" />
+            <div className="absolute bottom-0 left-0 w-32 h-32 bg-emerald-400/10 rounded-full blur-[60px] -ml-10 -mb-10" />
+            
+            <div className="relative z-10 flex items-center justify-between">
+              <div className="flex-1">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="w-2 h-2 rounded-full bg-teal-300 animate-pulse" />
+                  <p className="text-[10px] font-black text-teal-200/60 uppercase tracking-[0.2em]">Live Performance</p>
                 </div>
-                <div className="ml-3">
-                  <p className="text-sm font-bold text-orange-700">Profile Incomplete</p>
-                  <p className="text-sm text-orange-600">
-                    Add services to your profile to start receiving bookings.
-                  </p>
-                </div>
-                <div className="ml-auto">
-                  <FiArrowRight className="h-4 w-4 text-orange-500" />
+                <h3 className="text-white text-2xl font-[1000] leading-tight mb-4">
+                  Keep up the <br />great work!
+                </h3>
+                <motion.button 
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => navigate('/vendor/jobs')}
+                  className="bg-white text-teal-900 px-6 py-3 rounded-2xl text-[11px] font-black uppercase tracking-wider shadow-xl shadow-teal-900/20 active:scale-95 transition-all"
+                >
+                  Manage Tasks
+                </motion.button>
+              </div>
+
+              {/* Enhanced Circular Progress */}
+              <div className="relative w-28 h-28 flex items-center justify-center">
+                <svg className="w-full h-full -rotate-90 filter drop-shadow-[0_0_8px_rgba(255,255,255,0.2)]">
+                  <circle
+                    cx="56"
+                    cy="56"
+                    r="46"
+                    stroke="rgba(255,255,255,0.1)"
+                    strokeWidth="10"
+                    fill="transparent"
+                  />
+                  <circle
+                    cx="56"
+                    cy="56"
+                    r="46"
+                    stroke="#FFFFFF"
+                    strokeWidth="10"
+                    strokeDasharray={2 * Math.PI * 46}
+                    strokeDashoffset={2 * Math.PI * 46 * (1 - stats.performanceScore / 100)}
+                    strokeLinecap="round"
+                    fill="transparent"
+                    className="transition-all duration-1000 ease-out"
+                  />
+                </svg>
+                <div className="absolute inset-0 flex flex-col items-center justify-center">
+                  <span className="text-white text-2xl font-[1000]">{stats.performanceScore}%</span>
                 </div>
               </div>
             </div>
           </div>
-        )}
+        </div>
 
-        {/* Stats Cards - Optimized Component */}
-        <StatsCards stats={stats} />
-
-        {/* Content Section (below gradient) */}
-        <div className="px-4 py-4 space-y-4">
-          {/* Pending Booking Alerts - Optimized Component */}
+        {/* Content Section */}
+        <div className="px-5 space-y-8 relative z-10">
+          {/* Pending Booking Alerts */}
           <PendingBookings
             bookings={pendingBookings}
             maxSearchTimeMins={globalConfig.maxSearchTime}
             setPendingBookings={setPendingBookings}
             setActiveAlertBooking={(booking) => {
-              // Dispatch to global alert via CustomEvent
               window.dispatchEvent(new CustomEvent('showDashboardBookingAlert', { detail: booking }));
             }}
           />
 
-          {/* Performance Metrics */}
-          <div>
-            <h2 className="text-lg font-bold text-gray-800 mb-4">Performance</h2>
-            <div className="grid grid-cols-2 gap-4">
-              {/* Completed Jobs Card */}
-              <div
-                className="rounded-2xl shadow-lg relative overflow-hidden"
-                style={{
-                  background: 'linear-gradient(135deg, #FFFFFF 0%, #F0FDF4 100%)',
-                  boxShadow: '0 8px 24px rgba(16, 185, 129, 0.15), 0 4px 12px rgba(16, 185, 129, 0.1), 0 0 0 2px rgba(16, 185, 129, 0.2)',
-                  border: '2px solid rgba(16, 185, 129, 0.3)',
-                }}
-              >
-                {/* Left border accent */}
-                <div
-                  className="absolute left-0 top-0 bottom-0 w-1.5 rounded-l-2xl"
-                  style={{
-                    background: 'linear-gradient(180deg, #10B981 0%, #059669 100%)',
-                  }}
-                />
-                {/* Top Border with Heading */}
-                <div
-                  className="w-full py-3 px-4 rounded-t-2xl"
-                  style={{
-                    background: 'linear-gradient(135deg, #10B981 0%, #059669 100%)',
-                    boxShadow: '0 2px 8px rgba(16, 185, 129, 0.3)',
-                  }}
-                >
-                  <p className="text-base font-bold text-white text-center">Completed</p>
-                </div>
-                {/* Icon at top left - just below heading */}
-                <div
-                  className="absolute top-14 left-4 p-3 rounded-xl z-10"
-                  style={{
-                    background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.25) 0%, rgba(5, 150, 105, 0.2) 100%)',
-                    boxShadow: '0 4px 12px rgba(16, 185, 129, 0.3), 0 2px 6px rgba(0, 0, 0, 0.2)',
-                    border: '2px solid rgba(16, 185, 129, 0.4)',
-                  }}
-                >
-                  <FiCheckCircle className="w-7 h-7" style={{ color: '#10B981' }} />
-                </div>
-                {/* Content */}
-                <div className="p-5 pt-16">
-                  <p className="text-4xl font-bold mb-2 text-center" style={{ color: '#10B981' }}>
-                    {stats.completedJobs}
-                  </p>
-                  <p className="text-sm text-gray-600 font-semibold text-center">Total jobs</p>
-                </div>
+          {/* Performance Grid */}
+          <div className="grid grid-cols-2 gap-4">
+            <div className="bg-white/60 backdrop-blur-md rounded-[28px] p-5 shadow-sm border border-white/40 flex flex-col items-center text-center">
+              <div className="w-12 h-12 rounded-2xl bg-orange-50 flex items-center justify-center mb-3 text-orange-600">
+                <FiCheckCircle className="w-6 h-6" />
               </div>
-
-              {/* Rating Card */}
-              <div
-                className="rounded-2xl shadow-lg relative overflow-hidden"
-                style={{
-                  background: 'linear-gradient(135deg, #FFFFFF 0%, #FFFBEB 100%)',
-                  boxShadow: '0 8px 24px rgba(245, 158, 11, 0.15), 0 4px 12px rgba(245, 158, 11, 0.1), 0 0 0 2px rgba(245, 158, 11, 0.2)',
-                  border: '2px solid rgba(245, 158, 11, 0.3)',
-                }}
-              >
-                {/* Left border accent */}
-                <div
-                  className="absolute left-0 top-0 bottom-0 w-1.5 rounded-l-2xl"
-                  style={{
-                    background: 'linear-gradient(180deg, #F59E0B 0%, #D97706 100%)',
-                  }}
-                />
-                {/* Top Border with Heading */}
-                <div
-                  className="w-full py-3 px-4 rounded-t-2xl"
-                  style={{
-                    background: 'linear-gradient(135deg, #F59E0B 0%, #D97706 100%)',
-                    boxShadow: '0 2px 8px rgba(245, 158, 11, 0.3)',
-                  }}
-                >
-                  <p className="text-base font-bold text-white text-center">Rating</p>
-                </div>
-                {/* Icon at top left - just below heading */}
-                <div
-                  className="absolute top-14 left-4 p-3 rounded-xl z-10"
-                  style={{
-                    background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.25) 0%, rgba(217, 119, 6, 0.2) 100%)',
-                    boxShadow: '0 4px 12px rgba(245, 158, 11, 0.3), 0 2px 6px rgba(0, 0, 0, 0.2)',
-                    border: '2px solid rgba(245, 158, 11, 0.4)',
-                  }}
-                >
-                  <FiTrendingUp className="w-7 h-7" style={{ color: '#F59E0B' }} />
-                </div>
-                {/* Content */}
-                <div className="p-5 pt-16">
-                  <p className="text-4xl font-bold mb-2 text-center" style={{ color: '#F59E0B' }}>
-                    {stats.rating > 0 ? stats.rating.toFixed(1) : 'N/A'}
-                  </p>
-                  <p className="text-sm text-gray-600 font-semibold text-center">Average rating</p>
-                </div>
+              <p className="text-2xl font-[1000] text-gray-900 tracking-tight">
+                {stats.completedJobs}
+              </p>
+              <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Completed</p>
+            </div>
+            <div className="bg-white/60 backdrop-blur-md rounded-[28px] p-5 shadow-sm border border-white/40 flex flex-col items-center text-center">
+              <div className="w-12 h-12 rounded-2xl bg-blue-50 flex items-center justify-center mb-3 text-blue-600">
+                <FiStar className="w-6 h-6" />
               </div>
+              <p className="text-2xl font-[1000] text-gray-900 tracking-tight">
+                {stats.rating > 0 ? stats.rating.toFixed(1) : 'N/A'}
+              </p>
+              <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Rating</p>
             </div>
           </div>
 
-          {/* Recent Jobs - List View */}
-          <div>
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-bold text-gray-800">Active Jobs</h2>
+          {/* Active Jobs */}
+          <div className="pb-10">
+            <div className="flex items-center justify-between mb-5">
+              <h2 className="text-xl font-[1000] text-gray-900 tracking-tight">Live Jobs</h2>
               {recentJobs.length > 0 && (
                 <button
                   onClick={() => navigate('/vendor/jobs')}
-                  className="px-4 py-2 rounded-lg font-semibold text-sm transition-all duration-300 active:scale-95"
-                  style={{
-                    background: `linear-gradient(135deg, ${themeColors.button} 0%, ${themeColors.button}dd 100%)`,
-                    color: '#FFFFFF',
-                    boxShadow: `0 4px 12px ${hexToRgba(themeColors.button, 0.3)}, 0 2px 6px ${hexToRgba(themeColors.button, 0.2)}`,
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.transform = 'translateY(-2px)';
-                    e.currentTarget.style.boxShadow = `0 6px 16px ${hexToRgba(themeColors.button, 0.4)}, 0 3px 8px ${hexToRgba(themeColors.button, 0.3)}`;
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.transform = 'translateY(0)';
-                    e.currentTarget.style.boxShadow = `0 4px 12px ${hexToRgba(themeColors.button, 0.3)}, 0 2px 6px ${hexToRgba(themeColors.button, 0.2)}`;
-                  }}
+                  className="text-[11px] font-black text-teal-600 uppercase tracking-widest flex items-center gap-1 bg-teal-50 px-3 py-1.5 rounded-full"
                 >
-                  View All
+                  All <FiChevronRight />
                 </button>
               )}
             </div>
             {recentJobs.length > 0 ? (
-              <div className="space-y-3">
-                {recentJobs.map((job, index) => {
-                  // Alternating colors
-                  const isDarkBlue = index % 2 === 0;
-                  const accentColor = isDarkBlue ? '#001947' : '#406788';
+              <div className="space-y-4">
+                {recentJobs.map((job) => (
+                  <motion.div
+                    key={job.id}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={() => navigate(`/vendor/booking/${job.id}`)}
+                    className="bg-white/70 backdrop-blur-md rounded-[32px] p-4 shadow-sm border border-white/60 cursor-pointer hover:shadow-xl hover:shadow-teal-500/5 transition-all duration-300"
+                  >
+                    <div className="flex items-center gap-4">
+                      <div className="w-14 h-14 rounded-2xl bg-gray-50 flex items-center justify-center shrink-0 border border-gray-100/50">
+                        <div className="text-xl">🛠️</div>
+                      </div>
 
-                  return (
-                    <div
-                      key={job.id}
-                      onClick={() => navigate(`/vendor/booking/${job.id}`)}
-                      className="bg-white rounded-xl shadow-lg cursor-pointer active:scale-98 transition-all duration-200 relative overflow-hidden"
-                      style={{
-                        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1), 0 2px 6px rgba(0, 0, 0, 0.08)',
-                        border: '1px solid rgba(0, 0, 0, 0.1)',
-                      }}
-                    >
-                      {/* Left accent border */}
-                      <div
-                        className="absolute left-0 top-0 bottom-0 w-1.5 rounded-l-xl"
-                        style={{
-                          background: `linear-gradient(180deg, ${accentColor} 0%, ${accentColor}dd 100%)`,
-                        }}
-                      />
-
-                      {/* Compact Content - All in one row */}
-                      <div className="px-3 py-2.5">
-                        <div className="flex items-center gap-3">
-                          {/* Profile Image Circle */}
-                          <div
-                            className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 overflow-hidden"
-                            style={{
-                              border: `2.5px solid ${accentColor}40`,
-                              boxShadow: `0 2px 8px ${hexToRgba(accentColor, 0.25)}, inset 0 1px 0 rgba(255, 255, 255, 0.4)`,
-                              background: `linear-gradient(135deg, ${accentColor}20 0%, ${accentColor}10 100%)`,
-                            }}
-                          >
-                            <FiUser className="w-5 h-5" style={{ color: accentColor }} />
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center justify-between mb-1">
+                          <h4 className="text-[15px] font-[1000] text-gray-900 truncate">
+                            {job.customerName}
+                          </h4>
+                          <span className="text-sm font-black text-teal-600 bg-teal-50 px-2 py-0.5 rounded-lg">
+                            ₹{job.price}
+                          </span>
+                        </div>
+                        <p className="text-xs font-bold text-gray-500 mb-3">
+                          {job.serviceType}
+                        </p>
+                        
+                        <div className="flex flex-wrap items-center gap-4">
+                          <div className="flex items-center gap-1.5 text-[10px] font-black text-gray-400 uppercase tracking-tight">
+                            <FiMapPin className="w-3.5 h-3.5" />
+                            <span className="truncate max-w-[100px]">{job.location}</span>
                           </div>
-
-                          {/* Main Content */}
-                          <div className="flex-1 min-w-0">
-                            {/* Name and Service in one line */}
-                            <div className="flex items-center gap-2 mb-1.5">
-                              <p className="text-sm font-bold text-gray-800 truncate">{job.customerName}</p>
-                              <span
-                                className="text-xs font-bold px-2 py-0.5 rounded-lg flex-shrink-0"
-                                style={{
-                                  background: `linear-gradient(135deg, ${accentColor} 0%, ${accentColor}dd 100%)`,
-                                  color: '#FFFFFF',
-                                  boxShadow: `0 2px 5px ${hexToRgba(accentColor, 0.3)}`,
-                                }}
-                              >
-                                {job.serviceType || 'Service'}
-                              </span>
-                            </div>
-
-                            {/* Address, Time, Status in one line */}
-                            <div className="flex items-center gap-2 flex-wrap">
-                              <div
-                                className="flex items-center gap-1 px-2 py-0.5 rounded"
-                                style={{
-                                  background: 'rgba(0, 166, 166, 0.1)',
-                                  border: '1px solid rgba(0, 166, 166, 0.2)',
-                                }}
-                              >
-                                <FiMapPin className="w-3 h-3" style={{ color: themeColors.button }} />
-                                <span className="text-xs font-semibold text-gray-700 truncate max-w-[100px]">{job.location}</span>
-                              </div>
-                              <div
-                                className="flex items-center gap-1 px-2 py-0.5 rounded"
-                                style={{
-                                  background: 'rgba(245, 158, 11, 0.1)',
-                                  border: '1px solid rgba(245, 158, 11, 0.2)',
-                                }}
-                              >
-                                <FiClock className="w-3 h-3" style={{ color: '#F59E0B' }} />
-                                <span className="text-xs font-semibold text-gray-700">{job.time}</span>
-                              </div>
-                              <span
-                                className="text-xs font-bold px-2 py-0.5 rounded-full"
-                                style={{
-                                  background: `${accentColor}15`,
-                                  color: accentColor,
-                                  border: `1px solid ${accentColor}30`,
-                                }}
-                              >
-                                {getStatusLabel(job.status)}
-                              </span>
-                            </div>
+                          <div className="flex items-center gap-1.5 text-[10px] font-black text-gray-400 uppercase tracking-tight">
+                            <FiClock className="w-3.5 h-3.5" />
+                            <span>{job.timeSlot.time}</span>
                           </div>
-
-                          {/* Navigate Button */}
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              navigate(`/vendor/booking/${job.id}`);
-                            }}
-                            className="p-2 rounded-lg flex-shrink-0 transition-all duration-300 active:scale-95"
-                            style={{
-                              background: `linear-gradient(135deg, ${accentColor} 0%, ${accentColor}dd 100%)`,
-                              boxShadow: `0 3px 10px ${hexToRgba(accentColor, 0.3)}, 0 2px 5px ${hexToRgba(accentColor, 0.2)}`,
-                            }}
-                            onMouseEnter={(e) => {
-                              e.currentTarget.style.transform = 'scale(1.1)';
-                              e.currentTarget.style.boxShadow = `0 5px 14px ${hexToRgba(accentColor, 0.4)}, 0 3px 7px ${hexToRgba(accentColor, 0.3)}`;
-                            }}
-                            onMouseLeave={(e) => {
-                              e.currentTarget.style.transform = 'scale(1)';
-                              e.currentTarget.style.boxShadow = `0 3px 10px ${hexToRgba(accentColor, 0.3)}, 0 2px 5px ${hexToRgba(accentColor, 0.2)}`;
-                            }}
-                          >
-                            <FiArrowRight className="w-4 h-4" style={{ color: '#FFFFFF' }} />
-                          </button>
+                          <div className="ml-auto px-2.5 py-1 bg-gray-900 text-white rounded-full text-[8px] font-black uppercase tracking-widest">
+                            {getStatusLabel(job.status)}
+                          </div>
                         </div>
                       </div>
                     </div>
-                  );
-                })}
+                  </motion.div>
+                ))}
               </div>
             ) : (
-              <div
-                className="bg-white rounded-xl p-6 shadow-md text-center"
-                style={{
-                  boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
-                  border: '1px solid rgba(0, 0, 0, 0.08)',
-                }}
-              >
-                <FiBriefcase className="w-12 h-12 mx-auto mb-3" style={{ color: '#D1D5DB' }} />
-                <p className="text-sm text-gray-600 mb-1">No active jobs</p>
-                <p className="text-xs text-gray-500">New bookings will appear here</p>
+              <div className="bg-white/40 backdrop-blur-md rounded-[32px] p-12 shadow-sm border border-white/40 text-center">
+                <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6 text-3xl">
+                  📭
+                </div>
+                <h3 className="text-lg font-black text-gray-900 mb-2">No active jobs</h3>
+                <p className="text-sm text-gray-500 font-medium">New bookings will appear here instantly.</p>
               </div>
             )}
           </div>
         </div>
       </main>
-
     </div>
   );
 });

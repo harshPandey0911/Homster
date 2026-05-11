@@ -36,10 +36,11 @@ const userTheme = {
 const vendorTheme = {
   backgroundGradient: 'var(--bg-gradient)',
   gradient: brand.gradient,
-  headerGradient: brand.teal,
-  button: brand.teal,
-  primary: brand.teal,
-  icon: brand.teal,
+  headerGradient: '#000000',
+  accentGradient: 'linear-gradient(135deg, #1A3C43 0%, #102A30 100%)',
+  button: '#000000',
+  primary: '#000000',
+  icon: '#000000',
   brand: brand
 };
 

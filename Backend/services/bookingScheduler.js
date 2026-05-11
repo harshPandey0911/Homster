@@ -23,13 +23,13 @@ const Settings = require('../models/Settings');
 
 // Wave configuration
 let WAVE_CONFIG = {
-  1: { count: 3, duration: 60000 },
-  2: { count: 3, duration: 60000 },
-  3: { count: 4, duration: 60000 },
+  1: { count: 3, duration: 20000 },
+  2: { count: 3, duration: 20000 },
+  3: { count: 4, duration: 20000 },
   4: { count: Infinity, duration: 0 }
 };
 
-let MAX_SEARCH_TIME_MS = 5 * 60 * 1000; // 5 mins fallback
+let MAX_SEARCH_TIME_MS = 1 * 60 * 1000; // 1 minute fallback
 
 const ACTIVE_INTERVAL_MS = 5000;  // Poll every 5s when bookings exist
 const IDLE_INTERVAL_MS = 30000;   // Poll every 30s when no active bookings (circuit breaker)
@@ -93,14 +93,15 @@ class BookingScheduler {
       try {
         const globalSettings = await Settings.findOne({ type: 'global' }).lean();
         if (globalSettings) {
-          const waveDur = (globalSettings.waveDuration || 60) * 1000;
+          // Force 20s per wave for a total of 60s search time (3 waves)
+          const waveDur = 20 * 1000; 
           WAVE_CONFIG = {
             1: { count: 3, duration: waveDur },
             2: { count: 3, duration: waveDur },
             3: { count: 4, duration: waveDur },
             4: { count: Infinity, duration: 0 }
           };
-          MAX_SEARCH_TIME_MS = (globalSettings.maxSearchTime || 5) * 60 * 1000;
+          MAX_SEARCH_TIME_MS = 1 * 60 * 1000; // Strictly 1 minute
         }
       } catch (sErr) {
         console.error('[BookingScheduler] Settings fetch error:', sErr);

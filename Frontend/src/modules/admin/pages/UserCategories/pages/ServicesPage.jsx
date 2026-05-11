@@ -16,7 +16,10 @@ const serviceSchema = z.object({
   categoryId: z.string().min(1, "Category is required")
 });
 
-const ServicesPage = ({ catalog, setCatalog, selectedCity }) => {
+import { useOutletContext } from "react-router-dom";
+
+const ServicesPage = () => {
+  const { catalog, setCatalog } = useOutletContext();
   const [fetching, setFetching] = useState(false);
   const servicesData = catalog.services || []; // Brands
   const categories = catalog.categories || [];
@@ -76,7 +79,6 @@ const ServicesPage = ({ catalog, setCatalog, selectedCity }) => {
         }
 
         const params = { status: 'active' };
-        if (selectedCity) params.cityId = selectedCity;
 
         const [servicesRes, categoriesRes] = await Promise.all([
           brandService.getAll(params),
@@ -155,7 +157,7 @@ const ServicesPage = ({ catalog, setCatalog, selectedCity }) => {
 
     fetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedCity]); // Only re-fetch when city changes
+  }, []); // Only re-fetch on mount
 
   // Auto-select first brand
   useEffect(() => {

@@ -54,11 +54,11 @@ const BottomNav = React.memo(() => {
   ], []);
 
   const getActiveTab = () => {
-    if (location.pathname === '/user' || location.pathname === '/user/') return 'home';
-    if (location.pathname === '/user/my-bookings') return 'bookings';
-    if (location.pathname === '/user/shop') return 'scrap';
-    if (location.pathname === '/user/cart') return 'cart';
-    if (location.pathname === '/user/account') return 'account';
+    const path = location.pathname;
+    if (path === '/user' || path === '/user/' || path.startsWith('/user/category/')) return 'home';
+    if (path.startsWith('/user/my-bookings')) return 'bookings';
+    if (path.startsWith('/user/cart')) return 'cart';
+    if (path.startsWith('/user/account') || path.startsWith('/user/profile')) return 'account';
     return 'home';
   };
 
@@ -70,20 +70,34 @@ const BottomNav = React.memo(() => {
 
   // Update indicator position when active tab changes
   useEffect(() => {
-    if (navRef.current) {
-      const buttons = navRef.current.querySelectorAll('button');
-      if (buttons[activeIndex]) {
-        const button = buttons[activeIndex];
-        const navRect = navRef.current.getBoundingClientRect();
-        const buttonRect = button.getBoundingClientRect();
+    const updateIndicator = () => {
+      if (navRef.current) {
+        const buttons = navRef.current.querySelectorAll('button');
+        if (buttons[activeIndex]) {
+          const button = buttons[activeIndex];
+          const navRect = navRef.current.getBoundingClientRect();
+          const buttonRect = button.getBoundingClientRect();
 
-        setIndicatorStyle({
-          left: buttonRect.left - navRect.left + (buttonRect.width / 2) - 16, // Center the 32px indicator
-          width: 32
-        });
+          setIndicatorStyle({
+            left: buttonRect.left - navRect.left + (buttonRect.width / 2) - 16, // Center the 32px indicator
+            width: 32
+          });
+        }
       }
-    }
-  }, [activeIndex, activeTab]);
+    };
+
+    // Run immediately
+    updateIndicator();
+
+    // Run after a short delay to account for layout shifts
+    const timer = setTimeout(updateIndicator, 100);
+    
+    window.addEventListener('resize', updateIndicator);
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener('resize', updateIndicator);
+    };
+  }, [activeIndex, activeTab, cartCount]); // Added cartCount as it might change layout
 
   const handleTabClick = (path) => {
     navigate(path);

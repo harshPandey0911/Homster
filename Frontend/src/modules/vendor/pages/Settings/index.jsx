@@ -5,7 +5,6 @@ import { toast } from 'react-hot-toast';
 import { vendorTheme as themeColors } from '../../../../theme';
 import { vendorAuthService } from '../../../../services/authService';
 import { registerFCMToken, removeFCMToken } from '../../../../services/pushNotificationService';
-import Header from '../../components/layout/Header';
 import BottomNav from '../../components/layout/BottomNav';
 
 const Settings = () => {
@@ -113,116 +112,102 @@ const Settings = () => {
   };
 
   return (
-    <div className="min-h-screen pb-20" style={{ background: themeColors.backgroundGradient }}>
-      <Header title="Settings" />
+    <div className="min-h-screen pb-20" style={{ background: '#FFFFFF' }}>
+      <header className="px-6 py-5 flex items-center justify-between bg-transparent">
+        <h1 className="text-xl font-black text-gray-900">Settings</h1>
+        <div className="w-10 h-10 rounded-2xl bg-white shadow-sm flex items-center justify-center border border-gray-100">
+          <FiBell className="w-5 h-5 text-black" />
+        </div>
+      </header>
 
-      <main className="px-4 py-6">
-        {/* Notification Settings */}
-        <div
-          className="bg-white rounded-xl p-4 mb-6 shadow-md"
-          style={{
-            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
-          }}
-        >
-          <h3 className="font-bold text-gray-800 mb-4">Notifications</h3>
+      <main className="px-5">
+        {/* Notification Settings (Black Theme) */}
+        <div className="bg-white rounded-[32px] p-6 mb-6 shadow-sm border border-gray-100">
+          <h3 className="text-xs font-black text-gray-900 uppercase tracking-widest mb-5">Notifications</h3>
 
-          <div className="space-y-4">
+          <div className="space-y-5">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <FiBell className="w-5 h-5" style={{ color: themeColors.icon }} />
+                <div className="w-10 h-10 rounded-2xl bg-gray-50 flex items-center justify-center">
+                  <FiBell className="w-5 h-5 text-black" />
+                </div>
                 <div>
-                  <p className="font-semibold text-gray-800">Push Notifications</p>
-                  <p className="text-sm text-gray-600">Receive booking alerts</p>
+                  <p className="font-black text-sm text-gray-900">Push Notifications</p>
+                  <p className="text-[10px] font-bold text-gray-400">Receive booking alerts</p>
                 </div>
               </div>
               <button
                 onClick={() => handleToggle('notifications')}
-                className={`relative w-12 h-6 rounded-full transition-colors ${settings.notifications ? 'bg-green-500' : 'bg-gray-300'
-                  }`}
+                className={`relative w-12 h-6 rounded-full transition-colors ${settings.notifications ? 'bg-black' : 'bg-gray-200'}`}
               >
                 <span
-                  className={`absolute top-1 left-1 w-4 h-4 bg-white rounded-full transition-transform ${settings.notifications ? 'transform translate-x-6' : ''
-                    }`}
+                  className={`absolute top-1 left-1 w-4 h-4 bg-white rounded-full shadow-sm transition-transform ${settings.notifications ? 'translate-x-6' : ''}`}
                 />
               </button>
             </div>
 
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <FiVolume2 className="w-5 h-5" style={{ color: themeColors.icon }} />
+                <div className="w-10 h-10 rounded-2xl bg-gray-50 flex items-center justify-center">
+                  <FiVolume2 className="w-5 h-5 text-black" />
+                </div>
                 <div>
-                  <p className="font-semibold text-gray-800">Sound Alerts</p>
-                  <p className="text-sm text-gray-600">Play sound for new bookings</p>
+                  <p className="font-black text-sm text-gray-900">Sound Alerts</p>
+                  <p className="text-[10px] font-bold text-gray-400">Play sound for new bookings</p>
                 </div>
               </div>
               <button
                 onClick={() => handleToggle('soundAlerts')}
-                className={`relative w-12 h-6 rounded-full transition-colors ${settings.soundAlerts ? 'bg-green-500' : 'bg-gray-300'
-                  }`}
+                className={`relative w-12 h-6 rounded-full transition-colors ${settings.soundAlerts ? 'bg-black' : 'bg-gray-200'}`}
               >
                 <span
-                  className={`absolute top-1 left-1 w-4 h-4 bg-white rounded-full transition-transform ${settings.soundAlerts ? 'transform translate-x-6' : ''
-                    }`}
+                  className={`absolute top-1 left-1 w-4 h-4 bg-white rounded-full shadow-sm transition-transform ${settings.soundAlerts ? 'translate-x-6' : ''}`}
                 />
               </button>
             </div>
           </div>
         </div>
 
-        {/* Address Management */}
-        <div
-          className="bg-white rounded-xl p-4 mb-6 shadow-md cursor-pointer hover:shadow-lg transition-shadow"
-          style={{
-            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
-          }}
-          onClick={() => navigate('/vendor/address-management')}
-        >
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <FiMapPin className="w-5 h-5" style={{ color: themeColors.icon }} />
-              <div>
-                <p className="font-semibold text-gray-800">Manage Address</p>
-                <p className="text-sm text-gray-600">Set your business location</p>
+        <div className="space-y-4 mb-6">
+          <button
+            onClick={() => navigate('/vendor/address-management')}
+            className="w-full bg-white rounded-[28px] p-5 shadow-sm border border-gray-100 flex items-center justify-between active:scale-98 transition-all"
+          >
+            <div className="flex items-center gap-4">
+              <div className="w-10 h-10 rounded-2xl bg-gray-50 flex items-center justify-center">
+                <FiMapPin className="w-5 h-5 text-black" />
+              </div>
+              <div className="text-left">
+                <p className="font-black text-sm text-gray-900">Manage Address</p>
+                <p className="text-[10px] font-bold text-gray-400">Set your business location</p>
               </div>
             </div>
-            <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-            </svg>
-          </div>
-        </div>
+            <svg className="w-5 h-5 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
+          </button>
 
-        {/* Helpdesk & Support */}
-        <div
-          className="bg-white rounded-xl p-4 mb-6 shadow-md cursor-pointer hover:shadow-lg transition-shadow border-l-4 border-blue-500"
-          style={{
-            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
-          }}
-          onClick={() => navigate('/vendor/support')}
-        >
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <FiInfo className="w-5 h-5 text-blue-500" />
-              <div>
-                <p className="font-semibold text-gray-800">Helpdesk & Support</p>
-                <p className="text-sm text-gray-600">Raise a ticket or view status</p>
+          <button
+            onClick={() => navigate('/vendor/support')}
+            className="w-full bg-white rounded-[28px] p-5 shadow-sm border border-gray-100 flex items-center justify-between active:scale-98 transition-all"
+          >
+            <div className="flex items-center gap-4">
+              <div className="w-10 h-10 rounded-2xl bg-gray-50 flex items-center justify-center text-black">
+                <FiInfo className="w-5 h-5" />
+              </div>
+              <div className="text-left">
+                <p className="font-black text-sm text-gray-900">Helpdesk & Support</p>
+                <p className="text-[10px] font-bold text-gray-400">Raise a ticket or view status</p>
               </div>
             </div>
-            <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-            </svg>
-          </div>
+            <svg className="w-5 h-5 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
+          </button>
         </div>
 
-        {/* Language Settings */}
-        <div
-          className="bg-white rounded-xl p-4 mb-6 shadow-md"
-          style={{
-            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
-          }}
-        >
+        <div className="bg-white rounded-[32px] p-6 mb-6 shadow-sm border border-gray-100">
           <div className="flex items-center gap-3 mb-4">
-            <FiGlobe className="w-5 h-5" style={{ color: themeColors.icon }} />
-            <h3 className="font-bold text-gray-800">Language</h3>
+            <div className="w-10 h-10 rounded-2xl bg-gray-50 flex items-center justify-center">
+              <FiGlobe className="w-5 h-5 text-black" />
+            </div>
+            <h3 className="font-black text-sm text-gray-900 uppercase tracking-wider">Language</h3>
           </div>
 
           <div className="space-y-2">
@@ -233,18 +218,11 @@ const Settings = () => {
               <button
                 key={lang.code}
                 onClick={() => handleLanguageChange(lang.code)}
-                className={`w-full py-3 px-4 rounded-lg text-left transition-all ${settings.language === lang.code
-                  ? 'text-white'
-                  : 'bg-gray-50 text-gray-700'
-                  }`}
-                style={
+                className={`w-full py-3 px-4 rounded-2xl text-left font-black text-sm transition-all ${
                   settings.language === lang.code
-                    ? {
-                      background: themeColors.button,
-                      boxShadow: `0 2px 8px ${themeColors.button}40`,
-                    }
-                    : {}
-                }
+                    ? 'bg-black text-white shadow-lg shadow-gray-200'
+                    : 'bg-gray-50 text-gray-500'
+                }`}
               >
                 {lang.name}
               </button>
@@ -252,53 +230,33 @@ const Settings = () => {
           </div>
         </div>
 
-        {/* About */}
-        <div
-          className="bg-white rounded-xl p-4 mb-6 shadow-md"
-          style={{
-            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
-          }}
-        >
-          <div className="flex items-center gap-3 mb-4">
-            <FiInfo className="w-5 h-5" style={{ color: themeColors.icon }} />
-            <h3 className="font-bold text-gray-800">About</h3>
+        <div className="bg-white rounded-[32px] p-5 mb-6 shadow-sm border border-gray-100">
+          <div className="flex items-center gap-3 mb-2">
+            <div className="w-10 h-10 rounded-2xl bg-gray-50 flex items-center justify-center">
+              <FiInfo className="w-5 h-5 text-black" />
+            </div>
+            <h3 className="font-black text-sm text-gray-900 uppercase tracking-wider">About</h3>
           </div>
-
-          <div className="space-y-3">
-            <p className="text-sm text-gray-600">App Version: 1.0.0</p>
-            <p className="text-sm text-gray-600">Vendor App</p>
-          </div>
+          <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest pl-14">Version 1.0.0 · Vendor App</p>
         </div>
 
-        {/* Logout */}
-        <button
-          type="button"
-          onClick={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            handleLogout();
-          }}
-          className="w-full py-4 rounded-xl font-semibold text-white mb-4 flex items-center justify-center gap-2 transition-all active:scale-95"
-          style={{
-            background: themeColors.button,
-            boxShadow: `0 4px 12px ${themeColors.button}40`,
-            cursor: 'pointer'
-          }}
-        >
-          <FiLogOut className="w-5 h-5" />
-          Logout
-        </button>
+        <div className="space-y-4 mb-10">
+          <button
+            onClick={handleLogout}
+            className="w-full py-5 rounded-[28px] bg-black text-white font-black text-sm shadow-lg shadow-gray-400 flex items-center justify-center gap-2 active:scale-95 transition-all"
+          >
+            <FiLogOut className="w-5 h-5" />
+            LOGOUT
+          </button>
 
-        {/* Delete Account */}
-        <button
-          onClick={handleDeleteAccount}
-          className="w-full py-4 rounded-xl font-semibold text-red-600 border-2 border-red-600 transition-all active:scale-95"
-        >
-          <div className="flex items-center justify-center gap-2">
+          <button
+            onClick={handleDeleteAccount}
+            className="w-full py-5 rounded-[28px] bg-red-50 border border-red-100 text-red-500 font-black text-sm flex items-center justify-center gap-2 active:scale-95 transition-all"
+          >
             <FiTrash2 className="w-5 h-5" />
-            Delete Account
-          </div>
-        </button>
+            DELETE ACCOUNT
+          </button>
+        </div>
       </main>
 
       <BottomNav />

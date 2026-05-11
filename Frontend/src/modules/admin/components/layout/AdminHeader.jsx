@@ -70,7 +70,9 @@ const AdminHeader = ({ onMenuClick }) => {
       { path: '/admin/scrap', title: 'Scrap Orders', description: 'Manage platform scrap collection orders' },
     ];
 
-    const match = mappings.find(m => pathname === m.path || pathname.startsWith(m.path + '/'));
+    const match = mappings
+      .sort((a, b) => b.path.length - a.path.length) // Match longest/most specific path first
+      .find(m => pathname === m.path || pathname.startsWith(m.path + '/'));
 
     if (match) return match;
 

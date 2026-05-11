@@ -65,109 +65,83 @@ const PendingJobCard = ({ booking, onAccept, onReject, onClick, loadingAction, s
   return (
     <div
       onClick={onClick}
-      className="bg-white rounded-xl shadow-md cursor-pointer active:scale-98 transition-transform border-l-4 overflow-hidden"
-      style={{
-        boxShadow: '0 4px 12px rgba(245, 158, 11, 0.15)',
-        borderLeftColor: '#F59E0B',
-        borderTop: '1px solid rgba(245, 158, 11, 0.2)',
-        borderRight: '1px solid rgba(245, 158, 11, 0.2)',
-        borderBottom: '1px solid rgba(245, 158, 11, 0.2)',
-      }}
+      className="bg-white rounded-[32px] shadow-sm cursor-pointer active:scale-98 transition-all duration-300 border border-gray-100 overflow-hidden"
     >
       {/* Urgency header */}
       {showTimer && (
-        <div className="px-4 py-2 bg-yellow-50 border-b border-yellow-100 flex justify-between items-center">
-          <span className={`text-[10px] font-bold uppercase tracking-wide flex items-center gap-1 ${booking.bookingType === 'instant' ? 'text-red-500 animate-pulse' : 'text-gray-500'}`}>
-            {booking.bookingType === 'instant' && <span className="text-sm">⚡</span>}
-            {booking.bookingType === 'instant' ? 'INSTANT' : 'NEW REQUEST'}
+        <div className="px-5 py-2 bg-gray-50 border-b border-gray-100 flex justify-between items-center">
+          <span className={`text-[10px] font-black uppercase tracking-[0.1em] flex items-center gap-1.5 ${booking.bookingType === 'instant' ? 'text-black animate-pulse' : 'text-gray-400'}`}>
+            {booking.bookingType === 'instant' ? '⚡ INSTANT BOOKING' : 'NEW REQUEST'}
           </span>
           <CountdownTimer
             durationSeconds={maxSearchTimeMins * 60}
             createdAt={booking.createdAt}
             expiresAt={booking.expiresAt}
             onExpire={() => {
-              // Locally remove from state if it expires
               window.dispatchEvent(new CustomEvent('removeVendorBooking', { detail: { id: bookingId } }));
             }}
           />
         </div>
       )}
 
-      <div className="p-4">
-        <div className="flex items-start justify-between mb-2 gap-2">
+      <div className="p-5">
+        <div className="flex items-start justify-between mb-4 gap-4">
           <div className="flex-1 min-w-0">
-            <p className="text-[10px] uppercase font-bold text-gray-400 tracking-wider mb-0.5">
-              {booking.serviceCategory || (booking.serviceId?.category?.title) || (booking.categoryName) || 'General Service'}
-            </p>
-            <div className="flex items-start gap-2 mb-1">
-              <p className="font-bold text-gray-800 text-sm leading-tight line-clamp-2">
-                {booking.serviceName || booking.serviceType || booking.serviceId?.title || 'New Booking Request'}
-              </p>
-              <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-md bg-yellow-100 text-yellow-600 uppercase tracking-widest shrink-0 mt-0.5">
-                REQ
+            <div className="flex items-center gap-2 mb-1">
+              <span className="text-[9px] font-black px-1.5 py-0.5 rounded bg-black text-white uppercase tracking-widest">
+                {booking.serviceCategory || 'Service'}
+              </span>
+              <span className="text-[10px] font-bold text-gray-400">•</span>
+              <span className="text-[10px] font-bold text-gray-400 truncate max-w-[100px]">
+                {booking.customerName || 'Customer'}
               </span>
             </div>
-            {booking.brandName && (
-              <div className="flex items-center gap-1.5 mb-1.5 bg-gray-50 border border-gray-100 px-1.5 py-0.5 rounded-md w-fit">
-                {booking.brandIcon && (
-                  <img src={booking.brandIcon} alt={booking.brandName} className="w-3 h-3 object-contain" />
-                )}
-                <span className="text-[10px] font-bold text-gray-700 uppercase tracking-wide">{booking.brandName}</span>
-              </div>
-            )}
-            <p className="text-xs text-gray-500 font-medium line-clamp-1">
-              {booking.customerName || booking.userId?.name || 'Customer'} • {booking.location?.address || booking.address?.addressLine1 || 'Location'}
-            </p>
+            
+            <h3 className="font-black text-gray-900 text-base leading-tight mb-2 line-clamp-1">
+              {booking.serviceName || 'New Request'}
+            </h3>
+
+            <div className="flex items-center gap-2 text-[11px] font-bold text-gray-500">
+              <FiMapPin className="w-3.5 h-3.5 text-gray-400" />
+              <span className="truncate">{booking.location?.address || 'Location N/A'}</span>
+            </div>
           </div>
-          <div className="flex flex-col items-center shrink-0">
-            {booking.categoryIcon || booking.serviceId?.category?.icon ? (
-              <div className="w-10 h-10 rounded-xl bg-gray-50 border border-gray-100 overflow-hidden shadow-sm flex items-center justify-center p-0.5">
-                <img src={booking.categoryIcon || booking.serviceId?.category?.icon} className="max-w-full max-h-full object-contain" alt="Category" />
-              </div>
-            ) : (
-              <div className="w-10 h-10 rounded-xl bg-gray-50 border border-gray-100 flex items-center justify-center">
-                <FiBell className="w-5 h-5 animate-pulse" style={{ color: '#F59E0B' }} />
-              </div>
-            )}
+
+          <div className="w-14 h-14 rounded-2xl bg-gray-50 flex items-center justify-center shrink-0 border border-gray-100 relative">
+            <FiBell className="w-6 h-6 text-black" />
+            <div className="absolute -top-1 -right-1 w-3 h-3 bg-black rounded-full border-2 border-white animate-bounce" />
           </div>
         </div>
-        <div className="flex items-center justify-between mt-3">
-          <div className="flex items-center gap-1 text-xs text-gray-500">
-            <FiClock className="w-4 h-4" />
-            <span>
-              {booking.timeSlot?.date || (booking.scheduledDate ? new Date(booking.scheduledDate).toLocaleDateString() : '')}
-              {(booking.timeSlot?.date || booking.scheduledDate) ? ' • ' : ''}
-              {booking.timeSlot?.time || booking.scheduledTime || 'N/A'}
+
+        <div className="flex items-center justify-between mb-5 px-1">
+          <div className="flex items-center gap-1.5">
+            <div className="w-7 h-7 rounded-lg bg-gray-50 flex items-center justify-center">
+              <FiClock className="w-3.5 h-3.5 text-gray-400" />
+            </div>
+            <span className="text-[11px] font-black text-gray-700">
+              {booking.timeSlot?.time || 'ASAP'}
             </span>
           </div>
-          <div className="flex items-center gap-1 text-xs text-gray-500">
-            <FiMapPin className="w-4 h-4" />
-            <span>
-              {(() => {
-                const dist = booking.location?.distance || booking.distance;
-                if (!dist || dist === 'N/A') return 'N/A';
-                return String(dist).includes('km') ? dist : `${dist} km`;
-              })()}
-            </span>
-          </div>
-          <div className="text-sm font-bold text-gray-800">
-            ₹{booking.price || booking.vendorEarnings || booking.finalAmount || 0}
+          
+          <div className="text-xl font-black text-gray-900">
+            ₹{booking.price || 0}
           </div>
         </div>
-        <div className="flex gap-2 mt-3">
+
+        <div className="flex gap-3">
           <button
             disabled={!!loadingAction}
             onClick={(e) => onAccept(e, booking)}
-            className="flex-1 bg-green-500 text-white py-2 px-3 rounded-lg text-sm font-medium hover:bg-green-600 transition-colors disabled:opacity-50"
+            className="flex-[2] bg-black text-white py-3 px-4 rounded-2xl text-sm font-black shadow-lg shadow-gray-200 hover:bg-gray-900 transition-all active:scale-95 disabled:opacity-50"
           >
-            {loadingAction === 'accept' ? 'Accepting...' : 'Accept'}
+            {loadingAction === 'accept' ? 'ACCEPTING...' : 'ACCEPT NOW'}
           </button>
           <button
             disabled={!!loadingAction}
             onClick={(e) => onReject(e, booking)}
-            className="flex-1 bg-red-500 text-white py-2 px-3 rounded-lg text-sm font-medium hover:bg-red-600 transition-colors disabled:opacity-50"
+            className="flex-1 bg-gray-50 text-gray-400 py-3 px-4 rounded-2xl text-sm font-bold hover:bg-gray-100 transition-all active:scale-95 disabled:opacity-50"
           >
-            {loadingAction === 'reject' ? 'Rejecting...' : 'Reject'}
+            {loadingAction === 'reject' ? '...' : 'SKIP'}
           </button>
         </div>
       </div>
