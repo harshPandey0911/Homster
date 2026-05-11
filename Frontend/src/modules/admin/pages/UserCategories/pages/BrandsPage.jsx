@@ -16,7 +16,10 @@ const brandSchema = z.object({
   badge: z.string().optional(),
 });
 
-const BrandsPage = ({ catalog, setCatalog, selectedCity }) => {
+import { useOutletContext } from "react-router-dom";
+
+const BrandsPage = () => {
+  const { catalog, setCatalog } = useOutletContext();
   const [loading, setLoading] = useState(false);
   const [fetching, setFetching] = useState(true);
 
@@ -78,7 +81,6 @@ const BrandsPage = ({ catalog, setCatalog, selectedCity }) => {
       }
 
       const params = { status: 'active' };
-      if (selectedCity) params.cityId = selectedCity;
 
       // Fetch ALL categories for reliable resolution, but filtered services
       const [servicesRes, categoriesRes] = await Promise.all([
@@ -144,15 +146,14 @@ const BrandsPage = ({ catalog, setCatalog, selectedCity }) => {
   useEffect(() => {
     refreshData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedCity]);
+  }, []);
 
-  // Load form data when editing or changing city
+  // Load form data when editing
   useEffect(() => {
     if (!editingId) {
-      // In create mode, if selectedCity changes, update cityIds but preserve other fields
       setForm(prev => ({
         ...prev,
-        cityIds: selectedCity ? [selectedCity] : [],
+        cityIds: [],
       }));
       return;
     }
@@ -165,7 +166,7 @@ const BrandsPage = ({ catalog, setCatalog, selectedCity }) => {
       categoryIds: service.categoryIds || (service.categoryId ? [service.categoryId] : []),
       cityIds: service.cityIds || [],
     });
-  }, [editingId, services, selectedCity]);
+  }, [editingId, services]);
 
   const reset = () => {
     setEditingId(null);
@@ -174,7 +175,7 @@ const BrandsPage = ({ catalog, setCatalog, selectedCity }) => {
       iconUrl: "",
       badge: "",
       categoryIds: [],
-      cityIds: selectedCity ? [selectedCity] : [],
+      cityIds: [],
     });
     setIsModalOpen(false);
   };

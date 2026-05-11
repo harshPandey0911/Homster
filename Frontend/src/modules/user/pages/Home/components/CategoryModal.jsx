@@ -22,10 +22,10 @@ const CategoryModal = React.memo(({ isOpen, onClose, category, location, cartCou
   const [isClosing, setIsClosing] = useState(false);
   const [isRedirecting, setIsRedirecting] = useState(false);
 
-  const [view, setView] = useState('brands'); // 'brands' | 'services'
+  const [view, setView] = useState('services'); // Default to combined services
   const [brands, setBrands] = useState([]);
   const [selectedBrand, setSelectedBrand] = useState(null);
-  const [services, setServices] = useState([]); // Sub-services
+  const [services, setServices] = useState([]); 
   const [loading, setLoading] = useState(false);
   const [mounted, setMounted] = useState(false);
 
@@ -40,49 +40,24 @@ const CategoryModal = React.memo(({ isOpen, onClose, category, location, cartCou
       setIsClosing(false);
       // Reset state on close
       setTimeout(() => {
-        setView('brands');
+        setView('services');
         setSelectedBrand(null);
         setBrands([]);
         setServices([]);
         setIsRedirecting(false);
       }, 300);
     } else if (category?.id) {
-      if (category.initialBrand) {
-        // Direct to brand services if initialBrand is provided (from search)
-        const brand = category.initialBrand;
-        setSelectedBrand(brand);
-        setView('services');
-        fetchServices(brand.id || brand._id);
-      }
-      // Always fetch brands for this category to populate the background/back-navigation
-      fetchBrands();
+      // Directly fetch all services for this category from all vendors/brands
+      fetchAllCategoryServices();
     }
   }, [isOpen, category?.id, cityId]);
 
-  const fetchBrands = async () => {
-    try {
-      setLoading(true);
-      const response = await publicCatalogService.getBrands({
-        categoryId: category.id,
-        cityId: cityId
-      });
-      if (response.success) {
-        setBrands(response.brands || []);
-      }
-    } catch (error) {
-      console.error("Failed to load brands:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const fetchServices = async (brandId) => {
+  const fetchAllCategoryServices = async () => {
     try {
       setLoading(true);
       const response = await publicCatalogService.getServices({
-        brandId: brandId,
-        cityId: cityId,
-        categoryId: category?.id
+        categoryId: category?.id,
+        cityId: cityId
       });
       if (response.success) {
         setServices(response.services || []);
@@ -94,16 +69,8 @@ const CategoryModal = React.memo(({ isOpen, onClose, category, location, cartCou
     }
   };
 
-  const handleBrandClick = (brand) => {
-    setSelectedBrand(brand);
-    setView('services');
-    fetchServices(brand.id || brand._id);
-  };
-
   const handleBackToBrands = () => {
-    setView('brands');
-    setSelectedBrand(null);
-    setServices([]);
+    onClose(); // Since we only have one view now
   };
 
   const handleServiceClick = async (service) => {
@@ -231,104 +198,71 @@ const CategoryModal = React.memo(({ isOpen, onClose, category, location, cartCou
                     )}
                     <div>
                       <h1 className="text-xl font-bold text-gray-900">
-                        {view === 'brands' ? (category?.title || 'Brands') : (selectedBrand?.title || 'Services')}
+                        {category?.title || 'Services'}
                       </h1>
-                      {view === 'services' && <p className="text-xs text-gray-500">Select a service to add</p>}
+                      {view === 'services' && brands.length > 1 && <p className="text-xs text-gray-500">{selectedBrand?.title && `by ${selectedBrand.title}`}</p>}
+                      {view === 'services' && brands.length === 1 && <p className="text-xs text-gray-500">Select a service to add</p>}
                     </div>
                     {loading && <div className="w-5 h-5 border-2 border-primary-500 border-t-transparent rounded-full animate-spin ml-auto"></div>}
                   </div>
 
                   {/* Content */}
-                  {loading && (view === 'brands' ? brands.length === 0 : services.length === 0) ? (
-                    <div className="grid grid-cols-3 sm:grid-cols-4 gap-4 animate-pulse">
-                      {[1, 2, 3, 4, 5, 6].map((i) => (
-                        <div key={i} className="flex flex-col items-center">
-                          <div className="w-20 h-20 bg-gray-200 rounded-2xl mb-2"></div>
-                          <div className="h-3 w-16 bg-gray-200 rounded"></div>
-                        </div>
+                  {loading && services.length === 0 ? (
+                    <div className="space-y-4">
+                      {[1, 2, 3].map((i) => (
+                        <div key={i} className="h-24 bg-gray-100 rounded-2xl animate-pulse" />
                       ))}
                     </div>
                   ) : (
                     <>
-                      {view === 'brands' ? (
-                        // Brands Grid
-                        brands.length > 0 ? (
-                          <div className="grid grid-cols-3 sm:grid-cols-4 gap-4">
-                            {brands.map((brand) => (
-                              <div
-                                key={brand.id || brand._id}
-                                onClick={() => handleBrandClick(brand)}
-                                className="flex flex-col items-center cursor-pointer group active:scale-95 transition-all"
-                              >
-                                <div className="w-20 h-20 bg-gray-50 rounded-2xl flex items-center justify-center mb-2 group-hover:bg-gray-100 transition-colors shadow-sm overflow-hidden border border-gray-100 relative">
-                                  {brand.icon ? (
-                                    <img
-                                      src={toAssetUrl(brand.icon)}
-                                      alt={brand.title}
-                                      className="w-14 h-14 object-contain group-hover:scale-110 transition-transform"
-                                      loading="lazy"
-                                    />
-                                  ) : (
-                                    <FiLayers className="w-8 h-8 text-gray-300" />
-                                  )}
-                                  {brand.badge && (
-                                    <span className="absolute top-0 right-0 bg-purple-100 text-purple-700 text-[9px] font-bold px-1.5 py-0.5 rounded-bl-lg">
-                                      {brand.badge}
+                      {services.length > 0 ? (
+                        <div className="space-y-4">
+                          {services.map((svc) => (
+                            <div key={svc.id || svc._id} className="flex justify-between items-center p-4 border border-gray-100 rounded-2xl hover:shadow-lg transition-all bg-white group active:scale-[0.98]">
+                              <div className="flex-1 pr-4">
+                                <div className="flex flex-wrap items-center gap-2 mb-2">
+                                  <h3 className="font-black text-gray-900 text-base leading-tight">{svc.title}</h3>
+                                  {(svc.vendorName || svc.brandName) && (
+                                    <span className="text-[8px] font-black uppercase tracking-widest text-teal-600 bg-teal-50 px-2 py-0.5 rounded-full border border-teal-100/50">
+                                      {svc.vendorName || svc.brandName}
                                     </span>
                                   )}
                                 </div>
-                                <p className="text-[11px] font-bold text-gray-800 text-center leading-tight line-clamp-2 px-1">
-                                  {brand.title}
-                                </p>
-                              </div>
-                            ))}
-                          </div>
-                        ) : (
-                          <div className="text-center py-12 text-gray-500">
-                            <p>No brands found in this category.</p>
-                          </div>
-                        )
-                      ) : (
-                        // Services List
-                        services.length > 0 ? (
-                          <div className="space-y-4">
-                            {services.map((svc) => (
-                              <div key={svc.id || svc._id} className="flex justify-between items-center p-3 border border-gray-100 rounded-xl hover:shadow-md transition-shadow">
-                                <div className="flex-1 pr-4">
-                                  <h3 className="font-black text-gray-900 text-[15px] leading-snug mb-0.5">{svc.title}</h3>
-                                  <div className="flex items-center gap-2">
-                                    <span className="text-lg font-black text-emerald-600">₹{svc.discountPrice || svc.basePrice}</span>
-                                    {svc.discountPrice && svc.discountPrice < svc.basePrice && (
-                                      <span className="text-xs text-gray-400 line-through font-bold opacity-60">₹{svc.basePrice}</span>
-                                    )}
-                                  </div>
+                                <div className="flex items-center gap-2">
+                                  <span className="text-xl font-black text-emerald-600">₹{svc.basePrice}</span>
+                                  {svc.originalPrice && svc.originalPrice > svc.basePrice && (
+                                    <span className="text-xs text-gray-400 line-through font-bold opacity-60">₹{svc.originalPrice}</span>
+                                  )}
                                 </div>
-                                <button
-                                  onClick={() => handleServiceClick(svc)}
-                                  className="px-4 py-2 bg-green-50 text-green-700 rounded-lg text-sm font-bold flex items-center gap-1 hover:bg-green-100"
-                                >
-                                  <FiPlus /> Add
-                                </button>
                               </div>
-                            ))}
-                            
-                            {/* Bottom Disclaimer */}
-                            <div className="mt-8 pt-4 border-t border-gray-50 flex items-start gap-3 bg-gray-50/50 p-4 rounded-2xl">
-                              <div className="mt-0.5 text-gray-400">
-                                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                </svg>
-                              </div>
-                              <p className="text-[11px] text-rose-500 font-normal italic leading-snug">
-                                * It is a base price only, additional charges may be applicable after service
-                              </p>
+                              <button
+                                onClick={() => handleServiceClick(svc)}
+                                className="px-5 py-2.5 bg-teal-600 text-white rounded-xl text-xs font-black uppercase tracking-widest flex items-center gap-2 hover:bg-teal-700 shadow-lg shadow-teal-100 active:scale-90 transition-all"
+                              >
+                                <FiPlus className="w-3 h-3" /> Add
+                              </button>
                             </div>
+                          ))}
+                          
+                          {/* Bottom Disclaimer */}
+                          <div className="mt-8 pt-4 border-t border-gray-50 flex items-start gap-3 bg-gray-50/50 p-5 rounded-[2rem]">
+                            <div className="mt-0.5 text-gray-400">
+                              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                              </svg>
+                            </div>
+                            <p className="text-[10px] text-rose-500 font-bold italic leading-relaxed">
+                              * This is a base price only. Additional charges may apply based on the specific service requirements discussed with the professional.
+                            </p>
                           </div>
-                        ) : (
-                          <div className="text-center py-12 text-gray-500">
-                            <p>No services available for this brand yet.</p>
+                        </div>
+                      ) : (
+                        <div className="text-center py-20 bg-gray-50/50 rounded-[2.5rem] border-2 border-dashed border-gray-100">
+                          <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-sm">
+                            <FiLayers className="w-8 h-8 text-gray-200" />
                           </div>
-                        )
+                          <p className="text-sm font-bold text-gray-400">No services available in this category yet.</p>
+                        </div>
                       )}
                     </>
                   )}

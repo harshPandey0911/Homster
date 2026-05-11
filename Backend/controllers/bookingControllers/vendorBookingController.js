@@ -534,12 +534,11 @@ const assignWorker = async (req, res) => {
       });
     }
 
-    // Check if worker is active
-    const validStatuses = ['active', 'ONLINE', 'ACTIVE'];
-    if (!validStatuses.includes(worker.status)) {
+    // Check if worker is active and online
+    if (worker.status !== 'ONLINE') {
       return res.status(400).json({
         success: false,
-        message: `Worker is not active (Status: ${worker.status})`
+        message: `Worker is currently ${worker.status || 'offline'}. Only online workers can be assigned jobs.`
       });
     }
 

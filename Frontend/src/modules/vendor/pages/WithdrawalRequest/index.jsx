@@ -172,118 +172,114 @@ const WithdrawalRequest = () => {
   const netAmount = grossAmount - commissionAmount - platformFeeAmount - tdsAmount;
 
   return (
-    <div className="min-h-screen pb-24" style={{ background: themeColors.backgroundGradient }}>
+  return (
+    <div className="min-h-screen pb-24 bg-white">
       <Header title="Request Withdrawal" />
 
       <main className="px-4 py-6 max-w-lg mx-auto">
-        {/* Modern Balance Header */}
-        {/* Modern Balance Header - Matched with Wallet Earnings Card */}
-        <div className="rounded-2xl p-6 shadow-xl relative overflow-hidden mb-8 bg-gradient-to-br from-green-600 to-green-800">
+        {/* Modern Balance Header (Black Theme) */}
+        <div className="rounded-[32px] p-8 shadow-xl relative overflow-hidden mb-8 bg-black">
           <div className="relative z-10 text-white flex flex-col items-center">
-            <span className="text-white/80 text-[11px] font-bold uppercase tracking-[0.2em] mb-1">Total Redeemable</span>
+            <span className="text-white/40 text-[10px] font-black uppercase tracking-[0.3em] mb-2">Total Redeemable</span>
             <div className="flex items-baseline gap-1">
-              <span className="text-2xl font-black text-white/90">₹</span>
-              <span className="text-5xl font-black text-white tracking-tight">
+              <span className="text-2xl font-black text-white/50">₹</span>
+              <span className="text-6xl font-black text-white tracking-tighter">
                 {wallet.available.toLocaleString()}
               </span>
             </div>
-            <div className="mt-4 flex gap-2">
-              <div className="px-3 py-1 bg-white/20 text-white rounded-full text-[10px] font-bold border border-white/30 flex items-center gap-1 backdrop-blur-sm">
-                <FiCheckCircle className="w-3 h-3" /> Verified Balance
+            <div className="mt-6">
+              <div className="px-4 py-1.5 bg-white/10 text-white rounded-full text-[9px] font-black uppercase tracking-widest border border-white/10 flex items-center gap-2 backdrop-blur-sm">
+                <div className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
+                Verified Balance
               </div>
             </div>
           </div>
           {/* Decorative Icon Background */}
-          <div className="absolute -bottom-6 -right-6 text-white/10 transform rotate-12">
-            <FiDollarSign className="w-40 h-40" />
+          <div className="absolute -bottom-10 -right-10 text-white/[0.03] transform rotate-12">
+            <FiDollarSign className="w-64 h-64" />
           </div>
         </div>
 
-        {/* Input Card */}
-        <div className="bg-white rounded-[2rem] p-6 shadow-xl border border-gray-50 mb-6 group transition-all hover:shadow-2xl">
-          <div className="flex justify-between items-center mb-6">
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-emerald-50 flex items-center justify-center text-emerald-600">
+        {/* Input Card (Black Theme) */}
+        <div className="bg-white rounded-[40px] p-8 shadow-sm border border-gray-100 mb-6 group transition-all">
+          <div className="flex justify-between items-center mb-8">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-2xl bg-gray-50 flex items-center justify-center text-black border border-gray-100 shadow-sm">
                 <FiDollarSign className="w-5 h-5" />
               </div>
-              <h3 className="text-sm font-bold text-gray-800">Withdraw Amount</h3>
+              <h3 className="text-xs font-black text-gray-900 uppercase tracking-widest">Withdraw Amount</h3>
             </div>
             <button
               onClick={handleMaxAmount}
-              className="text-[10px] font-black text-white px-3 py-1.5 rounded-lg transition-all active:scale-95"
-              style={{ background: themeColors.button }}
+              className="text-[9px] font-black text-white px-4 py-2 rounded-xl bg-black shadow-lg shadow-gray-200 active:scale-95 transition-all uppercase tracking-widest"
             >
-              USE MAX
+              Max
             </button>
           </div>
 
-          <div className="relative mb-4 group-focus-within:scale-[1.02] transition-transform duration-300">
-            <div className="absolute top-1/2 left-4 -translate-y-1/2 text-gray-400 font-bold text-3xl">₹</div>
+          <div className="relative mb-6">
+            <div className="absolute top-1/2 left-0 -translate-y-1/2 text-gray-200 font-black text-4xl">₹</div>
             <input
               type="text"
               value={amount}
               onChange={(e) => handleAmountChange(e.target.value)}
               placeholder="0"
-              className={`w-full pl-10 pr-4 py-5 bg-white rounded-2xl border-2 border-dashed ${error ? 'border-red-300 bg-red-50 text-red-500' : 'border-emerald-300 focus:border-emerald-500'
-                } text-4xl font-black text-center focus:outline-none transition-all shadow-sm focus:shadow-emerald-100/50 focus:shadow-lg text-gray-900 caret-emerald-500 placeholder:text-gray-200`}
+              className={`w-full pl-8 pr-4 py-6 bg-white border-b-2 border-dashed ${error ? 'border-red-300 text-red-500' : 'border-gray-200 focus:border-black'
+                } text-5xl font-black text-right focus:outline-none transition-all text-gray-900 placeholder:text-gray-100`}
             />
           </div>
 
-          {error && <p className="text-red-500 text-[11px] font-bold text-center mb-4 flex justify-center items-center gap-1"><FiAlertCircle className="w-3.5 h-3.5" /> {error}</p>}
+          {error && <p className="text-red-500 text-[10px] font-black uppercase tracking-widest text-center mb-6 flex justify-center items-center gap-2"><FiAlertCircle className="w-4 h-4" /> {error}</p>}
 
           {amount && !error && (
-            <div className="bg-emerald-50/50 rounded-2xl p-4 space-y-3 border border-emerald-50">
-              <div className="flex justify-between text-xs font-bold text-gray-500">
+            <div className="bg-gray-50 rounded-[28px] p-6 space-y-4 border border-gray-100">
+              <div className="flex justify-between text-[10px] font-black uppercase tracking-widest text-gray-400">
                 <span>Gross Total</span>
-                <span>₹{grossAmount.toLocaleString()}</span>
+                <span className="text-gray-900">₹{grossAmount.toLocaleString()}</span>
               </div>
               
-              <div className="flex justify-between text-xs font-bold text-orange-600/80">
+              <div className="flex justify-between text-[10px] font-black uppercase tracking-widest text-gray-400">
                 <span>Commission ({commissionRate}%)</span>
-                <span>- ₹{commissionAmount.toLocaleString()}</span>
+                <span className="text-black">- ₹{commissionAmount.toLocaleString()}</span>
               </div>
 
-              <div className="flex justify-between text-xs font-bold text-blue-600/80">
-                <span>Platform Charge ({platformFeeRate}%)</span>
-                <span>- ₹{platformFeeAmount.toLocaleString()}</span>
+              <div className="flex justify-between text-[10px] font-black uppercase tracking-widest text-gray-400">
+                <span>Platform Fee ({platformFeeRate}%)</span>
+                <span className="text-black">- ₹{platformFeeAmount.toLocaleString()}</span>
               </div>
 
-              <div className="flex justify-between text-xs font-bold text-red-500/70">
-                <span>TDS Deduction ({tdsRate}%)</span>
-                <span>- ₹{tdsAmount.toLocaleString()}</span>
+              <div className="flex justify-between text-[10px] font-black uppercase tracking-widest text-gray-400">
+                <span>Tax (TDS {tdsRate}%)</span>
+                <span className="text-black">- ₹{tdsAmount.toLocaleString()}</span>
               </div>
 
-              <div className="pt-2 border-t border-emerald-100 flex justify-between items-end">
+              <div className="pt-4 border-t border-gray-200 flex justify-between items-end">
                 <div className="flex flex-col">
-                  <span className="text-[9px] font-black text-gray-400 uppercase tracking-widest leading-none mb-1">Estimated</span>
-                  <span className="text-xs font-black text-gray-800 uppercase tracking-widest leading-none">Net Payout</span>
+                  <span className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1">Estimated</span>
+                  <span className="text-sm font-black text-gray-900 uppercase tracking-[0.2em]">Net Payout</span>
                 </div>
-                <span className="text-2xl font-black text-emerald-600 leading-none">₹{netAmount.toLocaleString()}</span>
+                <span className="text-3xl font-black text-black tracking-tighter">₹{netAmount.toLocaleString()}</span>
               </div>
             </div>
           )}
         </div>
 
-        {/* Bank Detail Card - Pro Style */}
-        <div className="bg-white rounded-[2rem] p-6 shadow-xl border border-gray-50 mb-6 relative overflow-hidden">
-          <div className="absolute top-0 right-0 p-4 opacity-[0.03]">
-            <FiCreditCard className="w-32 h-32" />
-          </div>
-
-          <div className="flex items-center justify-between mb-6 relative z-10">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-2xl bg-blue-50 flex items-center justify-center text-blue-600 shadow-sm border border-blue-100">
-                <FiCreditCard className="w-5 h-5" />
+        {/* Bank Detail Card (Black Theme) */}
+        <div className="bg-white rounded-[40px] p-8 shadow-sm border border-gray-100 mb-6 relative overflow-hidden">
+          <div className="flex items-center justify-between mb-8">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-2xl bg-gray-50 flex items-center justify-center text-black border border-gray-100 shadow-sm">
+                <FiCreditCard className="w-6 h-6" />
               </div>
               <div>
-                <h3 className="text-base font-bold text-gray-900">Payout Destination</h3>
-                <p className="text-[10px] text-gray-500 font-medium">Where should we send money?</p>
+                <h3 className="text-sm font-black text-gray-900 uppercase tracking-widest">Payout Destination</h3>
+                <p className="text-[10px] text-gray-400 font-bold uppercase tracking-tighter mt-0.5">Primary Bank Account</p>
               </div>
             </div>
             {isBankSaved && !showBankForm && (
               <button
                 onClick={() => setShowBankForm(true)}
-                className="w-9 h-9 rounded-xl bg-gray-50 flex items-center justify-center text-gray-500 hover:text-blue-600 hover:bg-blue-50 transition-all border border-gray-200 active:scale-95"
+                className="w-10 h-10 rounded-xl bg-gray-50 flex items-center justify-center text-gray-400 border border-gray-100 active:scale-90 transition-all shadow-sm"
               >
                 <FiEdit2 className="w-4 h-4" />
               </button>
@@ -291,214 +287,121 @@ const WithdrawalRequest = () => {
           </div>
 
           {!isBankSaved || showBankForm ? (
-            <div className="space-y-4 relative z-10">
-              {/* Account Holder Name */}
-              <div className="space-y-1.5">
-                <label className="text-[11px] font-bold text-gray-400 uppercase tracking-wider ml-1">Account Holder</label>
+            <div className="space-y-5">
+              <div className="space-y-2">
+                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Account Holder</label>
                 <input
                   type="text"
                   name="accountHolderName"
                   value={bankAccount.accountHolderName}
                   onChange={handleBankInputChange}
-                  className="w-full px-4 py-3 bg-gray-50 rounded-xl border border-gray-200 focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-500/10 outline-none text-sm font-bold text-gray-800 placeholder:font-medium transition-all"
-                  placeholder="e.g. John Doe"
+                  className="w-full px-5 py-4 bg-gray-50 rounded-2xl border border-gray-100 focus:border-black focus:bg-white outline-none text-xs font-black text-gray-900 uppercase tracking-widest transition-all"
+                  placeholder="FULL NAME"
                 />
               </div>
 
-              {/* Bank Name */}
-              <div className="space-y-1.5">
-                <label className="text-[11px] font-bold text-gray-400 uppercase tracking-wider ml-1">Bank Name</label>
+              <div className="space-y-2">
+                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Bank Name</label>
                 <input
                   type="text"
                   name="bankName"
                   value={bankAccount.bankName}
                   onChange={handleBankInputChange}
-                  className="w-full px-4 py-3 bg-gray-50 rounded-xl border border-gray-200 focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-500/10 outline-none text-sm font-bold text-gray-800 placeholder:font-medium transition-all"
-                  placeholder="e.g. HDFC Bank"
+                  className="w-full px-5 py-4 bg-gray-50 rounded-2xl border border-gray-100 focus:border-black focus:bg-white outline-none text-xs font-black text-gray-900 uppercase tracking-widest transition-all"
+                  placeholder="BANK NAME"
                 />
               </div>
 
-              {/* Account Number */}
-              <div className="space-y-1.5">
-                <label className="text-[11px] font-bold text-gray-400 uppercase tracking-wider ml-1">Account Number</label>
+              <div className="space-y-2">
+                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Account Number</label>
                 <input
                   type="tel"
                   name="accountNumber"
                   value={bankAccount.accountNumber}
                   onChange={handleBankInputChange}
-                  className="w-full px-4 py-3 bg-gray-50 rounded-xl border border-gray-200 focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-500/10 outline-none text-xl font-bold text-gray-900 tracking-wide placeholder:font-medium transition-all"
-                  placeholder="0000000000"
+                  className="w-full px-5 py-4 bg-gray-50 rounded-2xl border border-gray-100 focus:border-black focus:bg-white outline-none text-lg font-black text-gray-900 tracking-widest transition-all"
+                  placeholder="00000000000"
                   inputMode="numeric"
                 />
-                <p className="text-[10px] text-gray-400 pl-1">Only numbers allowed</p>
               </div>
 
-              {/* Confirm Account Number */}
-              <div className="space-y-1.5">
-                <label className="text-[11px] font-bold text-gray-400 uppercase tracking-wider ml-1">Confirm Account Number</label>
-                <input
-                  type="tel"
-                  name="confirmAccountNumber"
-                  value={bankAccount.confirmAccountNumber || ''}
-                  onChange={handleBankInputChange}
-                  className={`w-full px-4 py-3 bg-gray-50 rounded-xl border focus:bg-white focus:ring-4 outline-none text-xl font-bold text-gray-900 tracking-wide placeholder:font-medium transition-all ${bankAccount.confirmAccountNumber && bankAccount.accountNumber !== bankAccount.confirmAccountNumber
-                    ? 'border-red-200 focus:border-red-500 focus:ring-red-500/10'
-                    : 'border-gray-200 focus:border-blue-500 focus:ring-blue-500/10'
-                    }`}
-                  placeholder="0000000000"
-                  inputMode="numeric"
-                  onPaste={(e) => e.preventDefault()}
-                />
-                {bankAccount.confirmAccountNumber && bankAccount.accountNumber !== bankAccount.confirmAccountNumber && (
-                  <p className="text-[10px] text-red-500 font-bold pl-1 flex items-center gap-1">
-                    <FiAlertCircle className="w-3 h-3" /> Account numbers do not match
-                  </p>
-                )}
-              </div>
-
-              {/* IFSC Code */}
-              <div className="space-y-1.5">
-                <label className="text-[11px] font-bold text-gray-400 uppercase tracking-wider ml-1">IFSC Code</label>
+              <div className="space-y-2">
+                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">IFSC Code</label>
                 <input
                   type="text"
                   name="ifscCode"
                   value={bankAccount.ifscCode}
                   onChange={handleBankInputChange}
-                  className="w-full px-4 py-3 bg-gray-50 rounded-xl border border-gray-200 focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-500/10 outline-none text-sm font-bold text-gray-800 placeholder:font-medium transition-all uppercase"
-                  placeholder="HDFC0000123"
+                  className="w-full px-5 py-4 bg-gray-50 rounded-2xl border border-gray-100 focus:border-black focus:bg-white outline-none text-xs font-black text-gray-900 uppercase tracking-[0.2em] transition-all"
+                  placeholder="IFSC0000XXX"
                   maxLength={11}
                 />
               </div>
 
-              {/* UPI ID */}
-              <div className="space-y-1.5">
-                <label className="text-[11px] font-bold text-gray-400 uppercase tracking-wider ml-1">UPI ID (Optional)</label>
-                <input
-                  type="text"
-                  name="upiId"
-                  value={bankAccount.upiId}
-                  onChange={handleBankInputChange}
-                  className="w-full px-4 py-3 bg-gray-50 rounded-xl border border-gray-200 focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-500/10 outline-none text-sm font-bold text-gray-800 placeholder:font-medium transition-all"
-                  placeholder="username@okaxis"
-                />
-              </div>
-
-              <div className="pt-2">
+              <div className="pt-4">
                 <button
                   onClick={saveBankDetails}
                   disabled={!bankAccount.accountNumber || bankAccount.accountNumber !== bankAccount.confirmAccountNumber}
-                  className="w-full py-4 bg-gray-900 text-white rounded-[1.2rem] font-bold text-xs uppercase tracking-[0.1em] shadow-xl hover:shadow-2xl active:scale-[0.98] transition-all disabled:opacity-50 disabled:scale-100"
+                  className="w-full py-5 bg-black text-white rounded-2xl font-black text-[10px] uppercase tracking-[0.2em] shadow-xl shadow-gray-200 active:scale-[0.98] transition-all disabled:opacity-20"
                 >
-                  Save & Confirm Account
+                  Verify & Save Account
                 </button>
               </div>
             </div>
           ) : (
-            <div className="bg-blue-50/50 rounded-2xl p-5 border border-blue-100 shadow-sm relative group cursor-pointer hover:border-blue-200 transition-all" onClick={() => setShowBankForm(true)}>
-              <div className="space-y-3">
+            <div className="bg-gray-50 rounded-[28px] p-6 border border-gray-100 shadow-sm relative group cursor-pointer" onClick={() => setShowBankForm(true)}>
+              <div className="space-y-5">
                 <div className="flex justify-between items-start">
                   <div>
-                    <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider mb-0.5">Account Holder</p>
-                    <p className="font-bold text-gray-900 text-sm">{bankAccount.accountHolderName}</p>
+                    <p className="text-[9px] text-gray-400 font-black uppercase tracking-widest mb-1">Account Holder</p>
+                    <p className="font-black text-gray-900 text-sm uppercase tracking-widest">{bankAccount.accountHolderName}</p>
                   </div>
-                  <div className="bg-blue-50 p-2 rounded-lg text-blue-600">
-                    <FiCreditCard className="w-5 h-5" />
+                  <div className="w-10 h-10 rounded-xl bg-white border border-gray-100 flex items-center justify-center text-black shadow-sm">
+                    <FiCheckCircle className="w-5 h-5" />
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-2 gap-6">
                   <div>
-                    <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider mb-0.5">Bank Name</p>
-                    <p className="font-bold text-gray-800 text-sm">{bankAccount.bankName}</p>
+                    <p className="text-[9px] text-gray-400 font-black uppercase tracking-widest mb-1">Bank</p>
+                    <p className="font-black text-gray-800 text-xs uppercase tracking-widest">{bankAccount.bankName}</p>
                   </div>
                   <div>
-                    <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider mb-0.5">IFSC Code</p>
-                    <p className="font-bold text-gray-800 text-sm uppercase">{bankAccount.ifscCode}</p>
+                    <p className="text-[9px] text-gray-400 font-black uppercase tracking-widest mb-1">IFSC</p>
+                    <p className="font-black text-gray-800 text-xs uppercase tracking-widest">{bankAccount.ifscCode}</p>
                   </div>
                 </div>
 
                 <div>
-                  <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider mb-0.5">Account Number</p>
-                  <p className="font-mono font-bold text-gray-900 text-lg tracking-wider">
+                  <p className="text-[9px] text-gray-400 font-black uppercase tracking-widest mb-1">Account Number</p>
+                  <p className="font-black text-gray-900 text-xl tracking-[0.2em]">
                     {bankAccount.accountNumber?.replace(/(.{4})/g, '$1 ').trim()}
                   </p>
                 </div>
               </div>
-
-              <div className="absolute top-4 right-12">
-                <span className="text-[10px] font-bold text-green-600 bg-green-50 px-2 py-1 rounded-full flex items-center gap-1">
-                  <FiCheckCircle className="w-3 h-3" /> Verified
-                </span>
-              </div>
-              <FiEdit2 className="w-4 h-4 text-gray-300 absolute top-5 right-5" />
             </div>
           )}
         </div>
 
-        {/* Ledger Summary */}
-        {history.length > 0 && (
-          <div className="mb-8">
-            <div className="flex items-center gap-2 mb-4 px-2">
-              <FiActivity className="text-gray-400 w-4 h-4" />
-              <h3 className="font-black text-gray-400 text-[10px] uppercase tracking-[0.2em]">Recent Activity</h3>
-            </div>
-            <div className="space-y-3">
-              {history.slice(0, 3).map((item) => (
-                <div
-                  key={item._id}
-                  className={`rounded-[1.2rem] p-4 flex justify-between items-center shadow-sm border transition-all ${item.status === 'approved' ? 'bg-emerald-50/50 border-emerald-100 hover:border-emerald-200' :
-                    item.status === 'rejected' ? 'bg-red-50/50 border-red-100 hover:border-red-200' :
-                      'bg-amber-50/50 border-amber-100 hover:border-amber-200'
-                    }`}
-                >
-                  <div className="flex items-center gap-3">
-                    <div className={`w-8 h-8 rounded-full flex items-center justify-center ${item.status === 'approved' ? 'bg-emerald-100 text-emerald-600' :
-                      item.status === 'rejected' ? 'bg-red-100 text-red-600' :
-                        'bg-amber-100 text-amber-600'
-                      }`}>
-                      <FiClock className="w-4 h-4" />
-                    </div>
-                    <div>
-                      <p className="font-black text-sm text-gray-800">₹{item.amount.toLocaleString()}</p>
-                      <p className="text-[9px] text-gray-400 font-bold uppercase tracking-widest">
-                        {new Date(item.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}
-                      </p>
-                    </div>
-                  </div>
-                  <div className={`text-[9px] font-black uppercase tracking-widest px-3 py-1 rounded-full ${item.status === 'approved' ? 'bg-white/60 text-emerald-700 border border-emerald-100' :
-                    item.status === 'rejected' ? 'bg-white/60 text-red-700 border border-red-100' :
-                      'bg-white/60 text-amber-700 border border-amber-100'
-                    }`}>
-                    {item.status}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Submit Action */}
+        {/* Submit Action (Black Theme) */}
         <button
           onClick={handleSubmit}
           disabled={!amount || !!error || !isBankSaved || loading}
-          className="w-full py-5 rounded-[1.5rem] font-black text-white text-[13px] uppercase tracking-[0.2em] flex items-center justify-center gap-3 transition-all active:scale-[0.98] disabled:opacity-40 disabled:grayscale shadow-2xl group"
-          style={{
-            background: `linear-gradient(135deg, ${themeColors.button}, #0f172a)`,
-          }}
+          className="w-full py-6 rounded-[32px] font-black text-white text-xs uppercase tracking-[0.3em] flex items-center justify-center gap-4 transition-all active:scale-[0.98] disabled:opacity-20 bg-black shadow-2xl shadow-gray-300 group"
         >
           {loading ? (
             <LogoLoader fullScreen={false} size="w-6 h-6" />
           ) : (
             <>
               Confirm Payout
-              <FiArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+              <FiArrowRight className="w-5 h-5 group-hover:translate-x-2 transition-transform" />
             </>
           )}
         </button>
 
-        <p className="text-center text-[10px] text-gray-400 mt-8 font-black uppercase tracking-wider leading-relaxed opacity-50 px-6">
-          Payouts hit your bank in 24-48 business hours.<br />
-          TDS is mandated by govt. regulations.
+        <p className="text-center text-[9px] text-gray-400 mt-10 font-black uppercase tracking-[0.1em] leading-relaxed opacity-40 px-8">
+          Payouts processed in 24-48 business hours.<br />
+          TDS deduction is mandatory as per govt norms.
         </p>
       </main>
 

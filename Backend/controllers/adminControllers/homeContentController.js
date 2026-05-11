@@ -31,6 +31,21 @@ const getHomeContent = async (req, res) => {
         isBookedVisible: homeContent.isBookedVisible ?? true,
         isCategorySectionsVisible: homeContent.isCategorySectionsVisible ?? true,
         isCategoriesVisible: homeContent.isCategoriesVisible ?? true,
+        isStatsVisible: homeContent.isStatsVisible ?? true,
+        isAppDownloadVisible: homeContent.isAppDownloadVisible ?? true,
+        isHowItWorksVisible: homeContent.isHowItWorksVisible ?? true,
+        isAboutUsVisible: homeContent.isAboutUsVisible ?? true,
+        isOffersVisible: homeContent.isOffersVisible ?? true,
+        isContactUsVisible: homeContent.isContactUsVisible ?? true,
+        heroSection: homeContent.heroSection,
+        stats: homeContent.stats || [],
+        appDownload: homeContent.appDownload,
+        navLinks: homeContent.navLinks || [],
+        siteIdentity: homeContent.siteIdentity,
+        howItWorks: homeContent.howItWorks,
+        aboutUs: homeContent.aboutUs,
+        offers: homeContent.offers,
+        contactUs: homeContent.contactUs,
         createdAt: homeContent.createdAt,
         updatedAt: homeContent.updatedAt
       }
@@ -126,6 +141,22 @@ const updateHomeContent = async (req, res) => {
     if (req.body.isBookedVisible !== undefined) homeContent.isBookedVisible = req.body.isBookedVisible;
     if (req.body.isCategorySectionsVisible !== undefined) homeContent.isCategorySectionsVisible = req.body.isCategorySectionsVisible;
     if (req.body.isCategoriesVisible !== undefined) homeContent.isCategoriesVisible = req.body.isCategoriesVisible;
+    if (req.body.isStatsVisible !== undefined) homeContent.isStatsVisible = req.body.isStatsVisible;
+    if (req.body.isAppDownloadVisible !== undefined) homeContent.isAppDownloadVisible = req.body.isAppDownloadVisible;
+    if (req.body.isHowItWorksVisible !== undefined) homeContent.isHowItWorksVisible = req.body.isHowItWorksVisible;
+    if (req.body.isAboutUsVisible !== undefined) homeContent.isAboutUsVisible = req.body.isAboutUsVisible;
+    if (req.body.isOffersVisible !== undefined) homeContent.isOffersVisible = req.body.isOffersVisible;
+    if (req.body.isContactUsVisible !== undefined) homeContent.isContactUsVisible = req.body.isContactUsVisible;
+
+    if (req.body.heroSection !== undefined) homeContent.heroSection = req.body.heroSection;
+    if (req.body.stats !== undefined) homeContent.stats = req.body.stats;
+    if (req.body.appDownload !== undefined) homeContent.appDownload = req.body.appDownload;
+    if (req.body.navLinks !== undefined) homeContent.navLinks = req.body.navLinks;
+    if (req.body.siteIdentity !== undefined) homeContent.siteIdentity = req.body.siteIdentity;
+    if (req.body.howItWorks !== undefined) homeContent.howItWorks = req.body.howItWorks;
+    if (req.body.aboutUs !== undefined) homeContent.aboutUs = req.body.aboutUs;
+    if (req.body.offers !== undefined) homeContent.offers = req.body.offers;
+    if (req.body.contactUs !== undefined) homeContent.contactUs = req.body.contactUs;
 
     await homeContent.save();
 
@@ -149,7 +180,14 @@ const updateHomeContent = async (req, res) => {
         isNoteworthyVisible: homeContent.isNoteworthyVisible,
         isBookedVisible: homeContent.isBookedVisible,
         isCategorySectionsVisible: homeContent.isCategorySectionsVisible,
-        isCategoriesVisible: homeContent.isCategoriesVisible
+        isCategoriesVisible: homeContent.isCategoriesVisible,
+        isStatsVisible: homeContent.isStatsVisible,
+        isAboutUsVisible: homeContent.isAboutUsVisible,
+        isOffersVisible: homeContent.isOffersVisible,
+        isContactUsVisible: homeContent.isContactUsVisible,
+        aboutUs: homeContent.aboutUs,
+        offers: homeContent.offers,
+        contactUs: homeContent.contactUs
       }
     });
   } catch (error) {

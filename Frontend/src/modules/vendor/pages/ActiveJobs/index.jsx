@@ -1,12 +1,9 @@
 import React, { useState, useEffect, useLayoutEffect, useMemo, useCallback, memo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FiBriefcase, FiMapPin, FiClock, FiUser, FiFilter, FiSearch, FiLoader } from 'react-icons/fi';
+import { FiBriefcase, FiMapPin, FiClock, FiUser, FiSearch } from 'react-icons/fi';
 import { toast } from 'react-hot-toast';
 import { vendorTheme as themeColors } from '../../../../theme';
-import Header from '../../components/layout/Header';
 import BottomNav from '../../components/layout/BottomNav';
-import LogoLoader from '../../../../components/common/LogoLoader';
-
 import { getBookings, assignWorker as assignWorkerApi } from '../../services/bookingService';
 import { ConfirmDialog } from '../../components/common';
 
@@ -140,26 +137,30 @@ const ActiveJobs = memo(() => {
   }, []);
 
   return (
-    <div className="min-h-screen pb-20" style={{ background: themeColors.backgroundGradient }}>
-      <Header title="Active Jobs" showSearch={true} />
+    <div className="min-h-screen pb-20" style={{ background: '#FFFFFF' }}>
+      <header className="px-6 py-5 flex items-center justify-between bg-transparent">
+        <h1 className="text-xl font-black text-gray-900">Active Jobs</h1>
+        <div className="w-10 h-10 rounded-2xl bg-white shadow-sm flex items-center justify-center border border-gray-100">
+          <FiBriefcase className="w-5 h-5 text-black" />
+        </div>
+      </header>
 
-      <main className="px-4 py-6">
-        {/* Search Bar */}
-        <div className="mb-4">
+      <main className="px-5">
+        {/* Search Bar (Black Theme) */}
+        <div className="mb-6">
           <div className="relative">
-            <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+            <FiSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
             <input
               type="text"
-              placeholder="Search jobs..."
+              placeholder="Search by customer name..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-3 bg-white rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-0"
-              style={{ focusRingColor: themeColors.button }}
+              className="w-full bg-white rounded-[24px] py-4 pl-12 pr-4 text-sm font-bold text-gray-900 shadow-sm border border-gray-100 focus:border-black outline-none transition-all"
             />
           </div>
         </div>
 
-        {/* Filter Buttons */}
+        {/* Filter Buttons (Black Theme) */}
         <div className="flex gap-2 mb-6 overflow-x-auto pb-2 scrollbar-hide">
           {[
             { id: 'all', label: 'All' },
@@ -170,20 +171,11 @@ const ActiveJobs = memo(() => {
             <button
               key={filterOption.id}
               onClick={() => setFilter(filterOption.id)}
-              className={`px-4 py-2 rounded-full font-semibold text-sm whitespace-nowrap transition-all ${filter === filterOption.id
-                ? 'text-white'
-                : 'bg-white text-gray-700'
-                }`}
-              style={
+              className={`px-6 py-2.5 rounded-full font-black text-xs whitespace-nowrap transition-all duration-300 ${
                 filter === filterOption.id
-                  ? {
-                    background: themeColors.button,
-                    boxShadow: `0 2px 8px ${themeColors.button}40`,
-                  }
-                  : {
-                    boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
-                  }
-              }
+                  ? 'bg-black text-white shadow-lg shadow-gray-200'
+                  : 'bg-white text-gray-400 border border-gray-100'
+              }`}
             >
               {filterOption.label}
             </button>
@@ -194,178 +186,117 @@ const ActiveJobs = memo(() => {
         {loading ? (
           <div className="space-y-4">
             {[1, 2, 3].map((i) => (
-              <div key={i} className="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm animate-pulse">
-                <div className="flex justify-between mb-4 pb-4 border-b border-slate-50">
-                  <div className="space-y-2">
-                    <div className="h-3 w-20 bg-slate-100 rounded"></div>
-                    <div className="h-5 w-48 bg-slate-100 rounded"></div>
-                  </div>
-                  <div className="h-10 w-20 bg-slate-100 rounded-lg"></div>
-                </div>
-                <div className="space-y-3">
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-lg bg-slate-100"></div>
-                    <div className="h-4 w-32 bg-slate-100 rounded"></div>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-lg bg-slate-100"></div>
-                    <div className="h-4 w-40 bg-slate-100 rounded"></div>
+              <div key={i} className="bg-white rounded-[32px] p-6 border border-gray-100 shadow-sm animate-pulse">
+                <div className="flex items-center gap-4 mb-4">
+                  <div className="w-14 h-14 bg-gray-50 rounded-2xl" />
+                  <div className="flex-1 space-y-2">
+                    <div className="h-4 w-32 bg-gray-50 rounded" />
+                    <div className="h-3 w-20 bg-gray-50 rounded" />
                   </div>
                 </div>
-                <div className="mt-4 pt-4 border-t border-slate-50 flex gap-3">
-                  <div className="h-10 flex-1 bg-slate-100 rounded-lg"></div>
-                  <div className="h-10 flex-1 bg-slate-100 rounded-lg"></div>
-                </div>
+                <div className="h-2 w-full bg-gray-50 rounded" />
               </div>
             ))}
           </div>
         ) : filteredJobs.length === 0 ? (
-          <div
-            className="bg-white rounded-xl p-8 text-center shadow-md"
-            style={{
-              boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
-            }}
-          >
-            <FiBriefcase className="w-16 h-16 mx-auto mb-4 text-gray-300" />
-            <p className="text-gray-600 font-semibold mb-2">No jobs found</p>
-            <p className="text-sm text-gray-500">
-              {searchQuery ? 'Try a different search term' : 'No active jobs at the moment'}
+          <div className="bg-white rounded-[32px] p-12 text-center shadow-sm border border-gray-100">
+            <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-6">
+              <FiBriefcase className="w-10 h-10 text-gray-200" />
+            </div>
+            <h3 className="text-lg font-black text-gray-900 mb-2">No jobs found</h3>
+            <p className="text-sm font-bold text-gray-400">
+              {searchQuery ? 'Try another search term' : 'You don\'t have any jobs here yet'}
             </p>
           </div>
         ) : (
-          <div className="space-y-3">
+          <div className="space-y-5">
             {filteredJobs.map((job) => {
-              const statusColor = getStatusColor(job.status);
+              const isCompleted = job.status?.toLowerCase() === 'completed';
 
               return (
                 <div
                   key={job.id}
                   onClick={() => navigate(`/vendor/booking/${job.id}`)}
-                  className="rounded-xl p-4 shadow-lg cursor-pointer active:scale-98 transition-all duration-200 relative overflow-hidden"
-                  style={{
-                    background: 'linear-gradient(135deg, #FFFFFF 0%, #F9FAFB 100%)',
-                    boxShadow: `0 8px 24px ${hexToRgba(statusColor, 0.15)}, 0 4px 12px ${hexToRgba(statusColor, 0.1)}, 0 0 0 2px ${hexToRgba(statusColor, 0.2)}`,
-                    border: `2px solid ${hexToRgba(statusColor, 0.3)}`,
-                  }}
+                  className="bg-white rounded-[32px] p-5 shadow-sm border border-gray-100 cursor-pointer active:scale-98 transition-all duration-200 relative group"
                 >
-                  {/* Left border accent */}
-                  <div
-                    className="absolute left-0 top-0 bottom-0 w-1 rounded-l-xl"
-                    style={{
-                      background: `linear-gradient(180deg, ${statusColor} 0%, ${statusColor}dd 100%)`,
-                    }}
-                  />
-
-                  <div className="relative z-10 pl-2">
-                    {/* Header Section */}
-                    <div className="flex items-start justify-between mb-3">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-1">
-                          <div
-                            className="p-1.5 rounded-lg"
-                            style={{
-                              background: `${statusColor}15`,
-                            }}
-                          >
-                            <FiBriefcase className="w-4 h-4" style={{ color: statusColor }} />
-                          </div>
-                          <h3 className="font-bold text-gray-800 text-base">{job.serviceType}</h3>
-                        </div>
-                        <div className="ml-8 mb-2">
-                          <span
-                            className="text-xs font-bold px-3 py-1.5 rounded-full"
-                            style={{
-                              background: `linear-gradient(135deg, ${statusColor} 0%, ${statusColor}dd 100%)`,
-                              color: '#FFFFFF',
-                              boxShadow: `0 2px 8px ${hexToRgba(statusColor, 0.3)}`,
-                            }}
-                          >
-                            {job.status.replace('_', ' ')}
-                          </span>
-                        </div>
-                      </div>
-                      <div
-                        className="px-3 py-2 rounded-lg font-bold text-lg flex items-center justify-center min-w-[80px]"
-                        style={{
-                          background: `linear-gradient(135deg, ${themeColors.button}15 0%, ${themeColors.button}10 100%)`,
-                          color: themeColors.button,
-                          border: `1px solid ${hexToRgba(themeColors.button, 0.2)}`,
-                        }}
-                      >
-                        {job.status?.toLowerCase() === 'completed' ? `₹${job.price}` : <FiClock className="w-5 h-5 opacity-40" title="Earnings visible after completion" />}
-                      </div>
+                  <div className="flex items-center gap-4 mb-4">
+                    {/* Status Icon */}
+                    <div className="w-14 h-14 rounded-2xl bg-gray-50 flex items-center justify-center shrink-0 border border-gray-100">
+                      <FiBriefcase className="w-6 h-6 text-black" />
                     </div>
 
-                    {/* Info Section */}
-                    <div className="space-y-2.5">
-                      <div className="flex items-center gap-2 text-sm">
-                        <div className="p-1 rounded" style={{ background: 'rgba(0, 0, 0, 0.03)' }}>
-                          <FiUser className="w-4 h-4" style={{ color: statusColor }} />
-                        </div>
-                        <span className="text-gray-700 font-medium">{job.user?.name || 'Customer'}</span>
+                    {/* Job Header */}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center justify-between mb-1">
+                        <h4 className="text-sm font-black text-gray-900 truncate">
+                          {job.user?.name || 'Customer'}
+                        </h4>
+                        <span className="text-[11px] font-black text-black">
+                          {isCompleted ? `₹${job.price}` : '---'}
+                        </span>
                       </div>
-
-                      <div className="flex items-center gap-2 text-sm">
-                        <div className="p-1 rounded" style={{ background: 'rgba(0, 0, 0, 0.03)' }}>
-                          <FiMapPin className="w-4 h-4" style={{ color: statusColor }} />
-                        </div>
-                        <span className="text-gray-700 font-medium truncate">{job.location?.address || 'Address not available'}</span>
-                      </div>
-
-                      {job.assignedTo && (
-                        <div className="flex items-center gap-2 text-sm">
-                          <div className="p-1 rounded" style={{ background: 'rgba(0, 0, 0, 0.03)' }}>
-                            <FiUser className="w-4 h-4" style={{ color: statusColor }} />
-                          </div>
-                          <span className="text-gray-700 font-medium">
-                            Assigned to: <span className="font-semibold">{job.assignedTo === 'SELF' ? 'Yourself' : job.assignedTo.name}</span>
-                          </span>
-                        </div>
-                      )}
-
-                      <div className="flex items-center gap-2 text-sm">
-                        <div className="p-1 rounded" style={{ background: 'rgba(0, 0, 0, 0.03)' }}>
-                          <FiClock className="w-4 h-4" style={{ color: statusColor }} />
-                        </div>
-                        <span className="text-gray-700 font-medium">{job.timeSlot?.date} • {job.timeSlot?.time}</span>
+                      <div className="flex items-center gap-2">
+                        <p className="text-[11px] font-bold text-gray-500">
+                          {job.serviceType}
+                        </p>
+                        <span className="text-[9px] font-black px-1.5 py-0.5 rounded bg-black text-white uppercase tracking-widest">
+                          {job.status.replace('_', ' ')}
+                        </span>
                       </div>
                     </div>
-
-                    {/* Quick Action Button for Unassigned Jobs */}
-                    {['ACCEPTED', 'CONFIRMED'].includes(job.status?.toUpperCase()) && !job.assignedTo && (
-                      <div className="mt-4 pt-3 border-t border-gray-100 flex gap-2">
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleAssignToSelf(job.id);
-                          }}
-                          className="flex-1 py-2 rounded-lg text-xs font-bold transition-all active:scale-95 flex items-center justify-center gap-1.5"
-                          style={{
-                            background: 'white',
-                            color: themeColors.button,
-                            border: `1.5px solid ${themeColors.button}`,
-                          }}
-                        >
-                          <FiUser className="w-3.5 h-3.5" />
-                          Do it Myself
-                        </button>
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            navigate(`/vendor/booking/${job.id}/assign-worker`);
-                          }}
-                          className="flex-1 py-2 rounded-lg text-xs font-bold text-white transition-all active:scale-95 flex items-center justify-center gap-1.5"
-                          style={{
-                            background: themeColors.button,
-                            boxShadow: `0 2px 8px ${themeColors.button}30`,
-                          }}
-                        >
-                          <FiUser className="w-3.5 h-3.5" />
-                          Assign Worker
-                        </button>
-                      </div>
-                    )}
                   </div>
+
+                  {/* Info Grid */}
+                  <div className="grid grid-cols-2 gap-3 mb-5 px-1">
+                    <div className="flex items-center gap-2 text-[10px] font-bold text-gray-400">
+                      <div className="w-6 h-6 rounded-lg bg-gray-50 flex items-center justify-center">
+                        <FiMapPin className="w-3.5 h-3.5" />
+                      </div>
+                      <span className="truncate">{job.location?.address}</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-[10px] font-bold text-gray-400">
+                      <div className="w-6 h-6 rounded-lg bg-gray-50 flex items-center justify-center">
+                        <FiClock className="w-3.5 h-3.5" />
+                      </div>
+                      <span className="truncate">{job.timeSlot?.time}</span>
+                    </div>
+                  </div>
+
+                  {/* Assigned Info */}
+                  {job.assignedTo && (
+                    <div className="flex items-center gap-2 px-3 py-2 bg-gray-50 rounded-2xl mb-4">
+                      <div className="w-6 h-6 rounded-full bg-white flex items-center justify-center shadow-sm">
+                        <FiUser className="w-3 h-3 text-black" />
+                      </div>
+                      <p className="text-[10px] font-bold text-gray-500">
+                        Assigned: <span className="text-gray-900">{job.assignedTo.name}</span>
+                      </p>
+                    </div>
+                  )}
+
+                  {/* Actions */}
+                  {['ACCEPTED', 'CONFIRMED'].includes(job.status?.toUpperCase()) && !job.assignedTo && (
+                    <div className="flex gap-3">
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleAssignToSelf(job.id);
+                        }}
+                        className="flex-1 py-3 rounded-2xl bg-white border border-black text-black text-[11px] font-black hover:bg-gray-50 transition-colors"
+                      >
+                        DO IT MYSELF
+                      </button>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          navigate(`/vendor/booking/${job.id}/assign-worker`);
+                        }}
+                        className="flex-1 py-3 rounded-2xl bg-black text-white text-[11px] font-black shadow-lg shadow-gray-200"
+                      >
+                        ASSIGN WORKER
+                      </button>
+                    </div>
+                  )}
                 </div>
               );
             })}

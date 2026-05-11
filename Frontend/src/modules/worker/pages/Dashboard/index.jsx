@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useLayoutEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FiBriefcase, FiCheckCircle, FiClock, FiTrendingUp, FiChevronRight, FiUser, FiBell, FiMapPin, FiArrowRight } from 'react-icons/fi';
-import { FaWallet } from 'react-icons/fa';
+import { FiBriefcase, FiCheckCircle, FiClock, FiTrendingUp, FiChevronRight, FiUser, FiBell, FiMapPin, FiArrowRight, FiSettings } from 'react-icons/fi';
+import { FaWallet, FaToggleOn, FaToggleOff } from 'react-icons/fa';
+import { toast } from 'react-hot-toast';
 import { workerTheme as themeColors, vendorTheme } from '../../../../theme';
 import Header from '../../components/layout/Header';
 import workerService from '../../../../services/workerService';
@@ -54,6 +55,9 @@ const Dashboard = () => {
     address: null,
   });
   const [recentJobs, setRecentJobs] = useState([]);
+  const [isOnline, setIsOnline] = useState(false);
+  const [statusUpdating, setStatusUpdating] = useState(false);
+  const [showAllCategories, setShowAllCategories] = useState(false);
 
   // Set background gradient
   useLayoutEffect(() => {
@@ -129,6 +133,10 @@ const Dashboard = () => {
         }
       }
 
+      if (profileRes.success) {
+        setIsOnline(profileRes.worker.status === 'ONLINE');
+      }
+
       setLoading(false);
     } catch (err) {
       console.error('Dashboard fetch error:', err);
@@ -173,6 +181,26 @@ const Dashboard = () => {
     return () => socket.off('notification', handleNotification);
   }, [socket]);
 
+  const toggleStatus = async () => {
+    try {
+      setStatusUpdating(true);
+      const newStatus = isOnline ? 'OFFLINE' : 'ONLINE';
+      const response = await workerService.updateStatus(newStatus);
+
+      if (response.success) {
+        setIsOnline(!isOnline);
+        toast.success(`You are now ${newStatus === 'ONLINE' ? 'Online' : 'Offline'}`);
+      } else {
+        toast.error(response.message || 'Failed to update status');
+      }
+    } catch (err) {
+      console.error('Status update error:', err);
+      toast.error('Failed to update status');
+    } finally {
+      setStatusUpdating(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen pb-20" style={{ background: themeColors.backgroundGradient }}>
@@ -216,51 +244,91 @@ const Dashboard = () => {
             <div className="relative z-10 flex items-center gap-3">
               {/* Profile Photo */}
               <div
-                className="w-14 h-14 rounded-full flex items-center justify-center shrink-0 overflow-hidden"
+                className="w-16 h-16 rounded-full flex items-center justify-center shrink-0 overflow-hidden"
                 style={{
                   background: `linear-gradient(135deg, ${themeColors.button} 0%, ${themeColors.button}dd 100%)`,
                   border: `2.5px solid #FFFFFF`,
                 }}
               >
-
                 {workerProfile.photo ? (
                   <OptimizedImage
                     src={workerProfile.photo}
                     alt={workerProfile.name}
                     className="w-full h-full object-cover"
-                    width={56}
-                    height={56}
+                    width={64}
+                    height={64}
                   />
                 ) : (
-                  <FiUser className="w-7 h-7" style={{ color: '#FFFFFF' }} />
+                  <FiUser className="w-8 h-8" style={{ color: '#FFFFFF' }} />
                 )}
               </div>
 
               {/* Profile Info */}
               <div className="flex-1 min-w-0">
-                <p className="text-lg font-bold uppercase tracking-wider mb-0.5" style={{
+                <p className="text-xl font-bold uppercase tracking-wider mb-0.5" style={{
                   color: '#FFFFFF',
                   textShadow: `1px 1px 0px rgba(0, 0, 0, 0.2)`,
-                  letterSpacing: '0.12em',
+                  letterSpacing: '0.1em',
                 }}>
                   WELCOME !
                 </p>
-                <h2 className="text-base font-bold text-white truncate mb-0.5">{workerProfile.name}</h2>
-                {workerProfile.categories && workerProfile.categories.length > 0 && (
-                  <p className="text-xs text-white truncate font-medium opacity-90">
-                    {workerProfile.categories.join(', ')}
-                  </p>
-                )}
+                <h2 className="text-lg font-bold text-white truncate mb-0">{workerProfile.name}</h2>
+                <p className="text-sm text-white truncate font-medium opacity-90 mb-1.5">
+                  Verified Professional
+                </p>
+
+                {/* Status Indicator */}
+                <div className="flex items-center gap-1.5">
+                  <div
+                    className={`w-2.5 h-2.5 rounded-full ${isOnline ? 'bg-green-400 animate-pulse' : 'bg-gray-400'}`}
+                    style={{
+                      boxShadow: isOnline ? '0 0 8px #4ade80' : 'none'
+                    }}
+                  />
+                  <span className="text-[11px] font-black uppercase text-white tracking-widest">
+                    {isOnline ? 'ACTIVE NOW' : 'OFFLINE NOW'}
+                  </span>
+                </div>
+              </div>
+
+              {/* Status Toggle Component */}
+              <div className="flex flex-col items-center gap-2">
+                <div
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    if (!statusUpdating) toggleStatus();
+                  }}
+                  className={`relative w-14 h-7 rounded-full cursor-pointer transition-all duration-300 ${isOnline ? 'bg-green-500' : 'bg-gray-400'
+                    }`}
+                  style={{
+                    boxShadow: isOnline ? 'inset 0 2px 4px rgba(0,0,0,0.1), 0 0 10px rgba(34, 197, 94, 0.3)' : 'inset 0 2px 4px rgba(0,0,0,0.1)',
+                  }}
+                >
+                  {/* Toggle Handle */}
+                  <div
+                    className={`absolute top-1 w-5 h-5 bg-white rounded-full transition-all duration-300 flex items-center justify-center shadow-md ${isOnline ? 'left-8' : 'left-1'
+                      }`}
+                  >
+                    {statusUpdating ? (
+                      <div className="w-3 h-3 border-2 border-gray-300 border-t-green-500 rounded-full animate-spin" />
+                    ) : (
+                      <div className={`w-1.5 h-1.5 rounded-full ${isOnline ? 'bg-green-500' : 'bg-gray-400'}`} />
+                    )}
+                  </div>
+                </div>
+                <span className="text-[9px] font-black text-white uppercase tracking-tighter opacity-90">
+                  {isOnline ? 'GO OFFLINE' : 'GO ONLINE'}
+                </span>
               </div>
 
               {/* Arrow Icon */}
               <div
-                className="p-2.5 rounded-lg shrink-0"
+                className="p-2.5 rounded-xl shrink-0"
                 style={{
-                  background: 'rgba(255, 255, 255, 0.35)',
+                  background: 'rgba(255, 255, 255, 0.25)',
                   backdropFilter: 'blur(10px)',
-                  boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)',
-                  border: '1px solid rgba(255, 255, 255, 0.4)',
+                  boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
+                  border: '1.5px solid rgba(255, 255, 255, 0.3)',
                 }}
               >
                 <FiChevronRight className="w-6 h-6" style={{ color: '#FFFFFF', fontWeight: 'bold' }} />
@@ -295,186 +363,173 @@ const Dashboard = () => {
             </div>
           )}
 
-        {/* Stats Cards - Outside Gradient */}
+        {/* Service Categories Section - 3 Cards in a Row */}
+        {workerProfile.categories && workerProfile.categories.length > 0 && (
+          <div className="px-4 pt-4">
+            <div className="flex items-center justify-between mb-3 px-1">
+              <h3 className="text-sm font-black text-gray-800 uppercase tracking-wider">Service Expertise</h3>
+              {workerProfile.categories.length > 3 && (
+                <button
+                  onClick={() => setShowAllCategories(!showAllCategories)}
+                  className="text-[10px] font-bold text-blue-600 uppercase tracking-widest"
+                >
+                  {showAllCategories ? 'See Less' : 'See All'}
+                </button>
+              )}
+            </div>
+            <div className="grid grid-cols-3 gap-2.5">
+              {(showAllCategories ? workerProfile.categories : workerProfile.categories.slice(0, 3)).map((cat, index) => {
+                const colors = [
+                  { bg: '#f0fdf4', border: '#dcfce7', text: '#166534', btn: '#16a34a', iconBg: '#ffffff' }, // Green
+                  { bg: '#eff6ff', border: '#dbeafe', text: '#1e40af', btn: '#2563eb', iconBg: '#ffffff' }, // Blue
+                  { bg: '#fff7ed', border: '#ffedd5', text: '#9a3412', btn: '#ea580c', iconBg: '#ffffff' }, // Orange
+                  { bg: '#faf5ff', border: '#f3e8ff', text: '#6b21a8', btn: '#9333ea', iconBg: '#ffffff' }, // Purple
+                  { bg: '#fff1f2', border: '#ffe4e6', text: '#9f1239', btn: '#e11d48', iconBg: '#ffffff' }, // Rose
+                ];
+                const color = colors[index % colors.length];
+
+                return (
+                  <div
+                    key={cat}
+                    className="rounded-2xl p-2.5 flex flex-col items-center justify-center relative active:scale-95 transition-all text-center min-h-[110px]"
+                    style={{
+                      background: color.bg,
+                      border: `1px solid ${color.border}`,
+                      boxShadow: `0 4px 12px ${color.bg}88`,
+                    }}
+                  >
+                    {/* Category Icon Placeholder */}
+                    <div
+                      className="w-10 h-10 rounded-xl mb-2 flex items-center justify-center shadow-sm"
+                      style={{ background: color.iconBg }}
+                    >
+                      <FiSettings className="w-5 h-5" style={{ color: color.btn }} />
+                    </div>
+
+                    <h4 className="text-[11px] font-black leading-tight mb-0.5 truncate w-full" style={{ color: color.text }}>
+                      {cat}
+                    </h4>
+                    <p className="text-[8px] font-black uppercase tracking-widest opacity-60" style={{ color: color.text }}>
+                      PREMIUM
+                    </p>
+
+                    {/* Circular Arrow Button */}
+                    <div
+                      className="absolute bottom-1.5 right-1.5 w-5 h-5 rounded-full flex items-center justify-center shadow-md"
+                      style={{ background: color.btn }}
+                    >
+                      <FiArrowRight className="w-3 h-3 text-white" />
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* Earnings Highlight - Full Width */}
         <div className="px-4 pt-4">
-          <div className="grid grid-cols-2 gap-3 mb-4">
-            {/* Card 1: This Month Earnings - Dark Blue Gradient */}
+          <div
+            onClick={() => navigate('/worker/wallet')}
+            className="rounded-2xl p-5 relative overflow-hidden cursor-pointer active:scale-98 transition-all"
+            style={{
+              background: 'linear-gradient(135deg, #001947 0%, #003b77 100%)',
+              boxShadow: '0 10px 20px rgba(0, 25, 71, 0.2)',
+              border: '1.5px solid rgba(255, 255, 255, 0.1)',
+            }}
+          >
+            <div className="relative z-10 flex items-center justify-between">
+              <div>
+                <p className="text-[10px] text-white font-black opacity-70 uppercase tracking-[0.2em] mb-1">Total Earnings</p>
+                <h3 className="text-3xl font-black text-white tracking-tight">
+                  ₹{stats.thisMonthEarnings.toLocaleString()}
+                </h3>
+                <div className="flex items-center gap-1.5 mt-2 px-2 py-0.5 rounded-full bg-white/10 w-fit">
+                  <FiTrendingUp className="w-3 h-3 text-green-400" />
+                  <span className="text-[10px] text-white font-bold">This Month</span>
+                </div>
+              </div>
+              <div
+                className="w-14 h-14 rounded-2xl flex items-center justify-center"
+                style={{
+                  background: 'rgba(255, 255, 255, 0.15)',
+                  backdropFilter: 'blur(10px)',
+                  border: '1px solid rgba(255, 255, 255, 0.2)',
+                }}
+              >
+                <FaWallet className="w-7 h-7 text-white" />
+              </div>
+            </div>
+            {/* Decorative background shape */}
+            <div className="absolute -bottom-6 -right-6 w-32 h-32 bg-white/5 rounded-full blur-2xl" />
+          </div>
+        </div>
+
+        {/* Stats Grid - 3 Cards in a Row */}
+        <div className="px-4 pt-4">
+          <div className="grid grid-cols-3 gap-3 mb-4">
+            {/* Pending Jobs */}
             <div
               onClick={() => navigate('/worker/jobs')}
-              className="rounded-xl p-4 relative overflow-hidden cursor-pointer active:scale-95 transition-transform"
+              className="rounded-2xl p-3 flex flex-col items-center justify-center relative active:scale-95 transition-all text-center"
               style={{
-                background: 'linear-gradient(135deg, #001947 0%, #003b77 100%)',
-                border: '2px solid rgba(255, 255, 255, 0.2)',
+                background: '#fef3c7', // light amber
+                border: '1px solid #fde68a',
+                boxShadow: '0 4px 10px rgba(251, 191, 36, 0.1)',
               }}
             >
-              {/* Decorative Pattern */}
-              <div
-                className="absolute top-0 right-0 w-20 h-20 rounded-full opacity-20"
-                style={{
-                  background: 'radial-gradient(circle, rgba(255, 255, 255, 0.4) 0%, transparent 70%)',
-                  transform: 'translate(20px, -20px)',
-                }}
-              />
-              <div className="relative z-10">
-                <div className="flex items-start justify-between mb-3">
-                  <div className="flex-1">
-                    <p className="text-xs text-white font-semibold mb-1 opacity-90 uppercase tracking-wide">This Month</p>
-                    <p className="text-2xl font-bold text-white leading-tight">
-                      ₹{stats.thisMonthEarnings.toLocaleString()}
-                    </p>
-                  </div>
-                  <div
-                    className="p-3 rounded-xl flex-shrink-0"
-                    style={{
-                      background: 'rgba(255, 255, 255, 0.25)',
-                      backdropFilter: 'blur(10px)',
-                      boxShadow: '0 4px 16px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.3)',
-                      border: '1px solid rgba(255, 255, 255, 0.3)',
-                    }}
-                  >
-                    <FaWallet className="w-6 h-6" style={{ color: '#FFFFFF' }} />
-                  </div>
-                </div>
-                <div className="flex items-center gap-1 mt-2">
-                  <FiTrendingUp className="w-4 h-4 text-white opacity-80" />
-                  <span className="text-xs text-white opacity-80 font-medium">Earnings</span>
-                </div>
+              <div className="w-10 h-10 rounded-xl mb-2 flex items-center justify-center bg-white shadow-sm">
+                <FiClock className="w-5 h-5 text-amber-500" />
+              </div>
+              <p className="text-[14px] font-black text-amber-900 leading-tight">{stats.pendingJobs}</p>
+              <p className="text-[9px] font-bold text-amber-700 uppercase tracking-tighter">Pending</p>
+              <div className="absolute bottom-2 right-2 w-5 h-5 rounded-full bg-amber-500 flex items-center justify-center shadow-md">
+                <FiArrowRight className="w-3 h-3 text-white" />
               </div>
             </div>
 
-            {/* Card 2: Pending Jobs - Light Blue Gradient */}
+            {/* Accepted Jobs */}
             <div
               onClick={() => navigate('/worker/jobs')}
-              className="rounded-xl p-4 relative overflow-hidden cursor-pointer active:scale-95 transition-transform"
+              className="rounded-2xl p-3 flex flex-col items-center justify-center relative active:scale-95 transition-all text-center"
               style={{
-                background: 'linear-gradient(135deg, #406788 0%, #304a63 100%)',
-                border: '2px solid rgba(255, 255, 255, 0.2)',
+                background: '#e0f2fe', // light blue
+                border: '1px solid #bae6fd',
+                boxShadow: '0 4px 10px rgba(14, 165, 233, 0.1)',
               }}
             >
-              {/* Decorative Pattern */}
-              <div
-                className="absolute top-0 right-0 w-20 h-20 rounded-full opacity-20"
-                style={{
-                  background: 'radial-gradient(circle, rgba(255, 255, 255, 0.4) 0%, transparent 70%)',
-                  transform: 'translate(20px, -20px)',
-                }}
-              />
-              <div className="relative z-10">
-                <div className="flex items-start justify-between mb-3">
-                  <div className="flex-1">
-                    <p className="text-xs text-white font-semibold mb-1 opacity-90 uppercase tracking-wide">Pending Jobs</p>
-                    <p className="text-2xl font-bold text-white leading-tight">
-                      {stats.pendingJobs}
-                    </p>
-                  </div>
-                  <div
-                    className="p-3 rounded-xl flex-shrink-0"
-                    style={{
-                      background: 'rgba(255, 255, 255, 0.25)',
-                      backdropFilter: 'blur(10px)',
-                      boxShadow: '0 4px 16px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.3)',
-                      border: '1px solid rgba(255, 255, 255, 0.3)',
-                    }}
-                  >
-                    <FiClock className="w-6 h-6" style={{ color: '#FFFFFF' }} />
-                  </div>
-                </div>
-                <div className="flex items-center gap-1 mt-2">
-                  <FiCheckCircle className="w-4 h-4 text-white opacity-80" />
-                  <span className="text-xs text-white opacity-80 font-medium">Waiting</span>
-                </div>
+              <div className="w-10 h-10 rounded-xl mb-2 flex items-center justify-center bg-white shadow-sm">
+                <FiCheckCircle className="w-5 h-5 text-sky-500" />
+              </div>
+              <p className="text-[14px] font-black text-sky-900 leading-tight">{stats.acceptedJobs}</p>
+              <p className="text-[9px] font-bold text-sky-700 uppercase tracking-tighter">Accepted</p>
+              <div className="absolute bottom-2 right-2 w-5 h-5 rounded-full bg-sky-500 flex items-center justify-center shadow-md">
+                <FiArrowRight className="w-3 h-3 text-white" />
               </div>
             </div>
 
-            {/* Card 3: Accepted Jobs - Light Blue Gradient */}
+            {/* Completed Jobs */}
             <div
               onClick={() => navigate('/worker/jobs')}
-              className="rounded-xl p-4 relative overflow-hidden cursor-pointer active:scale-95 transition-transform"
+              className="rounded-2xl p-3 flex flex-col items-center justify-center relative active:scale-95 transition-all text-center"
               style={{
-                background: 'linear-gradient(135deg, #406788 0%, #304a63 100%)',
-                border: '2px solid rgba(255, 255, 255, 0.2)',
+                background: '#f0fdf4', // light green
+                border: '1px solid #dcfce7',
+                boxShadow: '0 4px 10px rgba(34, 197, 94, 0.1)',
               }}
             >
-              {/* Decorative Pattern */}
-              <div
-                className="absolute top-0 right-0 w-20 h-20 rounded-full opacity-20"
-                style={{
-                  background: 'radial-gradient(circle, rgba(255, 255, 255, 0.4) 0%, transparent 70%)',
-                  transform: 'translate(20px, -20px)',
-                }}
-              />
-              <div className="relative z-10">
-                <div className="flex items-start justify-between mb-3">
-                  <div className="flex-1">
-                    <p className="text-xs text-white font-semibold mb-1 opacity-90 uppercase tracking-wide">Accepted</p>
-                    <p className="text-2xl font-bold text-white leading-tight">
-                      {stats.acceptedJobs}
-                    </p>
-                  </div>
-                  <div
-                    className="p-3 rounded-xl flex-shrink-0"
-                    style={{
-                      background: 'rgba(255, 255, 255, 0.25)',
-                      backdropFilter: 'blur(10px)',
-                      boxShadow: '0 4px 16px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.3)',
-                      border: '1px solid rgba(255, 255, 255, 0.3)',
-                    }}
-                  >
-                    <FiCheckCircle className="w-6 h-6" style={{ color: '#FFFFFF' }} />
-                  </div>
-                </div>
-                <div className="flex items-center gap-1 mt-2">
-                  <FiBriefcase className="w-4 h-4 text-white opacity-80" />
-                  <span className="text-xs text-white opacity-80 font-medium">Active</span>
-                </div>
+              <div className="w-10 h-10 rounded-xl mb-2 flex items-center justify-center bg-white shadow-sm">
+                <FiBriefcase className="w-5 h-5 text-green-500" />
               </div>
-            </div>
-
-            {/* Card 4: Completed Jobs - Dark Blue Gradient */}
-            <div
-              onClick={() => navigate('/worker/jobs')}
-              className="rounded-xl p-4 relative overflow-hidden cursor-pointer active:scale-95 transition-transform"
-              style={{
-                background: 'linear-gradient(135deg, #001947 0%, #003b77 100%)',
-                border: '2px solid rgba(255, 255, 255, 0.2)',
-              }}
-            >
-              {/* Decorative Pattern */}
-              <div
-                className="absolute top-0 right-0 w-20 h-20 rounded-full opacity-20"
-                style={{
-                  background: 'radial-gradient(circle, rgba(255, 255, 255, 0.4) 0%, transparent 70%)',
-                  transform: 'translate(20px, -20px)',
-                }}
-              />
-              <div className="relative z-10">
-                <div className="flex items-start justify-between mb-3">
-                  <div className="flex-1">
-                    <p className="text-xs text-white font-semibold mb-1 opacity-90 uppercase tracking-wide">Completed</p>
-                    <p className="text-2xl font-bold text-white leading-tight">
-                      {stats.completedJobs}
-                    </p>
-                  </div>
-                  <div
-                    className="p-3 rounded-xl flex-shrink-0"
-                    style={{
-                      background: 'rgba(255, 255, 255, 0.25)',
-                      backdropFilter: 'blur(10px)',
-                      boxShadow: '0 4px 16px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.3)',
-                      border: '1px solid rgba(255, 255, 255, 0.3)',
-                    }}
-                  >
-                    <FiBriefcase className="w-6 h-6" style={{ color: '#FFFFFF' }} />
-                  </div>
-                </div>
-                <div className="flex items-center gap-1 mt-2">
-                  <FiCheckCircle className="w-4 h-4 text-white opacity-80" />
-                  <span className="text-xs text-white opacity-80 font-medium">Done</span>
-                </div>
+              <p className="text-[14px] font-black text-green-900 leading-tight">{stats.completedJobs}</p>
+              <p className="text-[9px] font-bold text-green-700 uppercase tracking-tighter">Completed</p>
+              <div className="absolute bottom-2 right-2 w-5 h-5 rounded-full bg-green-500 flex items-center justify-center shadow-md">
+                <FiArrowRight className="w-3 h-3 text-white" />
               </div>
             </div>
           </div>
         </div>
+
 
         {/* Recent Jobs Section */}
         <div className="px-4 pt-4 pb-6">
