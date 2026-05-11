@@ -154,28 +154,31 @@ const VendorTraining = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col items-center py-12 px-4 sm:px-6 lg:px-8">
-      <div className="sm:mx-auto sm:w-full sm:max-w-2xl text-center mb-8">
-        <Logo className="h-16 w-auto mx-auto" />
-        <h2 className="mt-4 text-3xl font-extrabold text-gray-900 tracking-tight">{trainingData.title || 'Partner Training'}</h2>
+    <div className="min-h-screen bg-white flex flex-col items-center py-16 px-5">
+      <div className="sm:mx-auto sm:w-full sm:max-w-2xl text-center mb-12">
+        <div className="w-20 h-20 bg-black rounded-[28px] flex items-center justify-center mx-auto mb-6 shadow-2xl shadow-gray-200">
+          <Logo className="h-10 w-auto invert" />
+        </div>
+        <h2 className="text-sm font-black text-black uppercase tracking-[0.4em] mb-2">{trainingData.title || 'Partner Training'}</h2>
+        <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Onboarding Protocol</p>
       </div>
 
       <div className="sm:mx-auto sm:w-full sm:max-w-3xl">
-        <div className="bg-white py-8 px-4 shadow-xl sm:rounded-2xl sm:px-10 border border-gray-100">
+        <div className="bg-white py-10 px-5 shadow-sm sm:rounded-[40px] sm:px-12 border border-gray-100">
           
-          <div className="flex items-center justify-center mb-8 border-b pb-6 text-sm font-medium">
-             <div className={`flex items-center ${step === 'video' ? 'text-[#347989]' : 'text-gray-400'}`}>
-                <FiPlayCircle className="mr-2" /> 1. Video Training
+          <div className="flex items-center justify-center mb-12 border-b border-gray-50 pb-8 text-[9px] font-black uppercase tracking-[0.2em]">
+             <div className={`flex items-center transition-colors ${step === 'video' ? 'text-black' : 'text-gray-300'}`}>
+                <FiPlayCircle className="mr-2 w-4 h-4" /> 01. Video Briefing
              </div>
-             <div className="w-12 h-px bg-gray-300 mx-4"></div>
-             <div className={`flex items-center ${step === 'mcq' || step === 'result' ? 'text-[#347989]' : 'text-gray-400'}`}>
-                <FiList className="mr-2" /> 2. Knowledge Test
+             <div className="w-16 h-[2px] bg-gray-50 mx-6"></div>
+             <div className={`flex items-center transition-colors ${step === 'mcq' || step === 'result' ? 'text-black' : 'text-gray-300'}`}>
+                <FiList className="mr-2 w-4 h-4" /> 02. Assessment
              </div>
           </div>
 
           {step === 'video' && (
-            <div className="space-y-6 animate-fade-in text-center">
-              <div className="bg-slate-900 rounded-xl aspect-video flex items-center justify-center relative overflow-hidden border-2 border-slate-800 shadow-2xl">
+            <div className="space-y-10 animate-fade-in text-center">
+              <div className="bg-black rounded-[32px] aspect-video flex items-center justify-center relative overflow-hidden shadow-2xl shadow-gray-300">
                 <iframe 
                   className="w-full h-full"
                   src={getEmbedUrl(trainingData.videoUrl)} 
@@ -184,21 +187,20 @@ const VendorTraining = () => {
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
                   allowFullScreen
                 ></iframe>
-                <div className="absolute inset-0 z-10 bg-transparent"></div>
+                <div className="absolute inset-0 z-10 bg-transparent pointer-events-none"></div>
               </div>
               
-              <div className="bg-orange-50 text-orange-800 p-4 rounded-xl flex items-center justify-center gap-3 border border-orange-100 font-bold text-lg">
-                 <FiAlertCircle className="animate-pulse" />
-                 <span>{isVideoWatched ? "Training Complete!" : `Unlocking Test in: ${timeLeft}s`}</span>
+              <div className="bg-gray-50 text-black p-6 rounded-[28px] border border-gray-100 flex flex-col items-center justify-center gap-2">
+                 <FiClock className={`w-5 h-5 ${!isVideoWatched ? 'animate-pulse' : ''}`} />
+                 <span className="text-[10px] font-black uppercase tracking-[0.2em]">{isVideoWatched ? "Briefing Complete" : `Unlocking Assessment: ${timeLeft}s`}</span>
               </div>
 
               <button
                 onClick={handleProceedToTest}
                 disabled={!isVideoWatched}
-                className="w-full py-4 px-4 rounded-xl text-white font-bold transition-all disabled:opacity-30 disabled:grayscale shadow-lg hover:shadow-xl transform active:scale-[0.98] text-lg"
-                style={{ backgroundColor: brandColor }}
+                className="w-full py-6 px-6 rounded-[32px] text-white font-black uppercase tracking-[0.3em] transition-all disabled:opacity-20 shadow-2xl shadow-gray-200 active:scale-[0.98] text-xs bg-black"
               >
-                {isVideoWatched ? 'Start Knowledge Test' : `Please Watch Full Video`}
+                {isVideoWatched ? 'Begin Assessment' : `Awaiting Completion`}
               </button>
             </div>
           )}
@@ -206,30 +208,45 @@ const VendorTraining = () => {
           {step === 'mcq' && (
             <div className="space-y-8 animate-fade-in">
               {trainingData.questions.map((q, index) => (
-                <div key={index} className="bg-gray-50 p-5 rounded-xl border border-gray-100 shadow-sm">
-                  <h4 className="font-bold text-gray-900 mb-4">{index + 1}. {q.question}</h4>
-                  <div className="space-y-2">
+                <div key={index} className="bg-gray-50 p-8 rounded-[32px] border border-gray-100 shadow-sm">
+                  <h4 className="text-[11px] font-black text-gray-900 uppercase tracking-widest mb-6 leading-relaxed">
+                    <span className="text-gray-300 mr-2">{String(index + 1).padStart(2, '0')}.</span> 
+                    {q.question}
+                  </h4>
+                  <div className="space-y-3">
                     {q.options.map((opt, optIdx) => (
-                      <label key={optIdx} className={`flex items-center p-3 rounded-lg border cursor-pointer transition-all ${answers[index] === optIdx ? 'border-[#347989] bg-[#347989]/5 shadow-sm' : 'border-gray-200 hover:border-gray-300 bg-white'}`}>
-                        <input type="radio" name={`q-${index}`} className="mr-3 text-[#347989]" checked={answers[index] === optIdx} onChange={() => handleOptionSelect(index, optIdx)}/>
-                        <span className="text-gray-700">{opt}</span>
+                      <label key={optIdx} className={`flex items-center p-5 rounded-2xl border cursor-pointer transition-all ${answers[index] === optIdx ? 'border-black bg-white shadow-xl shadow-gray-100' : 'border-gray-100 hover:border-gray-300 bg-white'}`}>
+                        <input type="radio" name={`q-${index}`} className="w-4 h-4 border-2 border-gray-200 checked:bg-black checked:border-black transition-all accent-black" checked={answers[index] === optIdx} onChange={() => handleOptionSelect(index, optIdx)}/>
+                        <span className="ml-4 text-[10px] font-black uppercase tracking-widest text-gray-700">{opt}</span>
                       </label>
                     ))}
                   </div>
                 </div>
               ))}
-              <button onClick={handleSubmitTest} className="w-full py-4 rounded-xl text-white font-bold shadow-lg" style={{ backgroundColor: brandColor }}>Submit Answers</button>
+              <button 
+                onClick={handleSubmitTest} 
+                className="w-full py-6 rounded-[32px] text-white font-black uppercase tracking-[0.3em] shadow-2xl shadow-gray-200 bg-black active:scale-95 transition-all text-xs"
+              >
+                Finalize Submission
+              </button>
             </div>
           )}
 
           {step === 'result' && (
-            <div className="text-center py-8 animate-fade-in space-y-6">
-              <div className="mx-auto w-24 h-24 rounded-full flex items-center justify-center" style={{ backgroundColor: score >= (trainingData.minimumScore || 3) ? '#d1fae5' : '#fee2e2', color: score >= (trainingData.minimumScore || 3) ? '#059669' : '#dc2626' }}>
-                {score >= (trainingData.minimumScore || 3) ? <FiCheckCircle size={48} /> : <FiAlertCircle size={48} />}
+            <div className="text-center py-10 animate-fade-in space-y-8">
+              <div className="mx-auto w-24 h-24 rounded-[32px] flex items-center justify-center shadow-xl shadow-gray-100" style={{ backgroundColor: score >= (trainingData.minimumScore || 3) ? '#000000' : '#f3f4f6', color: score >= (trainingData.minimumScore || 3) ? '#ffffff' : '#9ca3af' }}>
+                {score >= (trainingData.minimumScore || 3) ? <FiCheckCircle size={40} /> : <FiAlertCircle size={40} />}
               </div>
-              <h3 className="text-2xl font-bold text-gray-900">{score >= (trainingData.minimumScore || 3) ? 'Test Passed!' : 'Test Failed'}</h3>
-              <p className="text-gray-500">Score: {score} / {trainingData.questions.length}</p>
-              <button onClick={handleFinish} className="w-full py-4 rounded-xl text-white font-bold shadow-lg" style={{ backgroundColor: brandColor }}>{score >= (trainingData.minimumScore || 3) ? 'Go to Login' : 'Retry'}</button>
+              <div>
+                <h3 className="text-sm font-black text-gray-900 uppercase tracking-[0.3em] mb-2">{score >= (trainingData.minimumScore || 3) ? 'Credential Verified' : 'Assessment Failed'}</h3>
+                <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Accuracy Level: {score} / {trainingData.questions.length}</p>
+              </div>
+              <button 
+                onClick={handleFinish} 
+                className="w-full py-6 rounded-[32px] text-white font-black uppercase tracking-[0.3em] shadow-2xl shadow-gray-200 bg-black active:scale-95 transition-all text-xs"
+              >
+                {score >= (trainingData.minimumScore || 3) ? 'Access Portal' : 'Re-Attempt Briefing'}
+              </button>
             </div>
           )}
         </div>

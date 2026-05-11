@@ -29,21 +29,42 @@ import userBannerService from '../../../../services/userBannerService';
 import LogoLoader from '../../../../components/common/LogoLoader';
 import AddressSelectionModal from '../Checkout/components/AddressSelectionModal';
 import ScrapPromotionCard from './components/ScrapPromotionCard';
+const OrderTrackingBar = lazy(() => import('./components/OrderTrackingBar'));
+const StatsBar = lazy(() => import('./components/StatsBar'));
+const AppDownloadBanner = lazy(() => import('./components/AppDownloadBanner'));
+const HowItWorks = lazy(() => import('./components/HowItWorks'));
+const AboutUs = lazy(() => import('./components/AboutUs'));
+const OffersSection = lazy(() => import('./components/OffersSection'));
+const ContactUs = lazy(() => import('./components/ContactUs'));
 
 
 
-
-const toAssetUrl = (url) => {
-  if (!url) return '';
-  const clean = url.replace('/api/upload', '/upload');
-  if (clean.startsWith('http')) return clean;
-  const base = (import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000').replace(/\/api$/, '');
-  return `${base}${clean.startsWith('/') ? '' : '/'}${clean}`;
-};
 
 const Home = () => {
   const navigate = useNavigate();
   const location = useLocation();
+
+  // Handle Hash Scroll
+  useEffect(() => {
+    if (location.hash) {
+      const id = location.hash.replace('#', '');
+      setTimeout(() => {
+        const element = document.getElementById(id);
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }, 500); // Wait for content to load
+    }
+  }, [location.hash]);
+
+  const toAssetUrl = (url) => {
+    if (!url) return '';
+    const clean = url.replace('/api/upload', '/upload');
+    if (clean.startsWith('http')) return clean;
+    const base = (import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000').replace(/\/api$/, '');
+    return `${base}${clean.startsWith('/') ? '' : '/'}${clean}`;
+  };
+
   const [address, setAddress] = useState(localStorage.getItem('currentAddress') || 'Select Location');
   const [coords, setCoords] = useState(() => {
     const saved = localStorage.getItem('currentCoords');
@@ -258,8 +279,17 @@ const Home = () => {
     if (location.state?.scrollToTop) {
       window.scrollTo({ top: 0, behavior: 'instant' });
       window.history.replaceState({}, '', location.pathname);
+    } else if (location.hash) {
+      // Small delay to ensure content is rendered
+      setTimeout(() => {
+        const id = location.hash.replace('#', '');
+        const element = document.getElementById(id);
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth' });
+        }
+      }, 500);
     }
-  }, [location.state?.scrollToTop, location.pathname]);
+  }, [location.state?.scrollToTop, location.pathname, location.hash]);
 
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
@@ -281,7 +311,8 @@ const Home = () => {
               slug: cat.slug,
               icon: toAssetUrl(cat.icon),
               hasSaleBadge: cat.hasSaleBadge,
-              badge: cat.badge
+              badge: cat.badge,
+              description: cat.description
             }));
             setCategories(mappedCategories);
           }
@@ -497,20 +528,54 @@ const Home = () => {
           <Header
             location={address}
             onLocationClick={handleLocationClick}
+            navLinks={homeContent?.navLinks}
+            siteIdentity={homeContent?.siteIdentity}
+            homeContent={homeContent}
           />
         </motion.div>
 
-        {!isSearchOpen && <HeroBanner banners={offerBanners} onSearchClick={() => setIsSearchOpen(true)} />}
+        {!isSearchOpen && (
+          <HeroBanner 
+            banners={offerBanners} 
+            onSearchClick={() => setIsSearchOpen(true)} 
+            heroData={homeContent?.heroSection}
+          />
+        )}
+
+
+
+        {/* Top-level Info Sections (Requested at Top) */}
+        <div className="space-y-8 mt-6">
+          {homeContent?.isHowItWorksVisible !== false && homeContent?.howItWorks?.items?.length > 0 && (
+            <Suspense fallback={<div className="h-40 bg-gray-50 animate-pulse rounded-xl mx-4" />}>
+              <div id="how-it-works">
+                <HowItWorks data={homeContent?.howItWorks} />
+              </div>
+            </Suspense>
+          )}
+
+          {homeContent?.isOffersVisible !== false && homeContent?.offers?.items?.length > 0 && (
+            <Suspense fallback={<div className="h-40 bg-gray-50 animate-pulse rounded-xl mx-4" />}>
+              <div id="offers">
+                <OffersSection data={homeContent?.offers} />
+              </div>
+            </Suspense>
+          )}
+        </div>
 
         {/* Dynamic Service Quick Links - New Premium Design */}
         {homeContent?.isCategoriesVisible !== false && (
-          <motion.section variants={itemVariants}>
+          <motion.section variants={itemVariants} id="services">
             <ServiceQuickLinks 
               categories={categories} 
               onCategoryClick={handleCategoryClick} 
             />
           </motion.section>
         )}
+
+
+
+
 
         {/* Hero Section - Promo Carousel */}
         {homeContent?.isPromosVisible !== false && (
@@ -534,44 +599,8 @@ const Home = () => {
         )}
 
         <main className="pt-6 space-y-8 pb-24 max-w-screen-xl mx-auto w-full">
-          {!isLocationSupported ? (
-            <div className="flex flex-col items-center justify-center pt-20 pb-10 px-6 text-center min-h-[60vh]">
-              <div className="w-24 h-24 bg-red-50 rounded-full flex items-center justify-center mb-6">
-                <svg className="w-12 h-12 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 3l18 18" />
-                </svg>
-              </div>
-              <h2 className="text-xl font-bold text-gray-900 mb-2">
-                Not service available in your city
-              </h2>
-              <p className="text-gray-500 max-w-xs mx-auto mb-8 font-medium">
-                Please fast! We are coming soon.
-              </p>
-              <button
-                onClick={() => setIsAddressModalOpen(true)}
-                className="px-6 py-3 bg-primary-600 text-white rounded-xl font-semibold shadow-md hover:bg-primary-700 transition-all font-bold"
-                style={{ backgroundColor: '#2874f0' }}
-              >
-                Change Location
-              </button>
-            </div>
-          ) : (
-            <>
               {/* All Categories Section (Optional/Secondary) */}
-              {homeContent?.isCategoriesVisible !== false && categories.length > 4 && (
-                <motion.section variants={itemVariants} className="relative overflow-hidden">
-                  <div className="px-5 mb-4">
-                    <h2 className="text-lg font-black text-gray-900">Explore All Categories</h2>
-                  </div>
-                  <ServiceCategories
-                    categories={categories}
-                    onCategoryClick={handleCategoryClick}
-                    onSeeAllClick={() => { }}
-                  />
-                </motion.section>
-              )}
+              {/* Categories Section removed as redundant with QuickLinks */}
 
 
 
@@ -635,27 +664,7 @@ const Home = () => {
                 </motion.div>
               )}
 
-              {/* Dynamic Banner 1 */}
-              {homeContent?.isBannersVisible !== false && (
-                <motion.div variants={itemVariants}>
-                  <Suspense fallback={<div className="h-32 bg-gray-50 animate-pulse rounded-xl mx-4" />}>
-                    <Banner
-                      imageUrl={homeContent?.banners?.[0] ? toAssetUrl(homeContent.banners[0].imageUrl) : null}
-                      onClick={() => {
-                        const b = homeContent?.banners?.[0];
-                        if (b?.slug) {
-                          navigate(`/user/${b.slug}`);
-                          return;
-                        }
-                        if (b?.targetCategoryId) {
-                          const cat = categories.find(c => c.id === b.targetCategoryId);
-                          if (cat) handleCategoryClick(cat);
-                        }
-                      }}
-                    />
-                  </Suspense>
-                </motion.div>
-              )}
+
 
               {/* Dynamic Sections */}
               {homeContent?.isCategorySectionsVisible !== false && (homeContent?.categorySections || []).sort((a, b) => (a.order || 0) - (b.order || 0)).map((section, sIdx) => (
@@ -692,32 +701,18 @@ const Home = () => {
                 </motion.div>
               ))}
 
-              {/* Dynamic Banner 2 */}
-              {homeContent?.isBannersVisible !== false && (
-                <motion.div variants={itemVariants}>
-                  <Suspense fallback={<div className="h-32 bg-gray-50 animate-pulse rounded-xl mx-4" />}>
-                    <Banner
-                      imageUrl={homeContent?.banners?.[1] ? toAssetUrl(homeContent.banners[1].imageUrl) : null}
-                      onClick={() => {
-                        const b = homeContent?.banners?.[1];
-                        if (b?.targetCategoryId) {
-                          const cat = categories.find(c => (c.id === b.targetCategoryId || c._id === b.targetCategoryId));
-                          if (cat) handleCategoryClick(cat);
-                        }
-                      }}
-                    />
-                  </Suspense>
-                </motion.div>
-              )}
 
-              {/* Refer & Earn Section */}
-              <motion.div variants={itemVariants}>
+
+
+
+              {/* Footer Space */}
+              <div className="h-10" />
+
+              {!isSearchOpen && homeContent?.isAppDownloadVisible !== false && (
                 <Suspense fallback={<div className="h-32 bg-gray-50 animate-pulse rounded-xl mx-4" />}>
-                  <ReferEarnSection onReferClick={handleReferClick} />
+                  <AppDownloadBanner appData={homeContent?.appDownload} />
                 </Suspense>
-              </motion.div>
-            </>
-          )}
+              )}
         </main>
       </motion.div>
 

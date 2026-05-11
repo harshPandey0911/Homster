@@ -91,15 +91,29 @@ const categorySchema = new mongoose.Schema({
   timestamps: true
 });
 
-// Generate slug from title before validation
+// Generate slug from title before validation with duplicate handling
 categorySchema.pre('validate', async function (next) {
   if (this.isModified('title') && !this.slug) {
-    this.slug = this.title
+    let baseSlug = this.title
       .toLowerCase()
       .replace(/[^a-z0-9\s-]/g, '')
       .replace(/\s+/g, '-')
       .replace(/-+/g, '-')
       .replace(/(^-|-$)/g, '');
+    
+    let generatedSlug = baseSlug;
+    let count = 1;
+    
+    // Check for uniqueness within the Category collection
+    while (true) {
+      const existingCategory = await mongoose.models.Category.findOne({ slug: generatedSlug });
+      if (!existingCategory || (this._id && existingCategory._id.equals(this._id))) {
+        break;
+      }
+      generatedSlug = `${baseSlug}-${count++}`;
+    }
+    
+    this.slug = generatedSlug;
   }
   next();
 });
